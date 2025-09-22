@@ -23,7 +23,7 @@ export default function ConversationPage({ params }: ConversationPageProps) {
 
   // Get the other participant(s)
   const otherParticipantIds = conversation.participants.filter(id => id !== currentUser.id);
-  const otherParticipants = otherParticipantIds.map(id => getUserById(id)).filter(Boolean);
+  const otherParticipants = otherParticipantIds.map(id => getUserById(id)).filter((user): user is NonNullable<typeof user> => Boolean(user));
 
   // Get property info if this conversation is about a specific property
   const property = conversation.propertyId ? getPropertyById(conversation.propertyId) : null;
