@@ -26,7 +26,7 @@ export default function ConversationPage({ params }: ConversationPageProps) {
   const otherParticipants = otherParticipantIds.map(id => getUserById(id)).filter((user): user is NonNullable<typeof user> => Boolean(user));
 
   // Get property info if this conversation is about a specific property
-  const property = conversation.propertyId ? getPropertyById(conversation.propertyId) : null;
+  const property = conversation.propertyId ? getPropertyById(conversation.propertyId) || null : null;
 
   // Determine conversation title
   const conversationTitle = conversation.isGroup
