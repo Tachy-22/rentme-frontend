@@ -27,19 +27,31 @@ export function SearchBar({ onSearch, onFilterChange, selectedFilters }: SearchB
   );
 
   const handleQuickFilter = (filter: string) => {
-    let newFilters = { ...localFilters };
+    let newFilters: SearchFilters;
 
     if (filter === 'All') {
-      newFilters.propertyTypes = [];
-      newFilters.priceRange = { min: 0, max: 1000000 };
+      newFilters = {
+        ...localFilters,
+        propertyTypes: [],
+        priceRange: { min: 0, max: 1000000 }
+      };
     } else if (filter === 'Under ₦300k') {
-      newFilters.priceRange = { min: 0, max: 300000 };
+      newFilters = {
+        ...localFilters,
+        priceRange: { min: 0, max: 300000 }
+      };
     } else {
       const propertyType = filter.toLowerCase() as PropertyType;
-      if (newFilters.propertyTypes.includes(propertyType)) {
-        newFilters.propertyTypes = newFilters.propertyTypes.filter(type => type !== propertyType);
+      if (localFilters.propertyTypes.includes(propertyType)) {
+        newFilters = {
+          ...localFilters,
+          propertyTypes: localFilters.propertyTypes.filter(type => type !== propertyType)
+        };
       } else {
-        newFilters.propertyTypes = [propertyType];
+        newFilters = {
+          ...localFilters,
+          propertyTypes: [propertyType]
+        };
       }
     }
 
