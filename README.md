@@ -7,7 +7,7 @@ A mobile-first platform connecting university students with accommodation agents
 - **Framework**: Next.js 15 (App Router)
 - **Styling**: Tailwind CSS (LinkedIn-inspired UX patterns)
 - **Animations**: Framer Motion
-- **Backend**: Firebase (Auth, Firestore, Storage)
+- **Backend**: Firebase (Auth, Firestore, Real time data base, Storage), Cloudinary (For image storage)
 - **Language**: TypeScript
 - **Design Philosophy**: Mobile-first native app feel with web responsiveness
 
