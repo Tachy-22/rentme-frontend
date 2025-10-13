@@ -265,7 +265,11 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
           },
           details: formData.details,
           amenities: formData.amenities,
-          images: formData.images,
+          images: formData.images.map(img => ({
+            id: ('id' in img ? img.id : img.publicId),
+            url: img.url,
+            alt: ('alt' in img ? img.alt : img.caption) || ''
+          })),
           status: formData.status
         };
 
