@@ -68,8 +68,8 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
       address: property?.location.address || '',
       city: property?.location.city || '',
       state: property?.location.state || '',
-      zipCode: property?.location.zipCode || '',
-      neighborhood: property?.location.neighborhood || '',
+      zipCode: (property?.location as unknown as { zipCode?: string })?.zipCode || '',
+      neighborhood: (property?.location as unknown as { neighborhood?: string })?.neighborhood || '',
       coordinates: property?.location.coordinates ? { lat: property.location.coordinates.latitude, lng: property.location.coordinates.longitude } : { lat: 0, lng: 0 },
       nearbyUniversities: property?.location.nearbyUniversities || [] as string[]
     },
@@ -85,8 +85,8 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
       smokingAllowed: property?.details.smokingAllowed || false,
       availableFrom: property?.details.availableFrom || '',
       leaseTerm: {
-        min: property?.details.leaseTerm?.min || 6,
-        max: property?.details.leaseTerm?.max || 12
+        min: (property?.details as unknown as { leaseTerm?: { min?: number; max?: number } })?.leaseTerm?.min || 6,
+        max: (property?.details as unknown as { leaseTerm?: { min?: number; max?: number } })?.leaseTerm?.max || 12
       }
     },
     amenities: property?.amenities || [] as string[],
@@ -201,8 +201,8 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
             city: formData.location.city,
             state: formData.location.state,
             coordinates: {
-              latitude: formData.location.coordinates.lat || formData.location.coordinates.latitude || 0,
-              longitude: formData.location.coordinates.lng || formData.location.coordinates.longitude || 0
+              latitude: ('lat' in formData.location.coordinates ? formData.location.coordinates.lat : formData.location.coordinates.latitude) || 0,
+              longitude: ('lng' in formData.location.coordinates ? formData.location.coordinates.lng : formData.location.coordinates.longitude) || 0
             },
             nearbyUniversities: formData.location.nearbyUniversities
           },
@@ -227,9 +227,9 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
           images: formData.images.map(img => ({
             url: img.url,
             publicId: ('id' in img ? img.id : img.publicId),
-            width: img.width || 800,
-            height: img.height || 600,
-            format: img.format || 'jpg',
+            width: ('width' in img ? img.width : 800) || 800,
+            height: ('height' in img ? img.height : 600) || 600,
+            format: ('format' in img ? img.format : 'jpg') || 'jpg',
             caption: ('alt' in img ? img.alt : img.caption)
           })),
           virtualTourUrl: '',
@@ -256,8 +256,8 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
           location: {
             ...formData.location,
             coordinates: {
-              lat: formData.location.coordinates.lat || formData.location.coordinates.latitude || 0,
-              lng: formData.location.coordinates.lng || formData.location.coordinates.longitude || 0
+              lat: ('lat' in formData.location.coordinates ? formData.location.coordinates.lat : formData.location.coordinates.latitude) || 0,
+              lng: ('lng' in formData.location.coordinates ? formData.location.coordinates.lng : formData.location.coordinates.longitude) || 0
             }
           },
           details: formData.details,
