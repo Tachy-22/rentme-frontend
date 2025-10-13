@@ -84,7 +84,7 @@ export async function getSavedSearches(userId: string): Promise<GetSavedSearches
     });
 
     if (result.success) {
-      const searches = result.data?.map(doc => doc as SavedSearch) || [];
+      const searches = result.data?.map(doc => doc as unknown as SavedSearch) || [];
       return {
         success: true,
         searches

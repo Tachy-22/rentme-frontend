@@ -27,7 +27,7 @@ export async function getMessages(conversationId: string) {
     }
 
     // Filter messages by conversation ID (client-side filtering for realtime DB)
-    const conversationMessages = (result.data as MessageData[]).filter((message) => 
+    const conversationMessages = (result.data as unknown as MessageData[]).filter((message) => 
       message.conversationId === conversationId
     );
 

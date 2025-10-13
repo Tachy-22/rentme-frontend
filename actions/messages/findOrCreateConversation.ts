@@ -19,7 +19,7 @@ export async function findOrCreateConversation(userId: string, otherUserId: stri
 
     if (result.success && result.data) {
       // Check if any conversation includes both users for this property
-      const existingConversation = (result.data as ConversationData[]).find((conv) => 
+      const existingConversation = (result.data as unknown as ConversationData[]).find((conv) => 
         conv.participantIds && 
         conv.participantIds.includes(userId) &&
         conv.participantIds.includes(otherUserId) &&

@@ -193,11 +193,11 @@ export function AgentApplicationsClient({ user, applications }: AgentApplication
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <span className="font-medium text-muted-foreground">Occupation:</span>
-                        <p>{application.renter.profile.occupation}</p>
+                        <p>{(application.renter.profile as any).occupation || 'N/A'}</p>
                       </div>
                       <div>
                         <span className="font-medium text-muted-foreground">Monthly Income:</span>
-                        <p>${application.renter.profile.monthlyIncome?.toLocaleString()}</p>
+                        <p>${(application.renter.profile as any).monthlyIncome?.toLocaleString() || 'N/A'}</p>
                       </div>
                       <div>
                         <span className="font-medium text-muted-foreground">Phone:</span>
@@ -211,7 +211,7 @@ export function AgentApplicationsClient({ user, applications }: AgentApplication
                     <div className="space-y-2">
                       <h4 className="font-medium">Personal Message</h4>
                       <p className="text-sm text-muted-foreground">
-                        {application.personalInfo.bio || 'No message provided'}
+                        {(application.personalInfo as any)?.bio || 'No message provided'}
                       </p>
                     </div>
                   )}

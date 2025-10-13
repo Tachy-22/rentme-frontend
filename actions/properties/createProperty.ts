@@ -7,7 +7,7 @@ interface CreatePropertyParams {
   agentId: string;
   title: string;
   description: string;
-  type: 'apartment' | 'house' | 'room' | 'studio' | 'shared';
+  type: 'apartment' | 'house' | 'room' | 'studio' | 'shared' | 'shared_room' | 'lodge';
   price: {
     amount: number;
     currency: string;

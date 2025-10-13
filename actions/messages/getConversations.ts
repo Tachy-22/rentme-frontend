@@ -49,7 +49,7 @@ export async function getConversations(userId: string) {
     }
 
     // Filter conversations where user is a participant and enrich with participant and property data
-    const userConversations = (result.data as ConversationData[]).filter((conversation) => 
+    const userConversations = (result.data as unknown as ConversationData[]).filter((conversation) => 
       conversation.participantIds && conversation.participantIds.includes(userId)
     );
 
@@ -79,8 +79,8 @@ export async function getConversations(userId: string) {
             return null;
           }
 
-          const participant = participantResult.data as UserData;
-          const property = propertyResult.data as PropertyData;
+          const participant = participantResult.data as unknown as UserData;
+          const property = propertyResult.data as unknown as PropertyData;
 
           if (!participant || !property) {
             return null;
@@ -103,7 +103,7 @@ export async function getConversations(userId: string) {
                 hour: '2-digit', 
                 minute: '2-digit' 
               }),
-              unread: conversation.unreadCounts?.[userId] > 0 || false
+              unread: (conversation.unreadCounts?.[userId] ?? 0) > 0 || false
             } : {
               content: 'No messages yet',
               timestamp: '',

@@ -31,7 +31,7 @@ export default async function EditPropertyPage({ params }: EditPropertyPageProps
     redirect('/agent/properties');
   }
 
-  const property = propertyResult.data as Property;
+  const property = propertyResult.data as unknown as Property;
 
   // Ensure the agent owns this property
   if (property.agentId !== user.id) {

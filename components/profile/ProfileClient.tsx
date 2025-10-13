@@ -149,6 +149,10 @@ export function ProfileClient({ user }: ProfileClientProps) {
 
   const role = watch('role') as UserRole;
 
+  // Type-safe helpers for discriminated union form
+  const safeRegister = register as unknown as (name: string) => Record<string, unknown>;
+  const safeErrors = errors as unknown as Record<string, { message?: string }>;
+
   const onSubmit = async (data: ProfileFormData) => {
     setIsLoading(true);
     setError('');
@@ -187,11 +191,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
               <Label htmlFor="occupation">Occupation</Label>
               <Input
                 id="occupation"
-                {...register('occupation')}
+                {...safeRegister('occupation')}
                 placeholder="Your current occupation"
               />
-              {errors.occupation && (
-                <p className="text-sm text-destructive">{errors.occupation?.message}</p>
+              {safeErrors.occupation && (
+                <p className="text-sm text-destructive">{safeErrors.occupation?.message}</p>
               )}
             </div>
 

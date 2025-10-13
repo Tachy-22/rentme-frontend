@@ -42,7 +42,7 @@ export async function getRenterApplications(
     const applications: EnrichedApplication[] = [];
     
     if (applicationsResult.data) {
-      for (const applicationData of applicationsResult.data as Application[]) {
+      for (const applicationData of applicationsResult.data as unknown as Application[]) {
         // Fetch property details
         let property: Property | undefined;
         try {

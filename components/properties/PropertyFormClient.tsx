@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Property, PropertyType } from '@/types';
+import { User, Property, PropertyType, CloudinaryImage } from '@/types';
 import { createProperty } from '@/actions/properties/createProperty';
 import { updateProperty } from '@/actions/properties/updateProperty';
 import { uploadImage } from '@/actions/upload/uploadImage';
@@ -70,7 +70,7 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
       state: property?.location.state || '',
       zipCode: property?.location.zipCode || '',
       neighborhood: property?.location.neighborhood || '',
-      coordinates: property?.location.coordinates || { lat: 0, lng: 0 },
+      coordinates: property?.location.coordinates ? { lat: property.location.coordinates.latitude, lng: property.location.coordinates.longitude } : { lat: 0, lng: 0 },
       nearbyUniversities: property?.location.nearbyUniversities || [] as string[]
     },
     details: {
@@ -90,7 +90,7 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
       }
     },
     amenities: property?.amenities || [] as string[],
-    images: property?.images || [] as Array<{ id: string; url: string; alt: string }>,
+    images: property?.images || [] as Array<CloudinaryImage | { id: string; url: string; alt: string }>,
     status: property?.status || 'available'
   });
 
@@ -174,7 +174,7 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
   const removeImage = (imageId: string) => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter(img => img.id !== imageId)
+      images: prev.images.filter(img => ('id' in img ? img.id : img.publicId) !== imageId)
     }));
   };
 
@@ -201,8 +201,8 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
             city: formData.location.city,
             state: formData.location.state,
             coordinates: {
-              latitude: formData.location.coordinates.lat,
-              longitude: formData.location.coordinates.lng
+              latitude: formData.location.coordinates.lat || formData.location.coordinates.latitude || 0,
+              longitude: formData.location.coordinates.lng || formData.location.coordinates.longitude || 0
             },
             nearbyUniversities: formData.location.nearbyUniversities
           },
@@ -225,12 +225,12 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
           },
           amenities: formData.amenities,
           images: formData.images.map(img => ({
-            id: img.id,
             url: img.url,
-            alt: img.alt,
-            width: 800,
-            height: 600,
-            publicId: img.id
+            publicId: ('id' in img ? img.id : img.publicId),
+            width: img.width || 800,
+            height: img.height || 600,
+            format: img.format || 'jpg',
+            caption: ('alt' in img ? img.alt : img.caption)
           })),
           virtualTourUrl: '',
           utilities: {
@@ -253,7 +253,13 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
           description: formData.description,
           type: formData.type,
           price: formData.price,
-          location: formData.location,
+          location: {
+            ...formData.location,
+            coordinates: {
+              lat: formData.location.coordinates.lat || formData.location.coordinates.latitude || 0,
+              lng: formData.location.coordinates.lng || formData.location.coordinates.longitude || 0
+            }
+          },
           details: formData.details,
           amenities: formData.amenities,
           images: formData.images,
@@ -662,10 +668,10 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
               {formData.images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {formData.images.map((image) => (
-                    <div key={image.id} className="relative group">
+                    <div key={('id' in image ? image.id : image.publicId)} className="relative group">
                       <img
                         src={image.url}
-                        alt={image.alt}
+                        alt={('alt' in image ? image.alt : image.caption) || ''}
                         className="w-full h-32 object-cover rounded-lg"
                       />
                       <Button
@@ -673,7 +679,7 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
                         variant="destructive"
                         size="icon"
                         className="absolute top-2 right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => removeImage(image.id)}
+                        onClick={() => removeImage(('id' in image ? image.id : image.publicId))}
                       >
                         <X className="h-3 w-3" />
                       </Button>

@@ -18,6 +18,7 @@ export default async function AgentMessagesPage() {
   const conversations: Array<{
     id: string;
     participant: {
+      id: string;
       name: string;
       avatar: string;
       role: string;

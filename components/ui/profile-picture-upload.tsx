@@ -73,14 +73,9 @@ export function ProfilePictureUpload({
     setUploadProgress(0);
 
     try {
-      // Convert file to base64
-      setUploadProgress(25);
-      const base64Data = await convertFileToBase64(file);
-      
-      setUploadProgress(50);
-
       // Upload to Cloudinary with profile picture transformations
-      const result = await uploadImage(base64Data, 'rentme/profiles', {
+      setUploadProgress(25);
+      const result = await uploadImage(file, 'rentme/profiles', {
         width: 400,
         height: 400,
         crop: 'fill',
