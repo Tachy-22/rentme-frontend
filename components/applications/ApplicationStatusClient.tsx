@@ -265,7 +265,7 @@ export function ApplicationStatusClient({
                 {application.status === 'pending' && (
                   <>
                     <p>• Your application is being reviewed</p>
-                    <p>• You'll receive an update within 24-48 hours</p>
+                    <p>• You&apos;ll receive an update within 24-48 hours</p>
                     <p>• The agent may contact you for additional information</p>
                   </>
                 )}

@@ -33,7 +33,7 @@ const WaitlistForm = () => {
       } else {
         setSubmitMessage(`❌ ${result.message}`);
       }
-    } catch (error) {
+    } catch {
       setSubmitMessage('❌ An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);

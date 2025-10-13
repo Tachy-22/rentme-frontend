@@ -1,6 +1,6 @@
 'use client'
 
-import { SetStateAction, useState } from 'react'
+import { useState } from 'react'
 import { Trash2, Download, RefreshCw } from 'lucide-react'
 import { getWaitlistData } from '@/actions/waitlist/getWaitlistData'
 import { deleteRenter } from '@/actions/waitlist/deleteRenter'
@@ -44,7 +44,7 @@ export default function AdminPage() {
       } else {
         setError(result.error || 'Failed to fetch data')
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while fetching data')
     } finally {
       setIsLoading(false)
@@ -64,7 +64,7 @@ export default function AdminPage() {
       } else {
         setError(result.error || 'Failed to delete renter')
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred while deleting renter')
     } finally {
       setDeletingId(null)

@@ -333,7 +333,7 @@ export function PropertyDetailClient({ property, agent, user }: PropertyDetailCl
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Submit your application to rent this property. You'll need to provide 
+                    Submit your application to rent this property. You&apos;ll need to provide 
                     documentation and personal information.
                   </p>
                   

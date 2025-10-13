@@ -13,11 +13,7 @@ import {
   MessageSquare, 
   Eye, 
   Plus, 
-  TrendingUp, 
-  DollarSign,
-  Users,
-  Calendar,
-  Star
+  DollarSign
 } from 'lucide-react';
 
 interface AgentDashboardClientProps {
@@ -45,7 +41,7 @@ export function AgentDashboardClient({ user, properties, applications, stats }: 
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Agent Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back, {user.profile.firstName}! Here's an overview of your property management business.
+            Welcome back, {user.profile.firstName}! Here&apos;s an overview of your property management business.
           </p>
         </div>
 

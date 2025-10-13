@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Save } from 'lucide-react';
 
@@ -191,8 +190,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                 {...register('occupation')}
                 placeholder="Your current occupation"
               />
-              {(errors as any).occupation && (
-                <p className="text-sm text-destructive">{(errors as any).occupation?.message}</p>
+              {errors.occupation && (
+                <p className="text-sm text-destructive">{errors.occupation?.message}</p>
               )}
             </div>
 
@@ -206,8 +205,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                     {...register('emergencyContact.name')}
                     placeholder="Emergency contact name"
                   />
-                  {(errors as any).emergencyContact?.name && (
-                    <p className="text-sm text-destructive">{(errors as any).emergencyContact.name.message}</p>
+                  {errors.emergencyContact?.name && (
+                    <p className="text-sm text-destructive">{errors.emergencyContact.name.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -217,8 +216,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                     {...register('emergencyContact.phone')}
                     placeholder="Emergency contact phone"
                   />
-                  {(errors as any).emergencyContact?.phone && (
-                    <p className="text-sm text-destructive">{(errors as any).emergencyContact.phone.message}</p>
+                  {errors.emergencyContact?.phone && (
+                    <p className="text-sm text-destructive">{errors.emergencyContact.phone.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -228,8 +227,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                     {...register('emergencyContact.relationship')}
                     placeholder="e.g., Parent, Spouse, Friend"
                   />
-                  {(errors as any).emergencyContact?.relationship && (
-                    <p className="text-sm text-destructive">{(errors as any).emergencyContact.relationship.message}</p>
+                  {errors.emergencyContact?.relationship && (
+                    <p className="text-sm text-destructive">{errors.emergencyContact.relationship.message}</p>
                   )}
                 </div>
               </div>
@@ -271,8 +270,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                 {...register('licenseNumber')}
                 placeholder="Real estate license number"
               />
-              {(errors as any).licenseNumber && (
-                <p className="text-sm text-destructive">{(errors as any).licenseNumber?.message}</p>
+              {errors.licenseNumber && (
+                <p className="text-sm text-destructive">{errors.licenseNumber?.message}</p>
               )}
             </div>
 
@@ -283,8 +282,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                 {...register('agencyName')}
                 placeholder="Your real estate agency"
               />
-              {(errors as any).agencyName && (
-                <p className="text-sm text-destructive">{(errors as any).agencyName?.message}</p>
+              {errors.agencyName && (
+                <p className="text-sm text-destructive">{errors.agencyName?.message}</p>
               )}
             </div>
 
@@ -296,8 +295,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                 {...register('experienceYears', { valueAsNumber: true })}
                 placeholder="Years in real estate"
               />
-              {(errors as any).experienceYears && (
-                <p className="text-sm text-destructive">{(errors as any).experienceYears?.message}</p>
+              {errors.experienceYears && (
+                <p className="text-sm text-destructive">{errors.experienceYears?.message}</p>
               )}
             </div>
           </>
@@ -314,8 +313,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                 {...register('department')}
                 placeholder="Your department"
               />
-              {(errors as any).department && (
-                <p className="text-sm text-destructive">{(errors as any).department?.message}</p>
+              {errors.department && (
+                <p className="text-sm text-destructive">{errors.department?.message}</p>
               )}
             </div>
 
@@ -326,8 +325,8 @@ export function ProfileClient({ user }: ProfileClientProps) {
                 {...register('employeeId')}
                 placeholder="Your employee ID"
               />
-              {(errors as any).employeeId && (
-                <p className="text-sm text-destructive">{(errors as any).employeeId?.message}</p>
+              {errors.employeeId && (
+                <p className="text-sm text-destructive">{errors.employeeId?.message}</p>
               )}
             </div>
           </>

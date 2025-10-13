@@ -38,7 +38,7 @@ export default async function ApplicationStatusPage({ params }: ApplicationStatu
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            You don't have permission to view this application.
+            You don&apos;t have permission to view this application.
           </AlertDescription>
         </Alert>
       </div>
@@ -51,7 +51,7 @@ export default async function ApplicationStatusPage({ params }: ApplicationStatu
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            You don't have permission to view this application.
+            You don&apos;t have permission to view this application.
           </AlertDescription>
         </Alert>
       </div>
