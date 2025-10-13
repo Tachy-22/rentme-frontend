@@ -3,6 +3,7 @@
 import { db, rtdb } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { ref, get } from 'firebase/database';
+import { serializeFirestoreData } from '@/lib/firestore-serializer';
 
 interface GetDocumentParams {
   collectionName: string;
@@ -55,10 +56,12 @@ export async function getDocument({
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        data = {
+        const rawData = {
           id: docSnap.id,
           ...docSnap.data()
         };
+        // Serialize all Firestore timestamps to prevent client-side issues
+        data = serializeFirestoreData(rawData) as Record<string, unknown>;
       }
     }
 

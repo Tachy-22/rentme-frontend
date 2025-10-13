@@ -1,15 +1,17 @@
 'use server';
 
 import { db, rtdb } from '@/lib/firebase';
+import { adminRtdb } from '@/lib/firebase-admin';
 import { collection, query, where, orderBy, limit, getDocs, QueryConstraint } from 'firebase/firestore';
 import { ref, query as rtQuery, orderByChild, orderByKey, equalTo, limitToFirst, limitToLast, get } from 'firebase/database';
+import { serializeFirestoreData } from '@/lib/firestore-serializer';
 
 interface QueryDocumentsParams {
   collectionName: string;
   filters?: {
     field: string;
-    operator: '==' | '!=' | '<' | '<=' | '>' | '>=';
-    value: string | number | boolean;
+    operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'array-contains-any' | 'in' | 'not-in';
+    value: any;
   }[];
   orderByField?: string;
   orderDirection?: 'asc' | 'desc';
@@ -42,32 +44,9 @@ export async function queryDocuments({
     let documents: Record<string, unknown>[] = [];
 
     if (realtime) {
-      // Use Realtime Database
-      let dbRef = ref(rtdb, collectionName);
-      let rtQueryRef = rtQuery(dbRef);
-
-      // Apply ordering (Realtime Database has limited query capabilities)
-      if (orderByField) {
-        rtQueryRef = rtQuery(dbRef, orderByChild(orderByField));
-      } else {
-        rtQueryRef = rtQuery(dbRef, orderByKey());
-      }
-
-      // Apply limit
-      if (limitCount) {
-        if (orderDirection === 'desc') {
-          rtQueryRef = rtQuery(dbRef, orderByChild(orderByField || '.key'), limitToLast(limitCount));
-        } else {
-          rtQueryRef = rtQuery(dbRef, orderByChild(orderByField || '.key'), limitToFirst(limitCount));
-        }
-      }
-
-      // Apply simple equality filter (only first filter, as Realtime Database has limited filtering)
-      if (filters.length > 0 && filters[0].operator === '==') {
-        rtQueryRef = rtQuery(dbRef, orderByChild(filters[0].field), equalTo(filters[0].value));
-      }
-
-      const snapshot = await get(rtQueryRef);
+      // Use Admin Realtime Database - simple query without complex filtering
+      const dbRef = adminRtdb.ref(collectionName);
+      const snapshot = await dbRef.once('value');
       
       if (snapshot.exists()) {
         const data = snapshot.val();
@@ -124,10 +103,14 @@ export async function queryDocuments({
       const q = query(collection(db, collectionName), ...constraints);
       const querySnapshot = await getDocs(q);
       
-      documents = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      documents = querySnapshot.docs.map(doc => {
+        const rawData = {
+          id: doc.id,
+          ...doc.data()
+        };
+        // Serialize all Firestore timestamps to prevent client-side issues
+        return serializeFirestoreData(rawData) as Record<string, unknown>;
+      });
     }
 
     return {

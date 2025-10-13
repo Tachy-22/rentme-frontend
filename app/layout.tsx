@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/lib/auth-context";
+import { ConditionalNavigation } from "@/components/layout/ConditionalNavigation";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RentMe - University Accommodation Platform",
-  description: "Find the perfect student accommodation near your university. Connect with verified agents and discover your ideal home away from home.",
+  title: "RentMe - Professional Property Rental Platform",
+  description: "Connect renters with verified housing agents through our professional property rental platform. Find your perfect home or manage your properties with ease.",
 };
 
 export default function RootLayout({
@@ -20,9 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} font-sans antialiased bg-gray-50 text-gray-900 `}
+        className={`${inter.variable} font-sans antialiased`}
       >
+        <AuthProvider>
+          {/* <ConditionalNavigation /> */}
           {children}
+        </AuthProvider>
       </body>
     </html>
   );

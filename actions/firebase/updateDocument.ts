@@ -1,6 +1,7 @@
 'use server';
 
 import { db, rtdb } from '@/lib/firebase';
+import { adminRtdb } from '@/lib/firebase-admin';
 import { doc, updateDoc } from 'firebase/firestore';
 import { ref, update } from 'firebase/database';
 
@@ -45,9 +46,9 @@ export async function updateDocument({
     }
 
     if (realtime) {
-      // Use Realtime Database
-      const dbRef = ref(rtdb, `${collectionName}/${documentId}`);
-      await update(dbRef, {
+      // Use Admin Realtime Database
+      const dbRef = adminRtdb.ref(`${collectionName}/${documentId}`);
+      await dbRef.update({
         ...data,
         updatedAt: new Date().toISOString()
       });

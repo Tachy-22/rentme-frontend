@@ -1,6 +1,6 @@
-export type UserRole = 'student' | 'agent';
+export type UserRole = 'renter' | 'agent' | 'admin' | 'super_admin';
 
-export type PropertyType = 'apartment' | 'house' | 'room' | 'studio' | 'shared';
+export type PropertyType = 'apartment' | 'house' | 'room' | 'studio' | 'shared' | 'shared_room' | 'lodge';
 
 export type PropertyStatus = 'available' | 'rented' | 'pending' | 'maintenance';
 
@@ -14,50 +14,97 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
-  profile: StudentProfile | AgentProfile;
+  profile: RenterProfile | AgentProfile | AdminProfile;
   createdAt: string;
   updatedAt: string;
   isActive: boolean;
+  emailVerified: boolean;
+  lastLoginAt?: string;
 }
 
-export interface StudentProfile {
+export interface RenterProfile {
   firstName: string;
   lastName: string;
-  university: string;
-  course: string;
-  yearOfStudy: number;
-  budget: {
+  dateOfBirth: string;
+  phoneNumber: string;
+  phone: string;
+  occupation: string;
+  employer?: string;
+  monthlyIncome: number;
+  preferredBudget: {
     min: number;
     max: number;
   };
   preferredPropertyTypes: PropertyType[];
+  preferredLocations: string[];
   bio: string;
   profilePicture: string;
-  videoIntroduction?: string;
-  phoneNumber: string;
+  identityVerified: boolean;
+  incomeVerified: boolean;
   emergencyContact: {
     name: string;
     relationship: string;
     phoneNumber: string;
+    email: string;
   };
+  preferences: {
+    petsAllowed: boolean;
+    smokingAllowed: boolean;
+    furnished: boolean;
+    maxCommute: number; // in minutes
+  };
+  savedSearches: string[];
+  viewedProperties: string[];
 }
 
 export interface AgentProfile {
   firstName: string;
   lastName: string;
   company: string;
-  license: string;
+  position: string;
+  licenseNumber: string;
   nin?: string;
   agentId?: string;
   bio: string;
   profilePicture: string;
   phoneNumber: string;
+  phone: string;
   officeAddress: string;
+  website?: string;
+  socialMedia?: {
+    linkedin?: string;
+    twitter?: string;
+    facebook?: string;
+  };
   specialties: PropertyType[];
+  serviceAreas: string[];
+  languages: string[];
   rating: number;
   totalReviews: number;
+  totalProperties: number;
+  totalDeals: number;
+  responseTime: number; // in hours
   verificationStatus: 'pending' | 'verified' | 'rejected';
   verificationDocuments: string[];
+  commissionRate: number;
+  availabilitySchedule: {
+    [key: string]: {
+      available: boolean;
+      startTime?: string;
+      endTime?: string;
+    };
+  };
+}
+
+export interface AdminProfile {
+  firstName: string;
+  lastName: string;
+  profilePicture: string;
+  phoneNumber: string;
+  phone: string;
+  department: string;
+  permissions: string[];
+  employeeId: string;
 }
 
 export interface Property {
@@ -137,17 +184,62 @@ export interface CloudinaryImage {
 export interface Application {
   id: string;
   propertyId: string;
-  studentId: string;
+  renterId: string;
   agentId: string;
   status: ApplicationStatus;
   submittedAt: string;
-  updatedAt: string;
-  documents: ApplicationDocument[];
-  personalStatement: string;
-  references: Reference[];
-  preferredMoveInDate: string;
-  additionalNotes?: string;
-  agentNotes?: string;
+  personalInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    dateOfBirth: string;
+    socialSecurityNumber?: string;
+  };
+  employmentInfo: {
+    employmentStatus: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired';
+    employer?: string;
+    jobTitle?: string;
+    monthlyIncome: number;
+    employmentLength?: string;
+  };
+  rentalHistory: {
+    currentAddress: string;
+    landlordName?: string;
+    landlordPhone?: string;
+    monthlyRent?: number;
+    reasonForMoving: string;
+  };
+  references: {
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+    emergencyContactRelation: string;
+    personalReferenceName?: string;
+    personalReferencePhone?: string;
+  };
+  additionalInfo: {
+    hasPets: boolean;
+    petDescription?: string;
+    smokingPreference: 'non_smoker' | 'smoker' | 'occasional';
+    moveInDate: string;
+    leaseDuration: '6_months' | '12_months' | '18_months' | '24_months' | 'month_to_month';
+    additionalComments?: string;
+  };
+  documents: {
+    idDocument: boolean;
+    incomeProof: boolean;
+    bankStatements: boolean;
+    references: boolean;
+    uploadedFiles?: Record<string, string[]>;
+  };
+  agreements: {
+    backgroundCheck: boolean;
+    creditCheck: boolean;
+    termsAndConditions: boolean;
+  };
+  reviewedAt: string | null;
+  reviewedBy: string | null;
+  notes: string | null;
 }
 
 export interface ApplicationDocument {
@@ -252,6 +344,15 @@ export interface SearchFilters {
   availableFrom: string | null;
   maxDistanceToUniversity: number | null;
   university: string | null;
+  location?: {
+    address: string;
+    city: string;
+    state: string;
+    coordinates: {
+      lat: number;
+      lng: number;
+    };
+  };
 }
 
 export interface PropertyAnalytics {
@@ -270,6 +371,60 @@ export interface PropertyAnalytics {
 export interface AnalyticsMetric {
   date: string;
   count: number;
+}
+
+export interface ApplicationFormData {
+  propertyId: string;
+  renterId: string;
+  agentId: string;
+  personalInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    dateOfBirth: string;
+    socialSecurityNumber?: string;
+  };
+  employmentInfo: {
+    employmentStatus: 'employed' | 'self_employed' | 'student' | 'unemployed' | 'retired';
+    employer?: string;
+    jobTitle?: string;
+    monthlyIncome: number;
+    employmentLength?: string;
+  };
+  rentalHistory: {
+    currentAddress: string;
+    landlordName?: string;
+    landlordPhone?: string;
+    monthlyRent?: number;
+    reasonForMoving: string;
+  };
+  references: {
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+    emergencyContactRelation: string;
+    personalReferenceName?: string;
+    personalReferencePhone?: string;
+  };
+  additionalInfo: {
+    hasPets: boolean;
+    petDescription?: string;
+    smokingPreference: 'non_smoker' | 'smoker' | 'occasional';
+    moveInDate: string;
+    leaseDuration: '6_months' | '12_months' | '18_months' | '24_months' | 'month_to_month';
+    additionalComments?: string;
+  };
+  documents: {
+    idDocument: boolean;
+    incomeProof: boolean;
+    bankStatements: boolean;
+    references: boolean;
+  };
+  agreements: {
+    backgroundCheck: boolean;
+    creditCheck: boolean;
+    termsAndConditions: boolean;
+  };
 }
 
 export interface AgentDashboard {
