@@ -204,8 +204,8 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
             city: formData.location.city,
             state: formData.location.state,
             coordinates: {
-              latitude: ('lat' in formData.location.coordinates ? formData.location.coordinates.lat : formData.location.coordinates.latitude) || 0,
-              longitude: ('lng' in formData.location.coordinates ? formData.location.coordinates.lng : formData.location.coordinates.longitude) || 0
+              latitude: (formData.location.coordinates as unknown as { lat?: number; latitude?: number }).lat || (formData.location.coordinates as unknown as { lat?: number; latitude?: number }).latitude || 0,
+              longitude: (formData.location.coordinates as unknown as { lng?: number; longitude?: number }).lng || (formData.location.coordinates as unknown as { lng?: number; longitude?: number }).longitude || 0
             },
             nearbyUniversities: formData.location.nearbyUniversities
           },
@@ -259,8 +259,8 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
           location: {
             ...formData.location,
             coordinates: {
-              lat: ('lat' in formData.location.coordinates ? formData.location.coordinates.lat : formData.location.coordinates.latitude) || 0,
-              lng: ('lng' in formData.location.coordinates ? formData.location.coordinates.lng : formData.location.coordinates.longitude) || 0
+              lat: (formData.location.coordinates as unknown as { lat?: number; latitude?: number }).lat || (formData.location.coordinates as unknown as { lat?: number; latitude?: number }).latitude || 0,
+              lng: (formData.location.coordinates as unknown as { lng?: number; longitude?: number }).lng || (formData.location.coordinates as unknown as { lng?: number; longitude?: number }).longitude || 0
             }
           },
           details: formData.details,
