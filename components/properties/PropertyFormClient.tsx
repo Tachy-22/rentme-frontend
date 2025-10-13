@@ -100,20 +100,23 @@ export function PropertyFormClient({ user, mode, property }: PropertyFormClientP
       if (keys.length === 1) {
         return { ...prev, [field]: value };
       } else if (keys.length === 2) {
+        const currentValue = prev[keys[0] as keyof typeof prev];
         return {
           ...prev,
           [keys[0]]: {
-            ...prev[keys[0] as keyof typeof prev],
+            ...(typeof currentValue === 'object' && currentValue !== null ? currentValue : {} as Record<string, unknown>),
             [keys[1]]: value
           }
         };
       } else if (keys.length === 3) {
+        const currentValue = prev[keys[0] as keyof typeof prev];
+        const nestedValue = typeof currentValue === 'object' && currentValue !== null ? (currentValue as Record<string, unknown>)[keys[1]] : null;
         return {
           ...prev,
           [keys[0]]: {
-            ...prev[keys[0] as keyof typeof prev],
+            ...(typeof currentValue === 'object' && currentValue !== null ? currentValue : {} as Record<string, unknown>),
             [keys[1]]: {
-              ...(prev[keys[0] as keyof typeof prev] as Record<string, unknown>)[keys[1]],
+              ...(typeof nestedValue === 'object' && nestedValue !== null ? nestedValue : {} as Record<string, unknown>),
               [keys[2]]: value
             }
           }

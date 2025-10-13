@@ -15,7 +15,7 @@ const page = () => {
       <DecorativeLines />
 
       {/* Header */}
-      <header className="relative z-10 flex justify-between items-center px-8 py-6 pt-0">
+      <header className="relative z-10 flex justify-between items-center pl-0 px-8 py-6 pt-0">
         <Image src="/logo.png" alt="Logo" width={1000} height={1000} className="h-[5rem] w-auto" />
 
         <a

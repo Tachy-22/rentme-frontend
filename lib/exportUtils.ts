@@ -2,18 +2,24 @@ interface WaitlistEntry {
   id: string
   name: string
   email: string
+  phoneNumber?: string
+  provider?: 'google' | 'manual'
+  photoURL?: string
+  uid?: string
   createdAt: Date | string
   status: string
 }
 
 export function exportToCSV(data: WaitlistEntry[], filename: string = 'rentme-waitlist') {
   // CSV headers
-  const headers = ['Name', 'Email', 'Status', 'Joined Date']
+  const headers = ['Name', 'Email', 'Phone', 'Provider', 'Status', 'Joined Date']
   
   // Convert data to CSV format
   const csvData = data.map(entry => [
     entry.name,
     entry.email,
+    entry.phoneNumber || 'N/A',
+    entry.provider || 'manual',
     entry.status,
     new Date(entry.createdAt).toLocaleDateString() + ' ' + new Date(entry.createdAt).toLocaleTimeString()
   ])
@@ -40,11 +46,13 @@ export function exportToCSV(data: WaitlistEntry[], filename: string = 'rentme-wa
 
 export function exportToExcel(data: WaitlistEntry[], filename: string = 'rentme-waitlist') {
   // For Excel export, we'll use a more structured CSV format that Excel recognizes better
-  const headers = ['Name', 'Email', 'Status', 'Joined Date']
+  const headers = ['Name', 'Email', 'Phone', 'Provider', 'Status', 'Joined Date']
   
   const excelData = data.map(entry => [
     entry.name,
     entry.email,
+    entry.phoneNumber || 'N/A',
+    entry.provider || 'manual',
     entry.status,
     new Date(entry.createdAt).toLocaleDateString() + ' ' + new Date(entry.createdAt).toLocaleTimeString()
   ])
