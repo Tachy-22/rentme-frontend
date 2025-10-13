@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { MessagesClient } from '@/components/messages/MessagesClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AgentMessagesPage() {
   const user = await getCurrentUser();
 

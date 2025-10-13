@@ -4,6 +4,8 @@ import { getAgentProperties } from '@/actions/properties/getAgentProperties';
 import { getAgentApplications } from '@/actions/applications/getAgentApplications';
 import { AgentDashboardClient } from '@/components/agent/AgentDashboardClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AgentDashboardPage() {
   const user = await getCurrentUser();
 

@@ -5,6 +5,8 @@ import { getRenterApplications } from '@/actions/applications/getRenterApplicati
 import { getRecommendedProperties } from '@/actions/properties/getRecommendedProperties';
 import RenterDashboard from '@/components/dashboard/RenterDashboard';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 

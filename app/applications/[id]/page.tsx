@@ -8,6 +8,8 @@ import { ApplicationStatusClient } from '@/components/applications/ApplicationSt
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 interface ApplicationStatusPageProps {
   params: Promise<{ id: string }>;
 }

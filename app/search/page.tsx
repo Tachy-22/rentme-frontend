@@ -4,6 +4,8 @@ import { searchProperties } from '@/actions/properties/searchProperties';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { SearchFilters, User, PropertyType } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 interface SearchPageProps {
   searchParams: Promise<{ 
     q?: string; 

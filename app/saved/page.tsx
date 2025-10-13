@@ -3,6 +3,8 @@ import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { getSavedProperties } from '@/actions/properties/getSavedProperties';
 import { SavedPropertiesClient } from '@/components/saved/SavedPropertiesClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function SavedPropertiesPage() {
   const user = await getCurrentUser();
 

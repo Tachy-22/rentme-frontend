@@ -3,6 +3,8 @@ import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { getAgentProperties } from '@/actions/properties/getAgentProperties';
 import { AgentPropertiesClient } from '@/components/agent/AgentPropertiesClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AgentPropertiesPage() {
   const user = await getCurrentUser();
 

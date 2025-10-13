@@ -4,6 +4,8 @@ import { getDocument } from '@/actions/firebase/getDocument';
 import { PropertyFormClient } from '@/components/properties/PropertyFormClient';
 import { Property } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 interface EditPropertyPageProps {
   params: Promise<{ id: string }>;
 }

@@ -3,6 +3,8 @@ import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { getRenterApplications } from '@/actions/applications/getRenterApplications';
 import { ApplicationsClient } from '@/components/applications/ApplicationsClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ApplicationsPage() {
   const user = await getCurrentUser();
 

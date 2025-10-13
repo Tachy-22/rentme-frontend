@@ -4,6 +4,8 @@ import { getConversations } from '@/actions/messages/getConversations';
 import { findOrCreateConversation } from '@/actions/messages/findOrCreateConversation';
 import { MessagesClient } from '@/components/messages/MessagesClient';
 
+export const dynamic = 'force-dynamic';
+
 interface MessagesPageProps {
   searchParams: Promise<{ to?: string; property?: string }>;
 }

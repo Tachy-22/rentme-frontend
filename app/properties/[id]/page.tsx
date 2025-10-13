@@ -6,6 +6,8 @@ import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { PropertyDetailClient } from '@/components/properties/PropertyDetailClient';
 import { User } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 interface PropertyDetailPageProps {
   params: Promise<{ id: string }>;
 }

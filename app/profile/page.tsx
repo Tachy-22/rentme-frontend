@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { ProfileClient } from '@/components/profile/ProfileClient';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
   const user = await getCurrentUser();
 

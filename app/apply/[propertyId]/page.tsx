@@ -6,6 +6,8 @@ import { ApplicationFormClient } from '@/components/applications/ApplicationForm
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 interface PropertyApplicationPageProps {
   params: Promise<{ propertyId: string }>;
 }
