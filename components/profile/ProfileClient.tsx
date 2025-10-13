@@ -206,33 +206,33 @@ export function ProfileClient({ user }: ProfileClientProps) {
                   <Label htmlFor="emergencyContact.name">Name</Label>
                   <Input
                     id="emergencyContact.name"
-                    {...register('emergencyContact.name')}
+                    {...safeRegister('emergencyContact.name')}
                     placeholder="Emergency contact name"
                   />
-                  {errors.emergencyContact?.name && (
-                    <p className="text-sm text-destructive">{errors.emergencyContact.name.message}</p>
+                  {safeErrors['emergencyContact.name'] && (
+                    <p className="text-sm text-destructive">{safeErrors['emergencyContact.name']?.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="emergencyContact.phone">Phone</Label>
                   <Input
                     id="emergencyContact.phone"
-                    {...register('emergencyContact.phone')}
+                    {...safeRegister('emergencyContact.phone')}
                     placeholder="Emergency contact phone"
                   />
-                  {errors.emergencyContact?.phone && (
-                    <p className="text-sm text-destructive">{errors.emergencyContact.phone.message}</p>
+                  {safeErrors['emergencyContact.phone'] && (
+                    <p className="text-sm text-destructive">{safeErrors['emergencyContact.phone']?.message}</p>
                   )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="emergencyContact.relationship">Relationship</Label>
                   <Input
                     id="emergencyContact.relationship"
-                    {...register('emergencyContact.relationship')}
+                    {...safeRegister('emergencyContact.relationship')}
                     placeholder="e.g., Parent, Spouse, Friend"
                   />
-                  {errors.emergencyContact?.relationship && (
-                    <p className="text-sm text-destructive">{errors.emergencyContact.relationship.message}</p>
+                  {safeErrors['emergencyContact.relationship'] && (
+                    <p className="text-sm text-destructive">{safeErrors['emergencyContact.relationship']?.message}</p>
                   )}
                 </div>
               </div>
@@ -246,7 +246,7 @@ export function ProfileClient({ user }: ProfileClientProps) {
                   <Input
                     id="preferences.budget.min"
                     type="number"
-                    {...register('preferences.budget.min', { valueAsNumber: true })}
+                    {...safeRegister('preferences.budget.min')}
                     placeholder="Minimum monthly budget"
                   />
                 </div>
@@ -255,7 +255,7 @@ export function ProfileClient({ user }: ProfileClientProps) {
                   <Input
                     id="preferences.budget.max"
                     type="number"
-                    {...register('preferences.budget.max', { valueAsNumber: true })}
+                    {...safeRegister('preferences.budget.max')}
                     placeholder="Maximum monthly budget"
                   />
                 </div>
@@ -271,11 +271,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
               <Label htmlFor="licenseNumber">License Number</Label>
               <Input
                 id="licenseNumber"
-                {...register('licenseNumber')}
+                {...safeRegister('licenseNumber')}
                 placeholder="Real estate license number"
               />
-              {errors.licenseNumber && (
-                <p className="text-sm text-destructive">{errors.licenseNumber?.message}</p>
+              {safeErrors.licenseNumber && (
+                <p className="text-sm text-destructive">{safeErrors.licenseNumber?.message}</p>
               )}
             </div>
 
@@ -283,11 +283,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
               <Label htmlFor="agencyName">Agency Name</Label>
               <Input
                 id="agencyName"
-                {...register('agencyName')}
+                {...safeRegister('agencyName')}
                 placeholder="Your real estate agency"
               />
-              {errors.agencyName && (
-                <p className="text-sm text-destructive">{errors.agencyName?.message}</p>
+              {safeErrors.agencyName && (
+                <p className="text-sm text-destructive">{safeErrors.agencyName?.message}</p>
               )}
             </div>
 
@@ -296,11 +296,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
               <Input
                 id="experienceYears"
                 type="number"
-                {...register('experienceYears', { valueAsNumber: true })}
+                {...safeRegister('experienceYears')}
                 placeholder="Years in real estate"
               />
-              {errors.experienceYears && (
-                <p className="text-sm text-destructive">{errors.experienceYears?.message}</p>
+              {safeErrors.experienceYears && (
+                <p className="text-sm text-destructive">{safeErrors.experienceYears?.message}</p>
               )}
             </div>
           </>
@@ -314,11 +314,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
               <Label htmlFor="department">Department</Label>
               <Input
                 id="department"
-                {...register('department')}
+                {...safeRegister('department')}
                 placeholder="Your department"
               />
-              {errors.department && (
-                <p className="text-sm text-destructive">{errors.department?.message}</p>
+              {safeErrors.department && (
+                <p className="text-sm text-destructive">{safeErrors.department?.message}</p>
               )}
             </div>
 
@@ -326,11 +326,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
               <Label htmlFor="employeeId">Employee ID</Label>
               <Input
                 id="employeeId"
-                {...register('employeeId')}
+                {...safeRegister('employeeId')}
                 placeholder="Your employee ID"
               />
-              {errors.employeeId && (
-                <p className="text-sm text-destructive">{errors.employeeId?.message}</p>
+              {safeErrors.employeeId && (
+                <p className="text-sm text-destructive">{safeErrors.employeeId?.message}</p>
               )}
             </div>
           </>
@@ -377,11 +377,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
-                    {...register('firstName')}
+                    {...safeRegister('firstName')}
                     placeholder="Your first name"
                   />
-                  {errors.firstName && (
-                    <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                  {safeErrors.firstName && (
+                    <p className="text-sm text-destructive">{safeErrors.firstName?.message}</p>
                   )}
                 </div>
 
@@ -389,11 +389,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
-                    {...register('lastName')}
+                    {...safeRegister('lastName')}
                     placeholder="Your last name"
                   />
-                  {errors.lastName && (
-                    <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                  {safeErrors.lastName && (
+                    <p className="text-sm text-destructive">{safeErrors.lastName?.message}</p>
                   )}
                 </div>
               </div>
@@ -403,11 +403,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
                   <Label htmlFor="phoneNumber">Phone Number</Label>
                   <Input
                     id="phoneNumber"
-                    {...register('phoneNumber')}
+                    {...safeRegister('phoneNumber')}
                     placeholder="Your phone number"
                   />
-                  {errors.phoneNumber && (
-                    <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
+                  {safeErrors.phoneNumber && (
+                    <p className="text-sm text-destructive">{safeErrors.phoneNumber?.message}</p>
                   )}
                 </div>
 
@@ -416,10 +416,10 @@ export function ProfileClient({ user }: ProfileClientProps) {
                   <Input
                     id="dateOfBirth"
                     type="date"
-                    {...register('dateOfBirth')}
+                    {...safeRegister('dateOfBirth')}
                   />
-                  {errors.dateOfBirth && (
-                    <p className="text-sm text-destructive">{errors.dateOfBirth.message}</p>
+                  {safeErrors.dateOfBirth && (
+                    <p className="text-sm text-destructive">{safeErrors.dateOfBirth?.message}</p>
                   )}
                 </div>
               </div>
@@ -428,12 +428,12 @@ export function ProfileClient({ user }: ProfileClientProps) {
                 <Label htmlFor="bio">Bio</Label>
                 <Textarea
                   id="bio"
-                  {...register('bio')}
+                  {...safeRegister('bio')}
                   placeholder="Tell us about yourself..."
                   rows={3}
                 />
-                {errors.bio && (
-                  <p className="text-sm text-destructive">{errors.bio.message}</p>
+                {safeErrors.bio && (
+                  <p className="text-sm text-destructive">{safeErrors.bio?.message}</p>
                 )}
               </div>
             </CardContent>
