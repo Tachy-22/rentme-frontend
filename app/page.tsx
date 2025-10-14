@@ -10,7 +10,7 @@ import Starfield from '@/components/Starfield';
 
 const page = () => {
   return (
-    <div className="relative min-h-screen h-screen max-h-screen bg-black text-white overflow-hidden">
+    <div className="relative min-h-[100dvh] h-[100dvh] max-h-[100dvh] bg-black text-white overflow-hidden">
       <Starfield />
       <DecorativeLines />
 
