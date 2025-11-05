@@ -1,532 +1,610 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Property, User, ApplicationFormData, RenterProfile, AgentProfile } from '@/types';
+import { User } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-// import { Separator } from '@/components/ui/separator';
-// import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  ArrowLeft,
-  FileText,
-  DollarSign,
-  User as UserIcon,
-  Calendar,
-  CheckCircle
-} from 'lucide-react';
-
-const applicationSchema = z.object({
-  personalInfo: z.object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
-    email: z.string().email('Valid email is required'),
-    phone: z.string().min(10, 'Valid phone number is required'),
-    dateOfBirth: z.string().min(1, 'Date of birth is required'),
-    socialSecurityNumber: z.string().min(9, 'Valid SSN is required').optional(),
-  }),
-  employmentInfo: z.object({
-    employmentStatus: z.enum(['employed', 'self_employed', 'student', 'unemployed', 'retired']),
-    employer: z.string().optional(),
-    jobTitle: z.string().optional(),
-    monthlyIncome: z.number().min(0, 'Income must be positive'),
-    employmentLength: z.string().optional(),
-  }),
-  rentalHistory: z.object({
-    currentAddress: z.string().min(1, 'Current address is required'),
-    landlordName: z.string().optional(),
-    landlordPhone: z.string().optional(),
-    monthlyRent: z.number().min(0).optional(),
-    reasonForMoving: z.string().min(1, 'Reason for moving is required'),
-  }),
-  references: z.object({
-    emergencyContactName: z.string().min(1, 'Emergency contact is required'),
-    emergencyContactPhone: z.string().min(10, 'Valid phone number is required'),
-    emergencyContactRelation: z.string().min(1, 'Relationship is required'),
-    personalReferenceName: z.string().optional(),
-    personalReferencePhone: z.string().optional(),
-  }),
-  additionalInfo: z.object({
-    hasPets: z.boolean(),
-    petDescription: z.string().optional(),
-    smokingPreference: z.enum(['non_smoker', 'smoker', 'occasional']),
-    moveInDate: z.string().min(1, 'Move-in date is required'),
-    leaseDuration: z.enum(['6_months', '12_months', '18_months', '24_months', 'month_to_month']),
-    additionalComments: z.string().optional(),
-  }),
-  documents: z.object({
-    idDocument: z.boolean().refine(val => val === true, 'ID document is required'),
-    incomeProof: z.boolean().refine(val => val === true, 'Income proof is required'),
-    bankStatements: z.boolean(),
-    references: z.boolean(),
-  }),
-  agreements: z.object({
-    backgroundCheck: z.boolean().refine(val => val === true, 'Background check consent is required'),
-    creditCheck: z.boolean().refine(val => val === true, 'Credit check consent is required'),
-    termsAndConditions: z.boolean().refine(val => val === true, 'Terms and conditions must be accepted'),
-  })
-});
-
-type ApplicationForm = z.infer<typeof applicationSchema>;
+import { Separator } from '@/components/ui/separator';
+import { ArrowLeft, FileText, User as UserIcon, Briefcase, Home, Users, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import { submitApplication } from '@/actions/applications/submitApplication';
+import { toast } from 'sonner';
 
 interface ApplicationFormClientProps {
-  property: Property;
   user: User;
+  property: any;
 }
 
-export function ApplicationFormClient({ property, user }: ApplicationFormClientProps) {
+export default function ApplicationFormClient({ user, property }: ApplicationFormClientProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<Record<string, File[]>>({});
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    watch
-  } = useForm<ApplicationForm>({
-    resolver: zodResolver(applicationSchema),
-    defaultValues: {
-      personalInfo: {
-        firstName: user?.profile?.firstName || '',
-        lastName: user?.profile?.lastName || '',
-        email: user?.email || '',
-        phone: (user.profile as RenterProfile | AgentProfile)?.phone || (user.profile as RenterProfile | AgentProfile)?.phoneNumber || '',
-      },
-      employmentInfo: {
-        monthlyIncome: 0,
-      },
-      rentalHistory: {
-        monthlyRent: 0,
-      },
-      additionalInfo: {
-        hasPets: false,
-        smokingPreference: 'non_smoker',
-        leaseDuration: '12_months',
-      },
-      documents: {
-        idDocument: false,
-        incomeProof: false,
-        bankStatements: false,
-        references: false,
-      },
-      agreements: {
-        backgroundCheck: false,
-        creditCheck: false,
-        termsAndConditions: false,
-      }
+  const renterProfile = user.role === 'renter' ? user.profile as any : null;
+
+  const [formData, setFormData] = useState({
+    personalInfo: {
+      firstName: user.profile.firstName || '',
+      lastName: user.profile.lastName || '',
+      email: user.email || '',
+      phone: user.profile.phone || '',
+      dateOfBirth: user.profile.dateOfBirth || '',
+      socialSecurityNumber: ''
+    },
+    employmentInfo: {
+      employmentStatus: 'student' as const,
+      employer: renterProfile?.employer || '',
+      jobTitle: '',
+      monthlyIncome: renterProfile?.monthlyIncome || 0,
+      employmentLength: ''
+    },
+    rentalHistory: {
+      currentAddress: user.profile.address || '',
+      landlordName: '',
+      landlordPhone: '',
+      monthlyRent: 0,
+      reasonForMoving: ''
+    },
+    references: {
+      emergencyContactName: renterProfile?.emergencyContact?.name || '',
+      emergencyContactPhone: renterProfile?.emergencyContact?.phoneNumber || '',
+      emergencyContactRelation: renterProfile?.emergencyContact?.relationship || '',
+      personalReferenceName: '',
+      personalReferencePhone: ''
+    },
+    additionalInfo: {
+      hasPets: false,
+      petDescription: '',
+      smokingPreference: 'non_smoker' as const,
+      moveInDate: '',
+      leaseDuration: '12_months' as const,
+      additionalComments: ''
+    },
+    documents: {
+      idDocument: false,
+      incomeProof: false,
+      bankStatements: false,
+      references: false
+    },
+    agreements: {
+      backgroundCheck: false,
+      creditCheck: false,
+      termsAndConditions: false
     }
   });
 
-  const watchHasPets = watch('additionalInfo.hasPets');
-  const watchEmploymentStatus = watch('employmentInfo.employmentStatus');
+  const steps = [
+    { title: 'Personal Info', icon: UserIcon, description: 'Basic personal information' },
+    { title: 'Employment', icon: Briefcase, description: 'Employment and income details' },
+    { title: 'Rental History', icon: Home, description: 'Previous rental experience' },
+    { title: 'References', icon: Users, description: 'Emergency contacts and references' },
+    { title: 'Additional Info', icon: FileText, description: 'Move-in preferences and comments' },
+    { title: 'Documents & Agreements', icon: CheckCircle, description: 'Required documents and agreements' }
+  ];
 
-  const handleFileUpload = (documentType: string, files: FileList | null) => {
-    if (files) {
-      setUploadedFiles(prev => ({
-        ...prev,
-        [documentType]: Array.from(files)
-      }));
-      if (documentType === 'idDocument') setValue('documents.idDocument', true);
-      if (documentType === 'incomeProof') setValue('documents.incomeProof', true);
-      if (documentType === 'bankStatements') setValue('documents.bankStatements', true);
-      if (documentType === 'references') setValue('documents.references', true);
+  const handleInputChange = (section: string, field: string, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section as keyof typeof prev],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
-  const onSubmit = async (data: ApplicationForm) => {
-    try {
-      setIsSubmitting(true);
-      
-      const applicationData: ApplicationFormData = {
-        ...data,
-        propertyId: property.id,
-        renterId: user.id,
-        agentId: property.agentId,
-      };
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
-      const { submitApplication } = await import('@/actions/applications/submitApplication');
-      const result = await submitApplication(applicationData, uploadedFiles);
-      
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const result = await submitApplication({
+        propertyId: property.id,
+        agentId: property.agentId,
+        applicationData: formData
+      });
+
       if (result.success) {
-        router.push(`/applications/${result.applicationId}`);
+        toast.success('Application submitted successfully!');
+        router.push(`/applications?success=true`);
       } else {
-        console.error('Application submission failed:', result.error);
+        toast.error(result.error || 'Failed to submit application');
       }
     } catch (error) {
-      console.error('Error submitting application:', error);
+      console.error('Submit error:', error);
+      toast.error('An error occurred while submitting your application');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Header */}
-      <div className="mb-8">
-        <Button variant="ghost" asChild className="mb-4">
-          <a href={`/properties/${property.id}`} className="flex items-center">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Property
-          </a>
-        </Button>
-        
-        <h1 className="text-3xl font-bold mb-2">Apply for Property</h1>
-        <div className="flex items-center space-x-4 text-muted-foreground">
-          <span>{property.title}</span>
-          <Badge>{property.type}</Badge>
-          <span>${property.price.amount.toLocaleString()}/{property.price.period}</span>
+  const renderPersonalInfo = () => (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="firstName">First Name *</Label>
+          <Input
+            id="firstName"
+            value={formData.personalInfo.firstName}
+            onChange={(e) => handleInputChange('personalInfo', 'firstName', e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="lastName">Last Name *</Label>
+          <Input
+            id="lastName"
+            value={formData.personalInfo.lastName}
+            onChange={(e) => handleInputChange('personalInfo', 'lastName', e.target.value)}
+            required
+          />
         </div>
       </div>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Personal Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <UserIcon className="h-5 w-5 mr-2" />
-              Personal Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="firstName">First Name *</Label>
-                <Input
-                  id="firstName"
-                  {...register('personalInfo.firstName')}
-                  className={errors.personalInfo?.firstName ? 'border-red-500' : ''}
-                />
-                {errors.personalInfo?.firstName && (
-                  <p className="text-sm text-red-500 mt-1">{errors.personalInfo.firstName.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="lastName">Last Name *</Label>
-                <Input
-                  id="lastName"
-                  {...register('personalInfo.lastName')}
-                  className={errors.personalInfo?.lastName ? 'border-red-500' : ''}
-                />
-                {errors.personalInfo?.lastName && (
-                  <p className="text-sm text-red-500 mt-1">{errors.personalInfo.lastName.message}</p>
-                )}
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...register('personalInfo.email')}
-                  className={errors.personalInfo?.email ? 'border-red-500' : ''}
-                />
-                {errors.personalInfo?.email && (
-                  <p className="text-sm text-red-500 mt-1">{errors.personalInfo.email.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone Number *</Label>
-                <Input
-                  id="phone"
-                  {...register('personalInfo.phone')}
-                  className={errors.personalInfo?.phone ? 'border-red-500' : ''}
-                />
-                {errors.personalInfo?.phone && (
-                  <p className="text-sm text-red-500 mt-1">{errors.personalInfo.phone.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="dateOfBirth">Date of Birth *</Label>
-              <Input
-                id="dateOfBirth"
-                type="date"
-                {...register('personalInfo.dateOfBirth')}
-                className={errors.personalInfo?.dateOfBirth ? 'border-red-500' : ''}
-              />
-              {errors.personalInfo?.dateOfBirth && (
-                <p className="text-sm text-red-500 mt-1">{errors.personalInfo.dateOfBirth.message}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Employment Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <DollarSign className="h-5 w-5 mr-2" />
-              Employment Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="employmentStatus">Employment Status *</Label>
-              <Select onValueChange={(value) => setValue('employmentInfo.employmentStatus', value as ApplicationForm['employmentInfo']['employmentStatus'])}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select employment status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="employed">Employed</SelectItem>
-                  <SelectItem value="self_employed">Self-Employed</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="unemployed">Unemployed</SelectItem>
-                  <SelectItem value="retired">Retired</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {(watchEmploymentStatus === 'employed' || watchEmploymentStatus === 'self_employed') && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="employer">Employer/Company</Label>
-                  <Input
-                    id="employer"
-                    {...register('employmentInfo.employer')}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="jobTitle">Job Title</Label>
-                  <Input
-                    id="jobTitle"
-                    {...register('employmentInfo.jobTitle')}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="monthlyIncome">Monthly Income *</Label>
-                <Input
-                  id="monthlyIncome"
-                  type="number"
-                  {...register('employmentInfo.monthlyIncome', { valueAsNumber: true })}
-                  className={errors.employmentInfo?.monthlyIncome ? 'border-red-500' : ''}
-                />
-                {errors.employmentInfo?.monthlyIncome && (
-                  <p className="text-sm text-red-500 mt-1">{errors.employmentInfo.monthlyIncome.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="employmentLength">Length of Employment</Label>
-                <Input
-                  id="employmentLength"
-                  placeholder="e.g., 2 years, 6 months"
-                  {...register('employmentInfo.employmentLength')}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Additional Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Calendar className="h-5 w-5 mr-2" />
-              Additional Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="moveInDate">Preferred Move-in Date *</Label>
-                <Input
-                  id="moveInDate"
-                  type="date"
-                  {...register('additionalInfo.moveInDate')}
-                  className={errors.additionalInfo?.moveInDate ? 'border-red-500' : ''}
-                />
-                {errors.additionalInfo?.moveInDate && (
-                  <p className="text-sm text-red-500 mt-1">{errors.additionalInfo.moveInDate.message}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="leaseDuration">Preferred Lease Duration *</Label>
-                <Select onValueChange={(value) => setValue('additionalInfo.leaseDuration', value as ApplicationForm['additionalInfo']['leaseDuration'])}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select lease duration" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="6_months">6 Months</SelectItem>
-                    <SelectItem value="12_months">12 Months</SelectItem>
-                    <SelectItem value="18_months">18 Months</SelectItem>
-                    <SelectItem value="24_months">24 Months</SelectItem>
-                    <SelectItem value="month_to_month">Month-to-Month</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="hasPets"
-                  checked={watchHasPets}
-                  onCheckedChange={(checked) => setValue('additionalInfo.hasPets', checked as boolean)}
-                />
-                <Label htmlFor="hasPets">I have pets</Label>
-              </div>
-
-              {watchHasPets && (
-                <div>
-                  <Label htmlFor="petDescription">Pet Description</Label>
-                  <Textarea
-                    id="petDescription"
-                    placeholder="Describe your pets (type, breed, size, etc.)"
-                    {...register('additionalInfo.petDescription')}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="additionalComments">Additional Comments</Label>
-              <Textarea
-                id="additionalComments"
-                placeholder="Any additional information you'd like to share"
-                {...register('additionalInfo.additionalComments')}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Document Upload */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileText className="h-5 w-5 mr-2" />
-              Required Documents
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="idDocument">Government ID * (Required)</Label>
-                <Input
-                  id="idDocument"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => handleFileUpload('idDocument', e.target.files)}
-                />
-                {uploadedFiles.idDocument && (
-                  <div className="flex items-center text-sm text-green-600">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    {uploadedFiles.idDocument.length} file(s) uploaded
-                  </div>
-                )}
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="incomeProof">Income Proof * (Required)</Label>
-                <Input
-                  id="incomeProof"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  multiple
-                  onChange={(e) => handleFileUpload('incomeProof', e.target.files)}
-                />
-                {uploadedFiles.incomeProof && (
-                  <div className="flex items-center text-sm text-green-600">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    {uploadedFiles.incomeProof.length} file(s) uploaded
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="text-sm text-muted-foreground">
-              <p>Accepted formats: PDF, JPG, JPEG, PNG (Max 10MB per file)</p>
-              <p>Income proof can include: Pay stubs, tax returns, bank statements, employment letter</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Agreements */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Agreements and Consent</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex items-start space-x-2">
-                <Checkbox
-                  id="backgroundCheck"
-                  {...register('agreements.backgroundCheck')}
-                  className={errors.agreements?.backgroundCheck ? 'border-red-500' : ''}
-                />
-                <Label htmlFor="backgroundCheck" className="text-sm leading-relaxed">
-                  I consent to a background check being performed as part of this application process. *
-                </Label>
-              </div>
-              {errors.agreements?.backgroundCheck && (
-                <p className="text-sm text-red-500">{errors.agreements.backgroundCheck.message}</p>
-              )}
-
-              <div className="flex items-start space-x-2">
-                <Checkbox
-                  id="creditCheck"
-                  {...register('agreements.creditCheck')}
-                  className={errors.agreements?.creditCheck ? 'border-red-500' : ''}
-                />
-                <Label htmlFor="creditCheck" className="text-sm leading-relaxed">
-                  I consent to a credit check being performed as part of this application process. *
-                </Label>
-              </div>
-              {errors.agreements?.creditCheck && (
-                <p className="text-sm text-red-500">{errors.agreements.creditCheck.message}</p>
-              )}
-
-              <div className="flex items-start space-x-2">
-                <Checkbox
-                  id="termsAndConditions"
-                  {...register('agreements.termsAndConditions')}
-                  className={errors.agreements?.termsAndConditions ? 'border-red-500' : ''}
-                />
-                <Label htmlFor="termsAndConditions" className="text-sm leading-relaxed">
-                  I have read and agree to the terms and conditions, privacy policy, and understand that 
-                  false information may result in application rejection. *
-                </Label>
-              </div>
-              {errors.agreements?.termsAndConditions && (
-                <p className="text-sm text-red-500">{errors.agreements.termsAndConditions.message}</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Submit Button */}
-        <div className="flex justify-end space-x-4">
-          <Button type="button" variant="outline" asChild>
-            <a href={`/properties/${property.id}`}>Cancel</a>
-          </Button>
-          <Button type="submit" disabled={isSubmitting} className="min-w-32">
-            {isSubmitting ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Submitting...
-              </>
-            ) : (
-              'Submit Application'
-            )}
-          </Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="email">Email *</Label>
+          <Input
+            id="email"
+            type="email"
+            value={formData.personalInfo.email}
+            onChange={(e) => handleInputChange('personalInfo', 'email', e.target.value)}
+            required
+          />
         </div>
-      </form>
+        <div>
+          <Label htmlFor="phone">Phone Number *</Label>
+          <Input
+            id="phone"
+            value={formData.personalInfo.phone}
+            onChange={(e) => handleInputChange('personalInfo', 'phone', e.target.value)}
+            required
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+          <Input
+            id="dateOfBirth"
+            type="date"
+            value={formData.personalInfo.dateOfBirth}
+            onChange={(e) => handleInputChange('personalInfo', 'dateOfBirth', e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="ssn">Social Security Number (Optional)</Label>
+          <Input
+            id="ssn"
+            value={formData.personalInfo.socialSecurityNumber}
+            onChange={(e) => handleInputChange('personalInfo', 'socialSecurityNumber', e.target.value)}
+            placeholder="XXX-XX-XXXX"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderEmploymentInfo = () => (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="employmentStatus">Employment Status *</Label>
+        <Select 
+          value={formData.employmentInfo.employmentStatus} 
+          onValueChange={(value) => handleInputChange('employmentInfo', 'employmentStatus', value)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="employed">Employed</SelectItem>
+            <SelectItem value="self_employed">Self Employed</SelectItem>
+            <SelectItem value="student">Student</SelectItem>
+            <SelectItem value="unemployed">Unemployed</SelectItem>
+            <SelectItem value="retired">Retired</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="employer">Employer/School</Label>
+          <Input
+            id="employer"
+            value={formData.employmentInfo.employer}
+            onChange={(e) => handleInputChange('employmentInfo', 'employer', e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="jobTitle">Job Title/Major</Label>
+          <Input
+            id="jobTitle"
+            value={formData.employmentInfo.jobTitle}
+            onChange={(e) => handleInputChange('employmentInfo', 'jobTitle', e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="monthlyIncome">Monthly Income (₦) *</Label>
+          <Input
+            id="monthlyIncome"
+            type="number"
+            value={formData.employmentInfo.monthlyIncome}
+            onChange={(e) => handleInputChange('employmentInfo', 'monthlyIncome', parseInt(e.target.value) || 0)}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="employmentLength">Employment Length</Label>
+          <Input
+            id="employmentLength"
+            value={formData.employmentInfo.employmentLength}
+            onChange={(e) => handleInputChange('employmentInfo', 'employmentLength', e.target.value)}
+            placeholder="e.g., 2 years"
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderRentalHistory = () => (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="currentAddress">Current Address *</Label>
+        <Input
+          id="currentAddress"
+          value={formData.rentalHistory.currentAddress}
+          onChange={(e) => handleInputChange('rentalHistory', 'currentAddress', e.target.value)}
+          required
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="landlordName">Current Landlord Name</Label>
+          <Input
+            id="landlordName"
+            value={formData.rentalHistory.landlordName}
+            onChange={(e) => handleInputChange('rentalHistory', 'landlordName', e.target.value)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="landlordPhone">Landlord Phone</Label>
+          <Input
+            id="landlordPhone"
+            value={formData.rentalHistory.landlordPhone}
+            onChange={(e) => handleInputChange('rentalHistory', 'landlordPhone', e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="monthlyRent">Current Monthly Rent (₦)</Label>
+          <Input
+            id="monthlyRent"
+            type="number"
+            value={formData.rentalHistory.monthlyRent}
+            onChange={(e) => handleInputChange('rentalHistory', 'monthlyRent', parseInt(e.target.value) || 0)}
+          />
+        </div>
+        <div>
+          <Label htmlFor="reasonForMoving">Reason for Moving *</Label>
+          <Input
+            id="reasonForMoving"
+            value={formData.rentalHistory.reasonForMoving}
+            onChange={(e) => handleInputChange('rentalHistory', 'reasonForMoving', e.target.value)}
+            required
+          />
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderReferences = () => (
+    <div className="space-y-6">
+      <div>
+        <h4 className="font-medium mb-3">Emergency Contact *</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="emergencyName">Name *</Label>
+            <Input
+              id="emergencyName"
+              value={formData.references.emergencyContactName}
+              onChange={(e) => handleInputChange('references', 'emergencyContactName', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="emergencyPhone">Phone *</Label>
+            <Input
+              id="emergencyPhone"
+              value={formData.references.emergencyContactPhone}
+              onChange={(e) => handleInputChange('references', 'emergencyContactPhone', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="emergencyRelation">Relationship *</Label>
+            <Input
+              id="emergencyRelation"
+              value={formData.references.emergencyContactRelation}
+              onChange={(e) => handleInputChange('references', 'emergencyContactRelation', e.target.value)}
+              required
+            />
+          </div>
+        </div>
+      </div>
+      <Separator />
+      <div>
+        <h4 className="font-medium mb-3">Personal Reference (Optional)</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="referenceName">Name</Label>
+            <Input
+              id="referenceName"
+              value={formData.references.personalReferenceName}
+              onChange={(e) => handleInputChange('references', 'personalReferenceName', e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="referencePhone">Phone</Label>
+            <Input
+              id="referencePhone"
+              value={formData.references.personalReferencePhone}
+              onChange={(e) => handleInputChange('references', 'personalReferencePhone', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAdditionalInfo = () => (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="hasPets"
+          checked={formData.additionalInfo.hasPets}
+          onCheckedChange={(checked) => handleInputChange('additionalInfo', 'hasPets', checked)}
+        />
+        <Label htmlFor="hasPets">I have pets</Label>
+      </div>
+      {formData.additionalInfo.hasPets && (
+        <div>
+          <Label htmlFor="petDescription">Pet Description *</Label>
+          <Textarea
+            id="petDescription"
+            value={formData.additionalInfo.petDescription}
+            onChange={(e) => handleInputChange('additionalInfo', 'petDescription', e.target.value)}
+            placeholder="Describe your pets (type, breed, size, etc.)"
+          />
+        </div>
+      )}
+      <div>
+        <Label htmlFor="smokingPreference">Smoking Preference *</Label>
+        <Select 
+          value={formData.additionalInfo.smokingPreference} 
+          onValueChange={(value) => handleInputChange('additionalInfo', 'smokingPreference', value)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="non_smoker">Non-smoker</SelectItem>
+            <SelectItem value="smoker">Smoker</SelectItem>
+            <SelectItem value="occasional">Occasional smoker</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="moveInDate">Preferred Move-in Date *</Label>
+          <Input
+            id="moveInDate"
+            type="date"
+            value={formData.additionalInfo.moveInDate}
+            onChange={(e) => handleInputChange('additionalInfo', 'moveInDate', e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="leaseDuration">Preferred Lease Duration *</Label>
+          <Select 
+            value={formData.additionalInfo.leaseDuration} 
+            onValueChange={(value) => handleInputChange('additionalInfo', 'leaseDuration', value)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="6_months">6 months</SelectItem>
+              <SelectItem value="12_months">12 months</SelectItem>
+              <SelectItem value="18_months">18 months</SelectItem>
+              <SelectItem value="24_months">24 months</SelectItem>
+              <SelectItem value="month_to_month">Month to month</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div>
+        <Label htmlFor="additionalComments">Additional Comments</Label>
+        <Textarea
+          id="additionalComments"
+          value={formData.additionalInfo.additionalComments}
+          onChange={(e) => handleInputChange('additionalInfo', 'additionalComments', e.target.value)}
+          placeholder="Any additional information you'd like to share..."
+        />
+      </div>
+    </div>
+  );
+
+  const renderDocumentsAndAgreements = () => (
+    <div className="space-y-6">
+      <div>
+        <h4 className="font-medium mb-3">Required Documents</h4>
+        <p className="text-sm text-muted-foreground mb-4">
+          Please confirm you have the following documents ready to upload:
+        </p>
+        <div className="space-y-3">
+          {[
+            { key: 'idDocument', label: 'Government-issued ID' },
+            { key: 'incomeProof', label: 'Proof of income (pay stubs, bank statements)' },
+            { key: 'bankStatements', label: 'Recent bank statements (last 3 months)' },
+            { key: 'references', label: 'Reference letters' }
+          ].map((doc) => (
+            <div key={doc.key} className="flex items-center space-x-2">
+              <Checkbox
+                id={doc.key}
+                checked={formData.documents[doc.key as keyof typeof formData.documents]}
+                onCheckedChange={(checked) => handleInputChange('documents', doc.key, checked)}
+              />
+              <Label htmlFor={doc.key}>{doc.label}</Label>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Separator />
+      <div>
+        <h4 className="font-medium mb-3">Agreements *</h4>
+        <div className="space-y-3">
+          {[
+            { key: 'backgroundCheck', label: 'I consent to a background check' },
+            { key: 'creditCheck', label: 'I consent to a credit check' },
+            { key: 'termsAndConditions', label: 'I agree to the terms and conditions' }
+          ].map((agreement) => (
+            <div key={agreement.key} className="flex items-center space-x-2">
+              <Checkbox
+                id={agreement.key}
+                checked={formData.agreements[agreement.key as keyof typeof formData.agreements]}
+                onCheckedChange={(checked) => handleInputChange('agreements', agreement.key, checked)}
+              />
+              <Label htmlFor={agreement.key}>{agreement.label}</Label>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0: return renderPersonalInfo();
+      case 1: return renderEmploymentInfo();
+      case 2: return renderRentalHistory();
+      case 3: return renderReferences();
+      case 4: return renderAdditionalInfo();
+      case 5: return renderDocumentsAndAgreements();
+      default: return renderPersonalInfo();
+    }
+  };
+
+  const canSubmit = () => {
+    return formData.agreements.backgroundCheck && 
+           formData.agreements.creditCheck && 
+           formData.agreements.termsAndConditions;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Back Button */}
+      <Button variant="ghost" asChild>
+        <Link href={`/properties/${property.id}`}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Property
+        </Link>
+      </Button>
+
+      {/* Property Summary */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+              <Home className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <div>
+              <h3 className="font-semibold">{property.title}</h3>
+              <p className="text-sm text-muted-foreground">{property.location?.address}, {property.location?.city}</p>
+              <p className="text-lg font-bold">₦{property.price?.amount?.toLocaleString()}/{property.price?.period}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Progress Steps */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            {steps.map((step, index) => (
+              <div key={index} className="flex flex-col items-center relative">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  index <= currentStep ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                }`}>
+                  <step.icon className="w-5 h-5" />
+                </div>
+                <div className="text-center mt-2 hidden md:block">
+                  <div className="text-sm font-medium">{step.title}</div>
+                  <div className="text-xs text-muted-foreground">{step.description}</div>
+                </div>
+                {index < steps.length - 1 && (
+                  <div className={`absolute top-5 left-12 w-full h-0.5 ${
+                    index < currentStep ? 'bg-primary' : 'bg-muted'
+                  }`} style={{ width: 'calc(100% + 2rem)' }} />
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Form Content */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{steps[currentStep].title}</CardTitle>
+          <p className="text-muted-foreground">{steps[currentStep].description}</p>
+        </CardHeader>
+        <CardContent className="p-6">
+          {renderStepContent()}
+        </CardContent>
+      </Card>
+
+      {/* Navigation */}
+      <div className="flex justify-between">
+        <Button 
+          variant="outline" 
+          onClick={handlePrevious}
+          disabled={currentStep === 0}
+        >
+          Previous
+        </Button>
+        
+        {currentStep === steps.length - 1 ? (
+          <Button 
+            onClick={handleSubmit}
+            disabled={!canSubmit() || isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Application'}
+          </Button>
+        ) : (
+          <Button onClick={handleNext}>
+            Next
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

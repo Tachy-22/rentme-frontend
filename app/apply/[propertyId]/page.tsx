@@ -1,48 +1,60 @@
-import React from 'react';
-import { notFound, redirect } from 'next/navigation';
-import { getProperty } from '@/actions/properties/getProperty';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { getDocument } from '@/actions/firebase';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
-import { ApplicationFormClient } from '@/components/applications/ApplicationFormClient';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import ApplicationFormClient from '@/components/applications/ApplicationFormClient';
 
-export const dynamic = 'force-dynamic';
-
-interface PropertyApplicationPageProps {
-  params: Promise<{ propertyId: string }>;
+interface ApplyPageProps {
+  params: {
+    propertyId: string;
+  };
 }
 
-export default async function PropertyApplicationPage({ params }: PropertyApplicationPageProps) {
-  const { propertyId } = await params;
-  
-  // Get current user
-  const user = await getCurrentUser();
-  
-  if (!user) {
-    redirect('/auth/login');
+export default async function ApplyPage({ params }: ApplyPageProps) {
+  const cookieStore = await cookies();
+  const userId = cookieStore.get('user-id')?.value;
+  const userRole = cookieStore.get('user-role')?.value;
+
+  if (!userId) {
+    redirect('/auth/login?redirect=/apply/' + params.propertyId);
   }
 
-  if (user.role !== 'renter') {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            You must be logged in as a renter to apply for properties.
-          </AlertDescription>
-        </Alert>
+  if (userRole !== 'renter') {
+    redirect('/dashboard?error=unauthorized');
+  }
+
+  const userResult = await getCurrentUser();
+  if (!userResult.success || !userResult.user) {
+    redirect('/auth/login?redirect=/apply/' + params.propertyId);
+  }
+
+  const propertyResult = await getDocument({
+    collectionName: 'properties',
+    documentId: params.propertyId
+  });
+  if (!propertyResult.success || !propertyResult.data) {
+    redirect('/properties?error=property-not-found');
+  }
+
+  const property = propertyResult.data;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="p-6 lg:p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">Apply for Property</h1>
+            <p className="text-muted-foreground mt-2">
+              Complete the application form for {(property as any)?.title || 'this property'}
+            </p>
+          </div>
+
+          <ApplicationFormClient 
+            user={userResult.user}
+            property={property as any}
+          />
+        </div>
       </div>
-    );
-  }
-  
-  // Load property details
-  const propertyResult = await getProperty(propertyId);
-  
-  if (!propertyResult.success || !propertyResult.property) {
-    notFound();
-  }
-  
-  const property = propertyResult.property;
-
-  return <ApplicationFormClient property={property} user={user} />;
+    </div>
+  );
 }

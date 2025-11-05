@@ -1,240 +1,238 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { User, Property } from '@/types';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Heart, MapPin, Bed, Bath, Square, Eye, HeartOff } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Heart,
+  Search,
+  MapPin,
+  Bed,
+  Bath,
+  Eye,
+  Calendar,
+  Trash2,
+  ExternalLink
+} from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
+import { getSavedProperties } from '@/actions/properties/getSavedProperties';
+import { saveProperty } from '@/actions/properties/saveProperty';
+import { toast } from 'sonner';
 
 interface SavedPropertiesClientProps {
   user: User;
-  savedProperties: Property[];
+  initialProperties: Property[];
 }
 
-export function SavedPropertiesClient({ user, savedProperties }: SavedPropertiesClientProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('saved_date');
+export default function SavedPropertiesClient({ user, initialProperties }: SavedPropertiesClientProps) {
+  const [properties, setProperties] = useState<Property[]>(initialProperties);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>(initialProperties);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredProperties = savedProperties.filter(property => {
-    const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         property.location?.address.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = typeFilter === 'all' || property.type === typeFilter;
-    return matchesSearch && matchesType;
-  });
+  useEffect(() => {
+    filterProperties();
+  }, [searchQuery, properties]);
 
-  const sortedProperties = [...filteredProperties].sort((a, b) => {
-    switch (sortBy) {
-      case 'price_low':
-        return a.price.amount - b.price.amount;
-      case 'price_high':
-        return b.price.amount - a.price.amount;
-      case 'newest':
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      case 'saved_date':
-      default:
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(); // Default sort by creation date
+  const filterProperties = () => {
+    if (!searchQuery) {
+      setFilteredProperties(properties);
+      return;
     }
-  });
 
-  const handleRemoveFromSaved = async (propertyId: string) => {
-    // TODO: Implement remove from saved functionality
-    console.log('Removing property from saved:', propertyId);
+    const filtered = properties.filter(property =>
+      property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      property.location.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      property.location.address.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    setFilteredProperties(filtered);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available':
-        return 'bg-green-100 text-green-800';
-      case 'rented':
-        return 'bg-blue-100 text-blue-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const handleUnsaveProperty = async (propertyId: string) => {
+    try {
+      setIsLoading(true);
+      const result = await saveProperty(propertyId);
+      
+      if (result.success) {
+        // Remove from local state
+        setProperties(prev => prev.filter(p => p.id !== propertyId));
+        toast.success('Property removed from saved');
+      } else {
+        toast.error(result.error || 'Failed to remove property');
+      }
+    } catch (error) {
+      toast.error('Failed to remove property');
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const formatDate = (date: any) => {
+    if (!date) return '';
+    const dateObj = date.toDate ? date.toDate() : new Date(date);
+    return dateObj.toLocaleDateString();
   };
 
   return (
-    <DashboardLayout user={user}>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Saved Properties</h1>
-          <p className="text-muted-foreground">
-            Your wishlist of favorite properties.
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Saved Properties</h1>
+        <p className="text-muted-foreground">
+          Properties you've saved for later review
+        </p>
+      </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+      {/* Search */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="Search saved properties..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
             />
           </div>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Property type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="apartment">Apartment</SelectItem>
-              <SelectItem value="house">House</SelectItem>
-              <SelectItem value="condo">Condo</SelectItem>
-              <SelectItem value="studio">Studio</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="saved_date">Recently Saved</SelectItem>
-              <SelectItem value="price_low">Price: Low to High</SelectItem>
-              <SelectItem value="price_high">Price: High to Low</SelectItem>
-              <SelectItem value="newest">Newest Listed</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Properties Grid */}
-        {sortedProperties.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Heart className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Saved Properties</h3>
-              <p className="text-muted-foreground text-center mb-4">
-                {savedProperties.length === 0 
-                  ? "You haven't saved any properties yet." 
-                  : "No properties match your current filters."
-                }
-              </p>
-              {savedProperties.length === 0 && (
-                <Button asChild>
-                  <Link href="/search">
-                    Start Searching Properties
-                  </Link>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedProperties.map((property) => (
-              <Card key={property.id} className="group hover:shadow-lg transition-shadow">
-                <div className="relative">
-                  {/* Property Image Placeholder */}
-                  <div className="aspect-video bg-muted rounded-t-lg relative overflow-hidden">
-                    {property.images && property.images.length > 0 ? (
-                      <img
-                        src={property.images[0].url}
-                        alt={property.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-muted-foreground">No Image</div>
-                      </div>
-                    )}
-                    
-                    {/* Remove from saved button */}
+      {/* Properties Count */}
+      <div className="flex justify-between items-center">
+        <p className="text-muted-foreground">
+          {filteredProperties.length} saved {filteredProperties.length === 1 ? 'property' : 'properties'}
+        </p>
+      </div>
+
+      {/* Properties Grid */}
+      {filteredProperties.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredProperties.map((property) => (
+            <Card key={property.id} className="group hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <div className="relative h-48 rounded-t-lg overflow-hidden">
+                  <Image
+                    src={property.images[0]?.url || '/placeholder.jpg'}
+                    alt={property.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                  <div className="absolute top-3 right-3">
                     <Button
                       size="sm"
                       variant="secondary"
-                      className="absolute top-2 right-2 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => handleRemoveFromSaved(property.id)}
+                      className="h-8 w-8 p-0 bg-white/90 hover:bg-white"
+                      onClick={() => handleUnsaveProperty(property.id)}
+                      disabled={isLoading}
                     >
-                      <HeartOff className="h-4 w-4" />
+                      <Heart className="w-4 h-4 fill-red-500 text-red-500" />
                     </Button>
-                    
-                    {/* Status badge */}
-                    <Badge className={`absolute bottom-2 left-2 ${getStatusColor(property.status)}`}>
+                  </div>
+                  <div className="absolute top-3 left-3">
+                    <Badge 
+                      className={cn(
+                        'capitalize',
+                        property.status === 'available' ? 'bg-green-100 text-green-800' :
+                        property.status === 'rented' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      )}
+                    >
                       {property.status}
                     </Badge>
                   </div>
                 </div>
-
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1 flex-1">
-                      <CardTitle className="text-lg line-clamp-1">{property.title}</CardTitle>
-                      <CardDescription className="flex items-center text-sm">
-                        <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-                        <span className="line-clamp-1">{property.location?.address}</span>
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="pt-0">
+                
+                <CardContent className="p-4">
                   <div className="space-y-3">
-                    {/* Property Details */}
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center">
-                          <Bed className="h-4 w-4 mr-1" />
-                          <span>{property.details.bedrooms}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Bath className="h-4 w-4 mr-1" />
-                          <span>{property.details.bathrooms}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Square className="h-4 w-4 mr-1" />
-                          <span>{property.details.area.value} {property.details.area.unit}</span>
-                        </div>
+                    <div>
+                      <h3 className="font-semibold text-lg leading-tight">
+                        {property.title}
+                      </h3>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                        <MapPin className="w-3 h-3" />
+                        {property.location.city}, {property.location.state}
                       </div>
                     </div>
 
-                    {/* Price */}
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-2xl font-bold">
-                          ${property.price.amount.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          per {property.price.period}
-                        </p>
+                      <div className="text-2xl font-bold text-primary">
+                        ₦{property.price.amount.toLocaleString()}
+                        <span className="text-sm font-normal text-muted-foreground">
+                          /{property.price.period}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Bed className="w-3 h-3" />
+                          {property.details.bedrooms}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Bath className="w-3 h-3" />
+                          {property.details.bathrooms}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex space-x-2 pt-2">
-                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        Saved {formatDate(property.savedAt)}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {property.viewCount || 0} views
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2">
+                      <Button asChild className="flex-1">
                         <Link href={`/properties/${property.id}`}>
-                          <Eye className="h-4 w-4 mr-2" />
+                          <ExternalLink className="w-4 h-4 mr-2" />
                           View Details
                         </Link>
                       </Button>
-                      <Button size="sm" className="flex-1" asChild>
-                        <Link href={`/apply/${property.id}`}>
-                          Apply Now
-                        </Link>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUnsaveProperty(property.id)}
+                        disabled={isLoading}
+                        className="px-3"
+                      >
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Summary */}
-        {savedProperties.length > 0 && (
-          <div className="text-center text-sm text-muted-foreground">
-            Showing {sortedProperties.length} of {savedProperties.length} saved properties
-          </div>
-        )}
-      </div>
-    </DashboardLayout>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Heart className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No saved properties yet</h3>
+            <p className="text-muted-foreground mb-6">
+              {searchQuery 
+                ? 'No properties match your search criteria.' 
+                : 'Start exploring properties and save your favorites here.'
+              }
+            </p>
+            <Button asChild>
+              <Link href="/properties">
+                <Search className="w-4 h-4 mr-2" />
+                Browse Properties
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

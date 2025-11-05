@@ -4,12 +4,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
   User as FirebaseUser,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
   signOut,
   updateProfile,
-  sendPasswordResetEmail,
-  sendEmailVerification,
   signInWithPopup
 } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
@@ -20,11 +16,9 @@ interface AuthContextType {
   user: User | null;
   firebaseUser: FirebaseUser | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signUp: (email: string, password: string, userData: Partial<User>) => Promise<{ success: boolean; error?: string }>;
-  signInWithGoogle: () => Promise<{ success: boolean; error?: string }>;
+  signInWithGoogle: () => Promise<{ success: boolean; error?: string; needsOnboarding?: boolean }>;
+  completeOnboarding: (userData: Partial<User>) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   updateUserProfile: (userData: Partial<User>) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -61,10 +55,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.log({ userDoc })
           if (userDoc.success && userDoc.data) {
             const rawData = userDoc.data as Record<string, unknown>;
-            
+
             // Convert Firestore Timestamps to strings for serialization
             const serializedData = { ...rawData };
-            
+
             // Handle common Firestore Timestamp fields
             if (serializedData.createdAt && typeof serializedData.createdAt === 'object' && serializedData.createdAt !== null) {
               const timestamp = serializedData.createdAt as { seconds: number; nanoseconds: number };
@@ -72,14 +66,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 serializedData.createdAt = new Date(timestamp.seconds * 1000).toISOString();
               }
             }
-            
+
             if (serializedData.updatedAt && typeof serializedData.updatedAt === 'object' && serializedData.updatedAt !== null) {
               const timestamp = serializedData.updatedAt as { seconds: number; nanoseconds: number };
               if ('seconds' in timestamp && 'nanoseconds' in timestamp) {
                 serializedData.updatedAt = new Date(timestamp.seconds * 1000).toISOString();
               }
             }
-            
+
             if (serializedData.lastLoginAt && typeof serializedData.lastLoginAt === 'object' && serializedData.lastLoginAt !== null) {
               const timestamp = serializedData.lastLoginAt as { seconds: number; nanoseconds: number };
               if ('seconds' in timestamp && 'nanoseconds' in timestamp) {
@@ -120,56 +114,67 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+
+  const signInWithGoogle = async (): Promise<{ success: boolean; error?: string; needsOnboarding?: boolean }> => {
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithPopup(auth, googleProvider);
 
-      return { success: true };
+      // Check if user exists in Firestore
+      const userDoc = await getDocument({
+        collectionName: 'users',
+        documentId: result.user.uid
+      });
+      console.log({ userDoc })
+      
+      // If user doesn't exist, they need onboarding
+      if (!userDoc.success || !userDoc.data) {
+        return {
+          success: true,
+          needsOnboarding: true
+        };
+      }
+
+      return { success: true, needsOnboarding: false };
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('Google sign in error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to sign in'
+        error: error instanceof Error ? error.message : 'Failed to sign in with Google'
       };
     } finally {
       setLoading(false);
     }
   };
 
-  const signUp = async (
-    email: string,
-    password: string,
-    user: Partial<User>
-  ): Promise<{ success: boolean; error?: string }> => {
+  const completeOnboarding = async (userData: Partial<User>): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-      // Send email verification
-      await sendEmailVerification(userCredential.user, {
-        url: `${window.location.origin}/auth/verify-email`,
-        handleCodeInApp: true
-      });
+      
+      if (!firebaseUser) {
+        return {
+          success: false,
+          error: 'No authenticated user found'
+        };
+      }
 
       // Update Firebase Auth profile
-      await updateProfile(userCredential.user, {
-        displayName: `${user.profile?.firstName} ${user.profile?.lastName}`
+      await updateProfile(firebaseUser, {
+        displayName: `${userData.profile?.firstName} ${userData.profile?.lastName}`
       });
 
       // Create user document in Firestore
       const newUser: User = {
-        id:userCredential.user.uid,
-        email: userCredential.user.email!,
-        role: user.role as UserRole,
-        profile: user.profile!,
+        id: firebaseUser.uid,
+        email: firebaseUser.email!,
+        role: userData.role as UserRole,
+        profile: userData.profile!,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         isActive: true,
-        emailVerified: userCredential.user.emailVerified
+        emailVerified: firebaseUser.emailVerified
       };
 
-      // This will be handled by server action
       const { addDocument } = await import('@/actions');
       const result = await addDocument({
         collectionName: 'users',
@@ -180,43 +185,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(result.error || 'Failed to create user profile');
       }
 
-      return { success: true };
-    } catch (error) {
-      console.error('Sign up error:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to create account'
-      };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signInWithGoogle = async (): Promise<{ success: boolean; error?: string }> => {
-    try {
-      setLoading(true);
-      const result = await signInWithPopup(auth, googleProvider);
-
-      // Check if user exists in Firestore
-      const userDoc = await getDocument({
-        collectionName: 'users',
-        documentId: result.user.uid
-      });
-
-      // If user doesn't exist, they need to complete registration
-      if (!userDoc.success || !userDoc.data) {
-        return {
-          success: false,
-          error: 'Please complete your registration with email and password first'
-        };
-      }
+      // Set cookies immediately after successful onboarding
+      const token = await firebaseUser.getIdToken();
+      document.cookie = `auth-token=${token}; path=/; max-age=3600`;
+      document.cookie = `user-role=${userData.role}; path=/; max-age=3600`;
+      document.cookie = `user-id=${firebaseUser.uid}; path=/; max-age=3600`;
 
       return { success: true };
     } catch (error) {
-      console.error('Google sign in error:', error);
+      console.error('Onboarding error:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Failed to sign in with Google'
+        error: error instanceof Error ? error.message : 'Failed to complete onboarding'
       };
     } finally {
       setLoading(false);
@@ -231,18 +211,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const resetPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
-    try {
-      await sendPasswordResetEmail(auth, email);
-      return { success: true };
-    } catch (error) {
-      console.error('Password reset error:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to send reset email'
-      };
-    }
-  };
 
   const updateUserProfile = async (userData: Partial<User>): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -279,11 +247,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     firebaseUser,
     loading,
-    signIn,
-    signUp,
     signInWithGoogle,
+    completeOnboarding,
     logout,
-    resetPassword,
     updateUserProfile
   };
 

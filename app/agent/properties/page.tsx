@@ -1,30 +1,24 @@
-import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { getAgentProperties } from '@/actions/properties/getAgentProperties';
-import { AgentPropertiesClient } from '@/components/agent/AgentPropertiesClient';
+import AgentPropertiesPage from '@/components/agent/AgentPropertiesPage';
+import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export default async function AgentPropertiesPage() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect('/auth/login');
+export default async function AgentPropertiesPageRoute() {
+  const userResult = await getCurrentUser();
+  
+  if (!userResult.success || !userResult.user) {
+    redirect('/auth');
   }
 
-  // Only agents can access this page
+  const user = userResult.user;
+
   if (user.role !== 'agent') {
     redirect('/dashboard');
   }
 
-  // Fetch agent's properties
-  const propertiesResult = await getAgentProperties(user.id);
-  const properties = propertiesResult.success ? propertiesResult.properties : [];
+  // Get agent properties
+  const propertiesResult = await getAgentProperties();
+  const properties = propertiesResult.success ? propertiesResult.data : [];
 
-  return (
-    <AgentPropertiesClient 
-      user={user} 
-      properties={properties}
-    />
-  );
+  return <AgentPropertiesPage user={user} properties={properties} />;
 }

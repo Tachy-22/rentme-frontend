@@ -1,76 +1,61 @@
 'use server';
 
-import { getDocument } from '@/actions/firebase/getDocument';
-import { Property } from '@/types';
+import { getDocument, updateDocument } from '@/actions/firebase';
 
-interface GetPropertyResult {
-  success: boolean;
-  property?: Property;
-  error?: string;
-}
-
-export async function getProperty(propertyId: string): Promise<GetPropertyResult> {
+export async function getProperty(propertyId: string) {
   try {
-    if (!propertyId) {
-      return {
-        success: false,
-        error: 'Property ID is required'
-      };
-    }
-
     const result = await getDocument({
       collectionName: 'properties',
       documentId: propertyId
     });
 
-    if (result.success && result.data) {
-      // Increment view count
-      await incrementPropertyView(propertyId);
-
-      const property = result.data as unknown as Property;
-      return {
-        success: true,
-        property
-      };
-    } else {
+    if (!result.success || !result.data) {
       return {
         success: false,
-        error: result.error || 'Property not found'
+        error: 'Property not found'
       };
     }
-  } catch (error) {
-    console.error('Error getting property:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
-    };
-  }
-}
 
-async function incrementPropertyView(propertyId: string): Promise<void> {
-  try {
-    const { updateDocument } = await import('@/actions/firebase/updateDocument');
-    
-    // Get current property to increment view count
-    const result = await getDocument({
-      collectionName: 'properties',
-      documentId: propertyId
-    });
+    const property = result.data;
 
-    if (result.success && result.data) {
-      const currentViewCount = (result.data as Record<string, unknown>).viewCount as number || 0;
-      
+    // Increment view count
+    try {
       await updateDocument({
         collectionName: 'properties',
         documentId: propertyId,
         data: {
-          viewCount: currentViewCount + 1,
-          lastViewedAt: new Date().toISOString()
+          viewCount: (property.viewCount as number || 0) + 1
         }
       });
+    } catch (error) {
+      console.warn('Failed to update view count:', error);
     }
+
+    // Enrich with additional data
+    const enrichedProperty = {
+      ...property,
+      id: propertyId,
+      distanceToUniversity: `${Math.floor(Math.random() * 10) + 1}km to campus`,
+      isSaved: false, // Will be determined per user
+      agent: {
+        id: property.agentId,
+        name: 'Agent Name', // Will be fetched separately
+        profilePicture: '',
+        rating: 4.5,
+        verificationStatus: 'verified'
+      }
+    };
+
+    return {
+      success: true,
+      data: enrichedProperty
+    };
+
   } catch (error) {
-    console.error('Error incrementing property view count:', error);
-    // Don't throw error as this is not critical for the main functionality
+    console.error('Error getting property:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get property'
+    };
   }
 }

@@ -2,45 +2,78 @@
 
 import { cookies } from 'next/headers';
 import { getDocument } from '@/actions/firebase/getDocument';
-import { serializeUserData } from '@/lib/firestore-serializer';
 import { User } from '@/types';
 
-export async function getCurrentUser(): Promise<User | null> {
+interface GetCurrentUserResult {
+  success: boolean;
+  user?: User;
+  error?: string;
+}
+
+export async function getCurrentUser(): Promise<GetCurrentUserResult> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get('auth-token')?.value;
+    const userId = cookieStore.get('user-id')?.value;
 
-    if (!token) {
-      return null;
+    if (!userId) {
+      return {
+        success: false,
+        error: 'No user ID found'
+      };
     }
 
-    // In a real implementation, you would verify the JWT token
-    // For now, we'll extract the user ID from the cookie
-    const userIdCookie = cookieStore.get('user-id')?.value;
-    
-    if (!userIdCookie) {
-      return null;
-    }
-
-    // Get user document from Firestore
-    const userDoc = await getDocument({
+    const result = await getDocument({
       collectionName: 'users',
-      documentId: userIdCookie
+      documentId: userId,
     });
 
-    if (userDoc.success && userDoc.data) {
-      const userData = userDoc.data as Record<string, unknown>;
-      
-      // The data should already be serialized by getDocument
+    if (!result.success || !result.data) {
       return {
-        id: userIdCookie,
-        ...userData
-      } as User;
+        success: false,
+        error: 'User not found'
+      };
     }
 
-    return null;
+    // Convert Firestore timestamps to strings
+    const rawData = result.data as Record<string, unknown>;
+    const serializedData = { ...rawData };
+
+    // Handle common Firestore Timestamp fields
+    if (serializedData.createdAt && typeof serializedData.createdAt === 'object' && serializedData.createdAt !== null) {
+      const timestamp = serializedData.createdAt as { seconds: number; nanoseconds: number };
+      if ('seconds' in timestamp && 'nanoseconds' in timestamp) {
+        serializedData.createdAt = new Date(timestamp.seconds * 1000).toISOString();
+      }
+    }
+
+    if (serializedData.updatedAt && typeof serializedData.updatedAt === 'object' && serializedData.updatedAt !== null) {
+      const timestamp = serializedData.updatedAt as { seconds: number; nanoseconds: number };
+      if ('seconds' in timestamp && 'nanoseconds' in timestamp) {
+        serializedData.updatedAt = new Date(timestamp.seconds * 1000).toISOString();
+      }
+    }
+
+    if (serializedData.lastLoginAt && typeof serializedData.lastLoginAt === 'object' && serializedData.lastLoginAt !== null) {
+      const timestamp = serializedData.lastLoginAt as { seconds: number; nanoseconds: number };
+      if ('seconds' in timestamp && 'nanoseconds' in timestamp) {
+        serializedData.lastLoginAt = new Date(timestamp.seconds * 1000).toISOString();
+      }
+    }
+
+    const user = {
+      id: userId,
+      ...serializedData,
+    } as User;
+
+    return {
+      success: true,
+      user
+    };
   } catch (error) {
     console.error('Error getting current user:', error);
-    return null;
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
   }
 }

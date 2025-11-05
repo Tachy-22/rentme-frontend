@@ -1,138 +1,107 @@
 'use server';
 
-import { queryDocuments } from '@/actions/firebase/queryDocuments';
-import { getDocument } from '@/actions/firebase/getDocument';
+import { cookies } from 'next/headers';
+import { queryDocuments, getDocument } from '@/actions/firebase';
 
-interface ConversationData {
-  id: string;
-  participantIds: string[];
-  propertyId: string;
-  lastMessage?: {
-    content: string;
-    createdAt: string;
-  };
-  unreadCounts?: Record<string, number>;
-}
-
-interface UserData {
-  id: string;
-  email: string;
-  role: string;
-  profile?: {
-    firstName?: string;
-    lastName?: string;
-    profilePicture?: string;
-  };
-}
-
-interface PropertyData {
-  id: string;
-  title: string;
-  location?: {
-    address?: string;
-  };
-}
-
-export async function getConversations(userId: string) {
+export async function getConversations() {
   try {
-    // Query all conversations (Realtime Database has limited filtering)
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User not authenticated'
+      };
+    }
+
+    // Get all conversations where user is a participant
     const result = await queryDocuments({
       collectionName: 'conversations',
-      realtime: true
+      filters: [
+        { field: 'participants', operator: 'array-contains', value: userId }
+      ],
+      orderByField: 'updatedAt',
+      orderDirection: 'desc'
     });
 
     if (!result.success || !result.data) {
       return {
         success: false,
-        error: result.error || 'Failed to fetch conversations'
+        error: 'Failed to fetch conversations'
       };
     }
 
-    // Filter conversations where user is a participant and enrich with participant and property data
-    const userConversations = (result.data as unknown as ConversationData[]).filter((conversation) => 
-      conversation.participantIds && conversation.participantIds.includes(userId)
-    );
-
+    // Enrich conversations with participant details
     const enrichedConversations = await Promise.all(
-      userConversations.map(async (conversation) => {
-        try {
-          // Get the other participant (not the current user)
-          const otherParticipantId = conversation.participantIds.find((id: string) => id !== userId);
-          
-          if (!otherParticipantId) {
-            return null;
-          }
+      result.data.map(async (conversation: any) => {
+        const otherParticipantId = conversation.participants.find((id: string) => id !== userId);
+        
+        if (!otherParticipantId) {
+          return conversation;
+        }
 
-          // Get participant data
-          const participantResult = await getDocument({
-            collectionName: 'users', 
-            documentId: otherParticipantId
-          });
+        // Get other participant details
+        const participantResult = await getDocument({
+          collectionName: 'users',
+          documentId: otherParticipantId
+        });
+
+        let otherParticipant = null;
+        if (participantResult.success && participantResult.data) {
+          const userData = participantResult.data as any;
+          const firstName = userData.profile?.firstName || '';
+          const lastName = userData.profile?.lastName || '';
+          const fullName = `${firstName} ${lastName}`.trim() || userData.name || 'Unknown User';
           
-          // Get property data
+          otherParticipant = {
+            id: otherParticipantId,
+            name: fullName,
+            profilePicture: userData.profile?.profilePicture || null,
+            role: userData.role,
+            verificationStatus: userData.profile?.verificationStatus || 'unverified',
+            isOnline: userData.lastSeen ? 
+              (new Date().getTime() - new Date(userData.lastSeen).getTime()) < 300000 : false // 5 minutes
+          };
+        }
+
+        // Get property details if conversation is about a property
+        let property = null;
+        if (conversation.propertyId) {
           const propertyResult = await getDocument({
-            collectionName: 'properties', 
+            collectionName: 'properties',
             documentId: conversation.propertyId
           });
 
-          if (!participantResult.success || !propertyResult.success) {
-            return null;
+          if (propertyResult.success && propertyResult.data) {
+            property = {
+              id: conversation.propertyId,
+              title: propertyResult.data.title,
+              price: propertyResult.data.price,
+              images: propertyResult.data.images || []
+            };
           }
-
-          const participant = participantResult.data as unknown as UserData;
-          const property = propertyResult.data as unknown as PropertyData;
-
-          if (!participant || !property) {
-            return null;
-          }
-
-          return {
-            id: conversation.id,
-            participant: {
-              id: participant.id,
-              name: participant.profile?.firstName && participant.profile?.lastName 
-                ? `${participant.profile.firstName} ${participant.profile.lastName}`
-                : participant.email,
-              avatar: participant.profile?.profilePicture || '',
-              role: participant.role,
-              lastSeen: 'Online' // TODO: Implement real last seen
-            },
-            lastMessage: conversation.lastMessage ? {
-              content: conversation.lastMessage.content,
-              timestamp: new Date(conversation.lastMessage.createdAt).toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              }),
-              unread: (conversation.unreadCounts?.[userId] ?? 0) > 0 || false
-            } : {
-              content: 'No messages yet',
-              timestamp: '',
-              unread: false
-            },
-            property: {
-              title: property.title,
-              address: property.location?.address || ''
-            }
-          };
-        } catch (error) {
-          console.error('Error enriching conversation:', error);
-          return null;
         }
+
+        return {
+          ...conversation,
+          otherParticipant,
+          property,
+          unreadCount: conversation.unreadCount?.[userId] || 0
+        };
       })
     );
 
-    // Filter out failed conversations
-    const validConversations = enrichedConversations.filter(conv => conv !== null);
-
     return {
       success: true,
-      conversations: validConversations
+      data: enrichedConversations
     };
+
   } catch (error) {
     console.error('Error getting conversations:', error);
     return {
       success: false,
-      error: 'Failed to fetch conversations'
+      error: error instanceof Error ? error.message : 'Failed to get conversations'
     };
   }
 }

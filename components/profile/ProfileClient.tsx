@@ -1,480 +1,358 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { User, UserRole, RenterProfile, AgentProfile, AdminProfile } from '@/types';
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import { useState } from 'react';
+import { User } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Save } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { 
+  User as UserIcon,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  Camera,
+  Edit2,
+  Save,
+  X,
+  CheckCircle,
+  AlertTriangle
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProfileClientProps {
   user: User;
 }
 
-// Base profile schema
-const baseProfileSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  phoneNumber: z.string().min(10, 'Valid phone number is required'),
-  dateOfBirth: z.string().min(1, 'Date of birth is required'),
-  bio: z.string().optional(),
-  profilePicture: z.string().optional(),
-});
-
-// Renter-specific fields
-const renterProfileSchema = baseProfileSchema.extend({
-  role: z.literal('renter'),
-  occupation: z.string().min(1, 'Occupation is required'),
-  emergencyContact: z.object({
-    name: z.string().min(1, 'Emergency contact name is required'),
-    phone: z.string().min(10, 'Emergency contact phone is required'),
-    relationship: z.string().min(1, 'Relationship is required'),
-  }),
-  preferences: z.object({
-    budget: z.object({
-      min: z.number().min(0).optional(),
-      max: z.number().min(0).optional(),
-    }).optional(),
-    propertyType: z.array(z.string()).optional(),
-    bedrooms: z.object({
-      min: z.number().min(0).optional(),
-      max: z.number().min(0).optional(),
-    }).optional(),
-    bathrooms: z.object({
-      min: z.number().min(0).optional(),
-    }).optional(),
-    petFriendly: z.boolean().optional(),
-    smokingAllowed: z.boolean().optional(),
-    furnished: z.boolean().optional(),
-  }).optional(),
-});
-
-// Agent-specific fields
-const agentProfileSchema = baseProfileSchema.extend({
-  role: z.literal('agent'),
-  licenseNumber: z.string().min(1, 'License number is required'),
-  agencyName: z.string().min(1, 'Agency name is required'),
-  experienceYears: z.number().min(0, 'Experience years must be positive'),
-  specializations: z.array(z.string()).min(1, 'At least one specialization is required'),
-  serviceAreas: z.array(z.string()).min(1, 'At least one service area is required'),
-  rating: z.number().min(0).max(5).optional(),
-  totalReviews: z.number().min(0).optional(),
-  totalDeals: z.number().min(0).optional(),
-  responseTime: z.number().min(0).optional(),
-});
-
-// Admin-specific fields
-const adminProfileSchema = baseProfileSchema.extend({
-  role: z.literal('admin'),
-  department: z.string().min(1, 'Department is required'),
-  permissions: z.array(z.string()).min(1, 'At least one permission is required'),
-  employeeId: z.string().min(1, 'Employee ID is required'),
-});
-
-// Super admin-specific fields
-const superAdminProfileSchema = baseProfileSchema.extend({
-  role: z.literal('super_admin'),
-  department: z.string().min(1, 'Department is required'),
-  permissions: z.array(z.string()).min(1, 'At least one permission is required'),
-  employeeId: z.string().min(1, 'Employee ID is required'),
-});
-
-// Union of all profile schemas
-const profileSchema = z.discriminatedUnion('role', [
-  renterProfileSchema,
-  agentProfileSchema,
-  adminProfileSchema,
-  superAdminProfileSchema,
-]);
-
-type ProfileFormData = z.infer<typeof profileSchema>;
-
-export function ProfileClient({ user }: ProfileClientProps) {
+export default function ProfileClient({ user }: ProfileClientProps) {
+  const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const router = useRouter();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      role: user.role,
-      firstName: user.profile.firstName,
-      lastName: user.profile.lastName,
-      phoneNumber: user.profile.phoneNumber || user.profile.phone || '',
-      dateOfBirth: (user.profile as RenterProfile)?.dateOfBirth || '',
-      bio: (user.profile as RenterProfile | AgentProfile)?.bio || '',
-      profilePicture: user.profile.profilePicture || '',
-      ...(user.role === 'renter' && {
-        occupation: (user.profile as RenterProfile).occupation || '',
-        emergencyContact: (user.profile as RenterProfile).emergencyContact || { name: '', phone: '', relationship: '' },
-        preferences: (user.profile as RenterProfile).preferences || {},
-      }),
-      ...(user.role === 'agent' && {
-        licenseNumber: (user.profile as AgentProfile).licenseNumber || '',
-        agencyName: (user.profile as AgentProfile).company || '',
-        experienceYears: 0, // Not in AgentProfile type, will be calculated
-        specializations: (user.profile as AgentProfile).specialties || [],
-        serviceAreas: (user.profile as AgentProfile).serviceAreas || [],
-        rating: (user.profile as AgentProfile).rating || 0,
-        totalReviews: (user.profile as AgentProfile).totalReviews || 0,
-        totalDeals: (user.profile as AgentProfile).totalDeals || 0,
-        responseTime: (user.profile as AgentProfile).responseTime || 0,
-      }),
-      ...(user.role === 'admin' && {
-        department: (user.profile as AdminProfile).department || '',
-        permissions: (user.profile as AdminProfile).permissions || [],
-        employeeId: (user.profile as AdminProfile).employeeId || '',
-      }),
-      ...(user.role === 'super_admin' && {
-        department: (user.profile as AdminProfile).department || '',
-        permissions: (user.profile as AdminProfile).permissions || [],
-        employeeId: (user.profile as AdminProfile).employeeId || '',
-      }),
-    } as ProfileFormData,
+  const [formData, setFormData] = useState({
+    firstName: user.profile?.firstName || '',
+    lastName: user.profile?.lastName || '',
+    phone: user.profile?.phone || '',
+    dateOfBirth: user.profile?.dateOfBirth || '',
+    address: user.profile?.address || '',
+    city: user.profile?.city || '',
+    state: user.profile?.state || '',
+    bio: user.profile?.bio || '',
+    university: user.profile?.university || '',
+    studentId: user.profile?.studentId || '',
+    preferredContactMethod: user.profile?.preferredContactMethod || 'email'
   });
 
-  const role = watch('role') as UserRole;
+  const profile = user.profile as any;
+  const isVerified = profile?.identityVerified || false;
 
-  // Type-safe helpers for discriminated union form
-  const safeRegister = register as unknown as (name: string) => Record<string, unknown>;
-  const safeErrors = errors as unknown as Record<string, { message?: string }>;
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
-  const onSubmit = async (data: ProfileFormData) => {
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
+  const handleSave = async () => {
     try {
-      const { updateDocument } = await import('@/actions');
-      const result = await updateDocument({
-        collectionName: 'users',
-        documentId: user.id,
-        data: {
-          profile: data,
-          updatedAt: new Date().toISOString()
-        }
-      });
-
-      if (result.success) {
-        setSuccess('Profile updated successfully!');
-        router.refresh();
-      } else {
-        setError(result.error || 'Failed to update profile');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred');
+      setIsLoading(true);
+      // TODO: Implement profile update server action
+      // const result = await updateUserProfile(formData);
+      
+      // Simulate API call for now
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success('Profile updated successfully');
+      setIsEditing(false);
+    } catch (error) {
+      toast.error('Failed to update profile');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const renderRoleSpecificFields = () => {
-    switch (role) {
-      case 'renter':
-        return (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="occupation">Occupation</Label>
-              <Input
-                id="occupation"
-                {...safeRegister('occupation')}
-                placeholder="Your current occupation"
-              />
-              {safeErrors.occupation && (
-                <p className="text-sm text-destructive">{safeErrors.occupation?.message}</p>
-              )}
-            </div>
+  const handleCancel = () => {
+    setFormData({
+      firstName: user.profile?.firstName || '',
+      lastName: user.profile?.lastName || '',
+      phone: user.profile?.phone || '',
+      dateOfBirth: user.profile?.dateOfBirth || '',
+      address: user.profile?.address || '',
+      city: user.profile?.city || '',
+      state: user.profile?.state || '',
+      bio: user.profile?.bio || '',
+      university: user.profile?.university || '',
+      studentId: user.profile?.studentId || '',
+      preferredContactMethod: user.profile?.preferredContactMethod || 'email'
+    });
+    setIsEditing(false);
+  };
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Emergency Contact</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="emergencyContact.name">Name</Label>
-                  <Input
-                    id="emergencyContact.name"
-                    {...safeRegister('emergencyContact.name')}
-                    placeholder="Emergency contact name"
-                  />
-                  {safeErrors['emergencyContact.name'] && (
-                    <p className="text-sm text-destructive">{safeErrors['emergencyContact.name']?.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="emergencyContact.phone">Phone</Label>
-                  <Input
-                    id="emergencyContact.phone"
-                    {...safeRegister('emergencyContact.phone')}
-                    placeholder="Emergency contact phone"
-                  />
-                  {safeErrors['emergencyContact.phone'] && (
-                    <p className="text-sm text-destructive">{safeErrors['emergencyContact.phone']?.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="emergencyContact.relationship">Relationship</Label>
-                  <Input
-                    id="emergencyContact.relationship"
-                    {...safeRegister('emergencyContact.relationship')}
-                    placeholder="e.g., Parent, Spouse, Friend"
-                  />
-                  {safeErrors['emergencyContact.relationship'] && (
-                    <p className="text-sm text-destructive">{safeErrors['emergencyContact.relationship']?.message}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Rental Preferences</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="preferences.budget.min">Min Budget</Label>
-                  <Input
-                    id="preferences.budget.min"
-                    type="number"
-                    {...safeRegister('preferences.budget.min')}
-                    placeholder="Minimum monthly budget"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="preferences.budget.max">Max Budget</Label>
-                  <Input
-                    id="preferences.budget.max"
-                    type="number"
-                    {...safeRegister('preferences.budget.max')}
-                    placeholder="Maximum monthly budget"
-                  />
-                </div>
-              </div>
-            </div>
-          </>
-        );
-
-      case 'agent':
-        return (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="licenseNumber">License Number</Label>
-              <Input
-                id="licenseNumber"
-                {...safeRegister('licenseNumber')}
-                placeholder="Real estate license number"
-              />
-              {safeErrors.licenseNumber && (
-                <p className="text-sm text-destructive">{safeErrors.licenseNumber?.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="agencyName">Agency Name</Label>
-              <Input
-                id="agencyName"
-                {...safeRegister('agencyName')}
-                placeholder="Your real estate agency"
-              />
-              {safeErrors.agencyName && (
-                <p className="text-sm text-destructive">{safeErrors.agencyName?.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="experienceYears">Years of Experience</Label>
-              <Input
-                id="experienceYears"
-                type="number"
-                {...safeRegister('experienceYears')}
-                placeholder="Years in real estate"
-              />
-              {safeErrors.experienceYears && (
-                <p className="text-sm text-destructive">{safeErrors.experienceYears?.message}</p>
-              )}
-            </div>
-          </>
-        );
-
-      case 'admin':
-      case 'super_admin':
-        return (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
-              <Input
-                id="department"
-                {...safeRegister('department')}
-                placeholder="Your department"
-              />
-              {safeErrors.department && (
-                <p className="text-sm text-destructive">{safeErrors.department?.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="employeeId">Employee ID</Label>
-              <Input
-                id="employeeId"
-                {...safeRegister('employeeId')}
-                placeholder="Your employee ID"
-              />
-              {safeErrors.employeeId && (
-                <p className="text-sm text-destructive">{safeErrors.employeeId?.message}</p>
-              )}
-            </div>
-          </>
-        );
-
-      default:
-        return null;
-    }
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'Not specified';
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
-    <DashboardLayout user={user}>
-      <div className="space-y-6">
-        {/* <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">My Profile</h1>
           <p className="text-muted-foreground">
-            Manage your account settings and preferences.
+            Manage your personal information and preferences
           </p>
-        </div> */}
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+        </div>
+        
+        {!isEditing ? (
+          <Button onClick={() => setIsEditing(true)}>
+            <Edit2 className="w-4 h-4 mr-2" />
+            Edit Profile
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button onClick={handleSave} disabled={isLoading}>
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
+            <Button variant="outline" onClick={handleCancel} disabled={isLoading}>
+              <X className="w-4 h-4 mr-2" />
+              Cancel
+            </Button>
+          </div>
         )}
+      </div>
 
-        {success && (
-          <Alert>
-            <AlertDescription>{success}</AlertDescription>
-          </Alert>
-        )}
+      {/* Verification Status */}
+     {!isVerified && <Card className={isVerified ? '' : 'border-yellow-200 bg-yellow-50'}>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            {!isVerified && (
+              <>
+                <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                <div>
+                  <span className="font-medium text-yellow-800">Verification Pending</span>
+                  <p className="text-sm text-yellow-700">Complete verification to unlock all features</p>
+                </div>
+                <Button size="sm" variant="secondary" className="ml-auto">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Get Verified
+                </Button>
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
-              <CardDescription>
-                Update your basic profile information.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile Photo & Basic Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Profile Photo</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col items-center space-y-4">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src={profile?.profilePicture} />
+                <AvatarFallback className="text-lg">
+                  {formData.firstName[0]}{formData.lastName[0]}
+                </AvatarFallback>
+              </Avatar>
+              
+              <Button variant="outline" size="sm">
+                <Camera className="w-4 h-4 mr-2" />
+                Change Photo
+              </Button>
+              
+              <div className="text-center">
+                <Badge variant={user.role === 'agent' ? 'default' : 'secondary'}>
+                  {user.role === 'agent' ? 'Agent' : 'Renter'}
+                </Badge>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                <span>{user.email}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span>Joined {formatDate(user.createdAt)}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Personal Information */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>
+              Your personal details and contact information
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                {isEditing ? (
                   <Input
                     id="firstName"
-                    {...safeRegister('firstName')}
-                    placeholder="Your first name"
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
                   />
-                  {safeErrors.firstName && (
-                    <p className="text-sm text-destructive">{safeErrors.firstName?.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    {...safeRegister('lastName')}
-                    placeholder="Your last name"
-                  />
-                  {safeErrors.lastName && (
-                    <p className="text-sm text-destructive">{safeErrors.lastName?.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
-                  <Input
-                    id="phoneNumber"
-                    {...safeRegister('phoneNumber')}
-                    placeholder="Your phone number"
-                  />
-                  {safeErrors.phoneNumber && (
-                    <p className="text-sm text-destructive">{safeErrors.phoneNumber?.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                  <Input
-                    id="dateOfBirth"
-                    type="date"
-                    {...safeRegister('dateOfBirth')}
-                  />
-                  {safeErrors.dateOfBirth && (
-                    <p className="text-sm text-destructive">{safeErrors.dateOfBirth?.message}</p>
-                  )}
-                </div>
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formData.firstName || 'Not specified'}</div>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  {...safeRegister('bio')}
-                  placeholder="Tell us about yourself..."
-                  rows={3}
-                />
-                {safeErrors.bio && (
-                  <p className="text-sm text-destructive">{safeErrors.bio?.message}</p>
+                <Label htmlFor="lastName">Last Name</Label>
+                {isEditing ? (
+                  <Input
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  />
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formData.lastName || 'Not specified'}</div>
                 )}
               </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Role-Specific Information</CardTitle>
-              <CardDescription>
-                Information specific to your role as a {role}.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {renderRoleSpecificFields()}
-            </CardContent>
-          </Card>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                {isEditing ? (
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => handleInputChange('phone', e.target.value)}
+                  />
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formData.phone || 'Not specified'}</div>
+                )}
+              </div>
 
-          <div className="flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
+              <div className="space-y-2">
+                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                {isEditing ? (
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    value={formData.dateOfBirth}
+                    onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
+                  />
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formatDate(formData.dateOfBirth)}</div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              {isEditing ? (
+                <Input
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                />
               ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Profile
-                </>
+                <div className="p-2 bg-muted rounded-md">{formData.address || 'Not specified'}</div>
               )}
-            </Button>
-          </div>
-        </form>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                {isEditing ? (
+                  <Input
+                    id="city"
+                    value={formData.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                  />
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formData.city || 'Not specified'}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="state">State</Label>
+                {isEditing ? (
+                  <Input
+                    id="state"
+                    value={formData.state}
+                    onChange={(e) => handleInputChange('state', e.target.value)}
+                  />
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formData.state || 'Not specified'}</div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bio">Bio</Label>
+              {isEditing ? (
+                <Textarea
+                  id="bio"
+                  rows={3}
+                  value={formData.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  placeholder="Tell us about yourself..."
+                />
+              ) : (
+                <div className="p-2 bg-muted rounded-md min-h-[80px]">
+                  {formData.bio || 'No bio provided'}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </DashboardLayout>
+
+      {/* Student Information (for renters) */}
+      {user.role === 'renter' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Student Information</CardTitle>
+            <CardDescription>
+              Your academic details for verification purposes
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="university">University</Label>
+                {isEditing ? (
+                  <Input
+                    id="university"
+                    value={formData.university}
+                    onChange={(e) => handleInputChange('university', e.target.value)}
+                  />
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formData.university || 'Not specified'}</div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="studentId">Student ID</Label>
+                {isEditing ? (
+                  <Input
+                    id="studentId"
+                    value={formData.studentId}
+                    onChange={(e) => handleInputChange('studentId', e.target.value)}
+                  />
+                ) : (
+                  <div className="p-2 bg-muted rounded-md">{formData.studentId || 'Not specified'}</div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

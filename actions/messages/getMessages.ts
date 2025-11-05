@@ -1,54 +1,117 @@
 'use server';
 
-import { queryDocuments } from '@/actions/firebase/queryDocuments';
+import { cookies } from 'next/headers';
+import { queryDocuments, getDocument } from '@/actions/firebase';
 
-interface MessageData {
-  id: string;
+interface GetMessagesParams {
   conversationId: string;
-  senderId: string;
-  content: string;
-  type?: string;
-  createdAt: string;
-  readBy?: string[];
+  limit?: number;
+  lastMessageId?: string;
 }
 
-export async function getMessages(conversationId: string) {
+export async function getMessages(params: GetMessagesParams) {
   try {
-    const result = await queryDocuments({
-      collectionName: 'messages',
-      realtime: true
-    });
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
 
-    if (!result.success || !result.data) {
+    if (!userId) {
       return {
         success: false,
-        error: result.error || 'Failed to fetch messages'
+        error: 'User not authenticated'
       };
     }
 
-    // Filter messages by conversation ID (client-side filtering for realtime DB)
-    const conversationMessages = (result.data as unknown as MessageData[]).filter((message) => 
-      message.conversationId === conversationId
+    // Verify user is participant in conversation
+    const conversationResult = await getDocument({
+      collectionName: 'conversations',
+      documentId: params.conversationId
+    });
+
+    if (!conversationResult.success || !conversationResult.data) {
+      return {
+        success: false,
+        error: 'Conversation not found'
+      };
+    }
+
+    const conversation = conversationResult.data as any;
+    if (!conversation.participants.includes(userId)) {
+      return {
+        success: false,
+        error: 'Unauthorized access to conversation'
+      };
+    }
+
+    // Get messages for this conversation
+    const queryOptions: any = {
+      collectionName: 'messages',
+      filters: [
+        { field: 'conversationId', operator: '==', value: params.conversationId }
+      ],
+      orderByField: 'sentAt',
+      orderDirection: 'desc',
+      limitCount: params.limit || 50
+    };
+
+    const result = await queryDocuments(queryOptions);
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: 'Failed to fetch messages'
+      };
+    }
+
+    // Enrich messages with sender details
+    const enrichedMessages = await Promise.all(
+      (result.data || []).map(async (message: any) => {
+        // Get sender details
+        const senderResult = await getDocument({
+          collectionName: 'users',
+          documentId: message.senderId
+        });
+
+        let sender = null;
+        if (senderResult.success && senderResult.data) {
+          const userData = senderResult.data as any;
+          const firstName = userData.profile?.firstName || '';
+          const lastName = userData.profile?.lastName || '';
+          const fullName = `${firstName} ${lastName}`.trim() || userData.name || 'Unknown User';
+          
+          sender = {
+            id: message.senderId,
+            name: fullName,
+            profilePicture: userData.profile?.profilePicture || null,
+            role: userData.role,
+            verificationStatus: userData.profile?.verificationStatus || 'unverified'
+          };
+        }
+
+        return {
+          ...message,
+          sender,
+          isOwn: message.senderId === userId
+        };
+      })
     );
 
-    const messages = conversationMessages.map((message) => ({
-      id: message.id,
-      senderId: message.senderId,
-      content: message.content,
-      type: message.type || 'text',
-      createdAt: message.createdAt,
-      readBy: message.readBy || []
-    }));
+    // Reverse to get chronological order (oldest first)
+    enrichedMessages.reverse();
 
     return {
       success: true,
-      messages
+      data: enrichedMessages,
+      conversation: {
+        ...conversation,
+        otherParticipantId: conversation.participants.find((id: string) => id !== userId)
+      }
     };
+
   } catch (error) {
     console.error('Error getting messages:', error);
     return {
       success: false,
-      error: 'Failed to fetch messages'
+      error: error instanceof Error ? error.message : 'Failed to get messages'
     };
   }
 }

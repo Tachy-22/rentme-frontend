@@ -1,226 +1,176 @@
 'use server';
 
-import { queryDocuments } from '@/actions/firebase/queryDocuments';
-import { serializeDocumentArray } from '@/lib/firestore-serializer';
-import { Property, SearchFilters } from '@/types';
+import { getProperties } from './getProperties';
 
 interface SearchPropertiesParams {
-  filters?: Partial<SearchFilters>;
-  searchQuery?: string;
+  query?: string;
+  location?: string;
+  city?: string;
+  state?: string;
+  propertyType?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  amenities?: string[];
+  furnished?: boolean;
+  sortBy?: 'price' | 'createdAt' | 'viewCount' | 'relevance';
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
   limit?: number;
-  lastVisible?: string;
 }
 
-interface SearchPropertiesResult {
-  success: boolean;
-  properties: Property[];
-  hasMore: boolean;
-  lastVisible?: string;
-  total: number;
-  error?: string;
-}
-
-export async function searchProperties(params: SearchPropertiesParams = {}): Promise<SearchPropertiesResult> {
+export async function searchProperties(params: SearchPropertiesParams) {
   try {
-    const { filters = {}, searchQuery, limit = 20 } = params;
-    
-    // Build query conditions based on filters
-    const queries: Array<{
-      field: string;
-      operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'array-contains-any' | 'in' | 'not-in';
-      value: any;
-    }> = [];
+    const {
+      query,
+      location,
+      city,
+      state,
+      propertyType,
+      minPrice,
+      maxPrice,
+      bedrooms,
+      bathrooms,
+      amenities,
+      furnished,
+      sortBy = 'relevance',
+      sortOrder = 'desc',
+      page = 1,
+      limit = 20
+    } = params;
 
-    // Status filter - only show available properties by default
-    queries.push({
-      field: 'status',
-      operator: '==',
-      value: 'available'
+    const offset = (page - 1) * limit;
+
+    // Build search query
+    let searchQuery = query || '';
+    if (location) {
+      searchQuery += ` ${location}`;
+    }
+
+    const filters: any = {};
+
+    if (city) filters.city = city;
+    if (state) filters.state = state;
+    if (propertyType) filters.type = propertyType;
+    if (minPrice) filters.minPrice = minPrice;
+    if (maxPrice) filters.maxPrice = maxPrice;
+    if (bedrooms) filters.bedrooms = bedrooms;
+    if (bathrooms) filters.bathrooms = bathrooms;
+    if (amenities && amenities.length > 0) filters.amenities = amenities;
+    if (furnished !== undefined) filters.furnished = furnished;
+
+    const result = await getProperties({
+      limit,
+      offset,
+      filters,
+      search: searchQuery.trim(),
+      sortBy: sortBy === 'relevance' ? 'createdAt' : sortBy,
+      sortOrder
     });
 
-    // Property type filter
-    if (filters.propertyTypes && filters.propertyTypes.length > 0) {
-      queries.push({
-        field: 'type',
-        operator: 'in',
-        value: filters.propertyTypes
-      });
+    if (!result.success) {
+      return result;
     }
 
-    // Price range filter
-    if (filters.priceRange) {
-      if (filters.priceRange.min > 0) {
-        queries.push({
-          field: 'price.amount',
-          operator: '>=',
-          value: filters.priceRange.min
+    // Add search relevance scoring for 'relevance' sort
+    if (sortBy === 'relevance' && searchQuery.trim()) {
+      const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 2);
+      
+      const scoredProperties = result?.data?.map((property: any) => {
+        let score = 0;
+        const searchableText = [
+          property.title,
+          property.description,
+          property.location?.address,
+          property.location?.city,
+          ...(property.amenities || [])
+        ].join(' ').toLowerCase();
+
+        searchTerms.forEach(term => {
+          const titleMatches = (property.title?.toLowerCase().includes(term) ? 3 : 0);
+          const descriptionMatches = (searchableText.includes(term) ? 1 : 0);
+          score += titleMatches + descriptionMatches;
         });
-      }
-      if (filters.priceRange.max > 0) {
-        queries.push({
-          field: 'price.amount',
-          operator: '<=',
-          value: filters.priceRange.max
-        });
-      }
-    }
 
-    // Bedroom filter
-    if (filters.bedrooms) {
-      if (filters.bedrooms.min >= 0) {
-        queries.push({
-          field: 'details.bedrooms',
-          operator: '>=',
-          value: filters.bedrooms.min
-        });
-      }
-      if (filters.bedrooms.max >= 0) {
-        queries.push({
-          field: 'details.bedrooms',
-          operator: '<=',
-          value: filters.bedrooms.max
-        });
-      }
-    }
-
-    // Bathroom filter
-    if (filters.bathrooms) {
-      if (filters.bathrooms.min >= 0) {
-        queries.push({
-          field: 'details.bathrooms',
-          operator: '>=',
-          value: filters.bathrooms.min
-        });
-      }
-      if (filters.bathrooms.max >= 0) {
-        queries.push({
-          field: 'details.bathrooms',
-          operator: '<=',
-          value: filters.bathrooms.max
-        });
-      }
-    }
-
-    // Furnished filter
-    if (filters.furnished !== null && filters.furnished !== undefined) {
-      queries.push({
-        field: 'details.furnished',
-        operator: '==',
-        value: filters.furnished
+        return { ...property, relevanceScore: score };
       });
-    }
 
-    // Pets allowed filter
-    if (filters.petsAllowed !== null && filters.petsAllowed !== undefined) {
-      queries.push({
-        field: 'details.petsAllowed',
-        operator: '==',
-        value: filters.petsAllowed
+      // Sort by relevance score
+      scoredProperties?.sort((a, b) => {
+        if (sortOrder === 'desc') {
+          return b.relevanceScore - a.relevanceScore;
+        }
+        return a.relevanceScore - b.relevanceScore;
       });
+
+      result.data = scoredProperties;
     }
 
-    // Smoking allowed filter
-    if (filters.smokingAllowed !== null && filters.smokingAllowed !== undefined) {
-      queries.push({
-        field: 'details.smokingAllowed',
-        operator: '==',
-        value: filters.smokingAllowed
-      });
-    }
+    return {
+      ...result,
+      query: searchQuery.trim(),
+      filters,
+      page,
+      totalPages: Math.ceil((result.total || 0) / limit)
+    };
 
-    // University filter
-    if (filters.university) {
-      queries.push({
-        field: 'location.nearbyUniversities',
-        operator: 'array-contains',
-        value: filters.university
-      });
-    }
-
-    // Available from filter
-    if (filters.availableFrom) {
-      queries.push({
-        field: 'details.availableFrom',
-        operator: '<=',
-        value: filters.availableFrom
-      });
-    }
-
-    // Amenities filter
-    if (filters.amenities && filters.amenities.length > 0) {
-      // For multiple amenities, we need to use array-contains-any
-      // In a real implementation, you might want to do multiple queries or use a different approach
-      queries.push({
-        field: 'amenities',
-        operator: 'array-contains-any',
-        value: filters.amenities
-      });
-    }
-
-    // For text search, we'll get all properties and filter on the client side
-    // In a production app, you'd use Elasticsearch, Algolia, or Firestore's full-text search
-    const result = await queryDocuments({
-      collectionName: 'properties',
-      filters: queries,
-      orderByField: 'createdAt',
-      orderDirection: 'desc',
-      limitCount: searchQuery ? 1000 : limit // Get more for text filtering
-    });
-
-    if (result.success) {
-      let rawProperties = result.data || [];
-      let properties = serializeDocumentArray<Property>(rawProperties);
-
-      // Apply text search filtering if search query exists
-      if (searchQuery && searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        properties = properties.filter(property => {
-          return (
-            property.title.toLowerCase().includes(query) ||
-            property.description?.toLowerCase().includes(query) ||
-            property.location.address.toLowerCase().includes(query) ||
-            property.location.city?.toLowerCase().includes(query) ||
-            property.location.state?.toLowerCase().includes(query) ||
-            (property.location as { neighborhood?: string })?.neighborhood?.toLowerCase().includes(query) ||
-            (property.location.nearbyUniversities || []).some(uni => 
-              uni.toLowerCase().includes(query)
-            ) ||
-            (property.amenities || []).some(amenity => 
-              amenity.toLowerCase().includes(query)
-            )
-          );
-        });
-      }
-
-      // Apply pagination after text search
-      const total = properties.length;
-      const paginatedProperties = searchQuery ? properties.slice(0, limit) : properties;
-      const hasMore = total > limit;
-
-      return {
-        success: true,
-        properties: paginatedProperties,
-        hasMore,
-        lastVisible: paginatedProperties.length > 0 ? paginatedProperties[paginatedProperties.length - 1].id : undefined,
-        total
-      };
-    } else {
-      return {
-        success: false,
-        properties: [],
-        hasMore: false,
-        total: 0,
-        error: result.error || 'Failed to search properties'
-      };
-    }
   } catch (error) {
     console.error('Error searching properties:', error);
     return {
       success: false,
-      properties: [],
-      hasMore: false,
-      total: 0,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: error instanceof Error ? error.message : 'Failed to search properties'
+    };
+  }
+}
+
+export async function getPropertyStats() {
+  try {
+    const result = await getProperties({ limit: 1000 }); // Get all properties for stats
+    
+    if (!result.success || !result.data) {
+      return {
+        success: false,
+        error: 'Failed to fetch property stats'
+      };
+    }
+
+    const properties = result.data;
+    
+    const stats = {
+      total: properties.length,
+      available: properties.filter((p: any) => p.status === 'available').length,
+      rented: properties.filter((p: any) => p.status === 'rented').length,
+      averagePrice: properties.length > 0 
+        ? Math.round(properties.reduce((sum: number, p: any) => sum + (p.price?.amount || 0), 0) / properties.length)
+        : 0,
+      cityCounts: properties.reduce((acc: any, p: any) => {
+        const city = p.location?.city || 'Unknown';
+        acc[city] = (acc[city] || 0) + 1;
+        return acc;
+      }, {}),
+      typeCounts: properties.reduce((acc: any, p: any) => {
+        const type = p.type || 'Unknown';
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {}),
+      thisWeek: properties.filter((p: any) => {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return new Date(p.createdAt) >= weekAgo;
+      }).length
+    };
+
+    return {
+      success: true,
+      data: stats
+    };
+
+  } catch (error) {
+    console.error('Error getting property stats:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get property stats'
     };
   }
 }

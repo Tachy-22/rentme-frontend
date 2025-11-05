@@ -1,270 +1,328 @@
 'use client';
 
-import React from 'react';
-import { User, Property, Application, RenterProfile } from '@/types';
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import { User } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Search, Heart, MessageSquare, Calendar, TrendingUp } from 'lucide-react';
-
-interface DashboardStats {
-  savedProperties: number;
-  activeApplications: number;
-  unreadMessages: number;
-  profileViews: number;
-}
-
-interface EnrichedApplication extends Application {
-  property?: Property;
-}
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Home, 
+  MessageCircle, 
+  FileText, 
+  Heart, 
+  TrendingUp,
+  MapPin,
+  Clock,
+  Shield,
+  ArrowRight,
+  Search
+} from 'lucide-react';
+import Link from 'next/link';
 
 interface RenterDashboardProps {
   user: User;
-  stats: DashboardStats;
-  recentApplications: EnrichedApplication[];
-  recommendedProperties: Property[];
+  stats?: {
+    savedProperties: number;
+    applications: number;
+    conversations: number;
+    messagesThisWeek: number;
+    pendingApplications: number;
+    approvedApplications: number;
+  } | null;
+  recentActivities?: Array<{
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    time: string;
+    icon: string;
+  }>;
+  recommendedProperties?: Array<{
+    id: string;
+    title: string;
+    location: { address: string; city: string };
+    price: { amount: number; currency: string; period: string };
+    images: Array<{ url: string }>;
+    details: { bedrooms: number; bathrooms: number };
+  }>;
 }
 
-export default function RenterDashboard({ 
-  user, 
-  stats, 
-  recentApplications, 
-  recommendedProperties 
-}: RenterDashboardProps) {
-  const profile = user.profile as RenterProfile;
-  const statsData = [
-    {
-      title: 'Saved Properties',
-      value: stats.savedProperties.toString(),
-      description: 'Properties in your wishlist',
-      icon: Heart,
-      color: 'text-red-500',
-    },
-    {
-      title: 'Active Applications',
-      value: stats.activeApplications.toString(),
-      description: 'Applications in review',
-      icon: Calendar,
-      color: 'text-blue-500',
-    },
-    {
-      title: 'Messages',
-      value: stats.unreadMessages.toString(),
-      description: 'Unread conversations',
-      icon: MessageSquare,
-      color: 'text-green-500',
-    },
-    {
-      title: 'Profile Views',
-      value: stats.profileViews.toString(),
-      description: 'Times agents viewed your profile',
-      icon: TrendingUp,
-      color: 'text-purple-500',
-    },
-  ];
+export default function RenterDashboard({ user, stats, recentActivities = [], recommendedProperties = [] }: RenterDashboardProps) {
+  const renterProfile = user.profile as any;
+  const isVerified = renterProfile?.identityVerified || false;
 
-  const quickActions = [
-    {
-      title: 'Search Properties',
-      description: 'Find your perfect home',
-      icon: Search,
-      href: '/search',
-      color: 'bg-blue-500',
-    },
-    {
-      title: 'View Messages',
-      description: 'Chat with agents',
-      icon: MessageSquare,
-      href: '/messages',
-      color: 'bg-green-500',
-    },
-    {
-      title: 'Saved Properties',
-      description: 'Review your favorites',
-      icon: Heart,
-      href: '/saved',
-      color: 'bg-red-500',
-    },
-    {
-      title: 'Applications',
-      description: 'Track your applications',
-      icon: Calendar,
-      href: '/applications',
-      color: 'bg-purple-500',
-    },
-  ];
+  // Use real stats or fallback to zeros
+  const dashboardStats = stats || {
+    savedProperties: 0,
+    applications: 0,
+    conversations: 0,
+    messagesThisWeek: 0,
+    pendingApplications: 0,
+    approvedApplications: 0
+  };
+
+  // Icon mapping function
+  const getIcon = (iconName: string) => {
+    const icons = {
+      FileText,
+      MessageCircle,
+      Home,
+      Search,
+      Heart,
+      TrendingUp,
+      Clock,
+      Shield,
+      ArrowRight,
+      MapPin
+    };
+    return icons[iconName as keyof typeof icons] || Home;
+  };
+
+
 
   return (
-    <DashboardLayout user={user}>
-      <div className="space-y-8">
-        {/* Welcome Section */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back, {profile.firstName}!
-          </h1>
-          <p className="text-muted-foreground">
-            Here&apos;s what&apos;s happening with your property search today.
-          </p>
+    <div className="space-y-6">
+      {/* Welcome Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-violet-600 rounded-lg text-white p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">
+              Welcome back, {renterProfile?.firstName}!
+            </h1>
+            <p className="text-blue-100 mt-1">
+              Find your perfect home near campus
+            </p>
+          </div>
+          <Avatar className="h-16 w-16 border-2 border-white/20">
+            <AvatarImage src={renterProfile?.profilePicture} />
+            <AvatarFallback className="bg-white/20 text-white">
+              {renterProfile?.firstName?.[0]}{renterProfile?.lastName?.[0]}
+            </AvatarFallback>
+          </Avatar>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {statsData.map((stat) => (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stat.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {!isVerified && (
+          <div className="mt-4 p-3 bg-yellow-500/20 border border-yellow-400/30 rounded-lg">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              <span className="font-medium">Get verified to unlock full access</span>
+            </div>
+            <p className="text-sm text-blue-100 mt-1">
+              Upload your student ID to message agents and access priority listings
+            </p>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="mt-2"
+              asChild
+            >
+              <Link href="/verification">
+                Get Verified
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Heart className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{dashboardStats.savedProperties}</p>
+                <p className="text-sm text-muted-foreground">Saved Properties</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <FileText className="w-4 h-4 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{dashboardStats.applications}</p>
+                <p className="text-sm text-muted-foreground">Applications</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <MessageCircle className="w-4 h-4 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{dashboardStats.conversations}</p>
+                <p className="text-sm text-muted-foreground">Conversations</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <TrendingUp className="w-4 h-4 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{dashboardStats.messagesThisWeek}</p>
+                <p className="text-sm text-muted-foreground">Messages This Week</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Activity */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Your latest interactions and updates</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity) => {
+                const Icon = getIcon(activity.icon);
+                return (
+                  <div key={activity.id} className="flex items-start gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors">
+                    <div className="p-2 bg-muted rounded-lg">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{activity.title}</p>
+                      <p className="text-sm text-muted-foreground">{activity.description}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <Clock className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">{activity.time}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Home className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No recent activity</p>
+                <p className="text-sm">Start browsing properties to see your activity here</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
         <Card>
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>
-              Common tasks to help you find your perfect home
-            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {quickActions.map((action) => (
-                <Button
-                  key={action.title}
-                  variant="outline"
-                  className="h-auto p-4 justify-start"
-                  asChild
-                >
-                  <a href={action.href} className="space-y-2">
-                    <div className={`w-8 h-8 rounded-lg ${action.color} flex items-center justify-center`}>
-                      <action.icon className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="space-y-1 text-left">
-                      <p className="font-medium">{action.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {action.description}
-                      </p>
-                    </div>
-                  </a>
-                </Button>
-              ))}
-            </div>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start" asChild>
+              <Link href="/properties">
+                <Search className="w-4 h-4 mr-2" />
+                Browse Properties
+              </Link>
+            </Button>
+            <Button variant="outline" className="w-full justify-start" asChild>
+              <Link href="/saved">
+                <Heart className="w-4 h-4 mr-2" />
+                View Saved Properties
+              </Link>
+            </Button>
+            <Button variant="outline" className="w-full justify-start" asChild>
+              <Link href="/messages">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Check Messages
+              </Link>
+            </Button>
+            <Button variant="outline" className="w-full justify-start" asChild>
+              <Link href="/applications">
+                <FileText className="w-4 h-4 mr-2" />
+                My Applications
+              </Link>
+            </Button>
           </CardContent>
         </Card>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          {/* Recent Applications */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Applications</CardTitle>
-              <CardDescription>
-                Track your latest applications
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentApplications.length === 0 ? (
-                  <div className="text-center py-4 text-muted-foreground">
-                    No applications yet
-                  </div>
-                ) : (
-                  recentApplications.map((application) => (
-                    <div key={application.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="space-y-1">
-                        <p className="font-medium">
-                          {application.property?.title || 'Property not found'}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {application.property?.location?.address || 'Location not available'}
-                        </p>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs text-muted-foreground">
-                            Applied {new Date(application.submittedAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          application.status === 'pending' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : application.status === 'approved'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {application.status}
-                        </span>
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={`/applications/${application.id}`}>
-                            View
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recommended Properties */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommended Properties</CardTitle>
-              <CardDescription>
-                Properties that match your preferences
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recommendedProperties.length === 0 ? (
-                  <div className="text-center py-4 text-muted-foreground">
-                    No recommendations yet
-                  </div>
-                ) : (
-                  recommendedProperties.slice(0, 3).map((property) => (
-                    <div key={property.id} className="p-3 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">{property.title}</h4>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          property.status === 'available' 
-                            ? 'bg-green-100 text-green-800' 
-                            : property.status === 'rented'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {property.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {property.location?.address || 'Location not available'}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-lg">
-                          ${property.price.amount.toLocaleString()}/{property.price.period === 'monthly' ? 'month' : property.price.period}
-                        </span>
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={`/properties/${property.id}`}>
-                            View Details
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
-    </DashboardLayout>
+
+      {/* Recommended Properties */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Recommended for You</CardTitle>
+            <CardDescription>Properties that match your preferences</CardDescription>
+          </div>
+          <Button variant="outline" asChild>
+            <Link href="/properties">
+              View All
+              <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {recommendedProperties.length > 0 ? (
+              recommendedProperties.map((property) => (
+                <div key={property.id} className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                  <div 
+                    className="h-40 bg-cover bg-center bg-muted"
+                    style={{ 
+                      backgroundImage: property.images?.[0]?.url ? `url(${property.images[0].url})` : 'none'
+                    }}
+                  >
+                    {!property.images?.[0]?.url && (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Home className="w-8 h-8 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold">{property.title}</h3>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+                      <MapPin className="w-3 h-3" />
+                      {property.location?.address}, {property.location?.city}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="font-bold text-lg">
+                        ₦{property.price?.amount?.toLocaleString()}/{property.price?.period}
+                      </p>
+                      <div className="text-sm text-muted-foreground">
+                        {property.details?.bedrooms}BR • {property.details?.bathrooms}BA
+                      </div>
+                    </div>
+                    <Button size="sm" className="w-full mt-3" asChild>
+                      <Link href={`/properties/${property.id}`}>
+                        View Details
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-2 text-center py-8 text-muted-foreground">
+                <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No recommendations yet</p>
+                <p className="text-sm">Complete your profile to get personalized property recommendations</p>
+                <Button variant="outline" className="mt-4" asChild>
+                  <Link href="/properties">
+                    Browse All Properties
+                  </Link>
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

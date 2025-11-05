@@ -1,15 +1,21 @@
-import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
-import { ProfileClient } from '@/components/profile/ProfileClient';
-
-export const dynamic = 'force-dynamic';
+import ProfileClient from '@/components/profile/ProfileClient';
+import RenterLayout from '@/components/layout/RenterLayout';
+import { redirect } from 'next/navigation';
 
 export default async function ProfilePage() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect('/auth/login');
+  const userResult = await getCurrentUser();
+  
+  if (!userResult.success || !userResult.user) {
+    redirect('/auth');
   }
 
-  return <ProfileClient user={user} />;
+  const user = userResult.user;
+
+  // Profile page is available to all authenticated users
+  return (
+    <RenterLayout>
+      <ProfileClient user={user} />
+    </RenterLayout>
+  );
 }

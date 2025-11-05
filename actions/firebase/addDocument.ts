@@ -14,6 +14,7 @@ interface AddDocumentParams {
 interface AddDocumentResult {
   success: boolean;
   id?: string;
+  data?: Record<string, unknown>;
   error?: string;
 }
 
@@ -70,7 +71,8 @@ export async function addDocument({
 
     return {
       success: true,
-      id: documentId
+      id: documentId,
+      data: { id: documentId, ...data }
     };
   } catch (error) {
     console.error('Error adding document:', error);

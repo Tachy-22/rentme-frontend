@@ -1,15 +1,12 @@
-import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/actions/auth/getCurrentUser';
-import { SettingsClient } from '@/components/profile/SettingsClient';
+import RenterLayout from '@/components/layout/RenterLayout';
 
-export const dynamic = 'force-dynamic';
-
-export default async function SettingsPage() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect('/auth/login');
-  }
-
-  return <SettingsClient user={user} />;
+export default function SettingsPage() {
+  return (
+    <RenterLayout>
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <p className="text-muted-foreground">Configure your account settings.</p>
+      </div>
+    </RenterLayout>
+  );
 }

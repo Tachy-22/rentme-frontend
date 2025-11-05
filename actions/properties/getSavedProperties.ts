@@ -1,94 +1,58 @@
 'use server';
 
-import { queryDocuments } from '@/actions/firebase/queryDocuments';
-import { getDocument } from '@/actions/firebase/getDocument';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { cookies } from 'next/headers';
 import { Property } from '@/types';
 
-// Helper function to recursively serialize Firestore Timestamps
-function serializeFirestoreData(obj: unknown): unknown {
-  if (obj === null || obj === undefined) {
-    return obj;
-  }
-  
-  if (typeof obj === 'object') {
-    // Check if it's a Firestore Timestamp
-    const timestamp = obj as { seconds?: number; nanoseconds?: number; toDate?: () => Date };
-    if (timestamp.seconds !== undefined && timestamp.nanoseconds !== undefined) {
-      return new Date(timestamp.seconds * 1000).toISOString();
-    }
-    
-    // If it's an array, recursively serialize each element
-    if (Array.isArray(obj)) {
-      return obj.map(item => serializeFirestoreData(item));
-    }
-    
-    // If it's an object, recursively serialize each property
-    const serialized: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      serialized[key] = serializeFirestoreData(value);
-    }
-    return serialized;
-  }
-  
-  return obj;
-}
-
-interface GetSavedPropertiesResult {
-  success: boolean;
-  properties: Property[];
-  error?: string;
-}
-
-export async function getSavedProperties(userId: string): Promise<GetSavedPropertiesResult> {
+export async function getSavedProperties() {
   try {
-    // Get saved property records for this user
-    const savedRecordsResult = await queryDocuments({
-      collectionName: 'savedProperties',
-      filters: [{ field: 'renterId', operator: '==', value: userId }],
-      orderByField: 'savedAt',
-      orderDirection: 'desc'
-    });
-
-    if (!savedRecordsResult.success || !savedRecordsResult.data) {
-      return {
-        success: false,
-        properties: [],
-        error: savedRecordsResult.error || 'Failed to get saved properties'
-      };
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+    
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
     }
 
+    // Get saved property IDs
+    const savedPropertiesRef = collection(db, 'users', userId, 'savedProperties');
+    const savedPropertiesSnapshot = await getDocs(savedPropertiesRef);
+    
+    if (savedPropertiesSnapshot.empty) {
+      return { success: true, data: [] };
+    }
+
+    // Get property details for each saved property
     const properties: Property[] = [];
     
-    // Fetch each property's details
-    for (const record of savedRecordsResult.data) {
-      const savedRecord = record as { propertyId: string; savedAt: string };
+    for (const savedDoc of savedPropertiesSnapshot.docs) {
+      const propertyId = savedDoc.data().propertyId;
+      const propertyRef = doc(db, 'properties', propertyId);
+      const propertySnapshot = await getDoc(propertyRef);
       
-      try {
-        const propertyResult = await getDocument({
-          collectionName: 'properties',
-          documentId: savedRecord.propertyId
-        });
-        
-        if (propertyResult.success && propertyResult.data) {
-          const serializedProperty = serializeFirestoreData(propertyResult.data) as Property;
-          properties.push(serializedProperty);
-        }
-      } catch (error) {
-        console.error('Error fetching saved property:', error);
-        // Continue with other properties even if one fails
+      if (propertySnapshot.exists()) {
+        const propertyData = propertySnapshot.data();
+        properties.push({
+          id: propertySnapshot.id,
+          ...propertyData,
+          savedAt: savedDoc.data().savedAt
+        } as unknown as Property);
       }
     }
 
-    return {
-      success: true,
-      properties
-    };
+    // Sort by saved date (most recent first)
+    properties.sort((a, b) => {
+      const dateA = a.savedAt?.toDate() || new Date(0);
+      const dateB = b.savedAt?.toDate() || new Date(0);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    return { success: true, data: properties };
   } catch (error) {
     console.error('Error getting saved properties:', error);
-    return {
-      success: false,
-      properties: [],
-      error: error instanceof Error ? error.message : 'Failed to get saved properties'
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to get saved properties' 
     };
   }
 }

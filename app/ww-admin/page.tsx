@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Trash2, Download, RefreshCw } from 'lucide-react'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { getWaitlistData } from '@/actions/waitlist/getWaitlistData'
 import { deleteRenter } from '@/actions/waitlist/deleteRenter'
 import { exportToCSV, exportToExcel } from '@/lib/exportUtils'
@@ -156,6 +157,8 @@ export default function AdminPage() {
               <Download className="w-4 h-4" />
               Export Excel
             </button>
+
+            <ThemeToggle />
 
             <button
               onClick={() => setIsAuthenticated(false)}

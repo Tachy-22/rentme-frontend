@@ -14,6 +14,7 @@ interface UpdateDocumentParams {
 
 interface UpdateDocumentResult {
   success: boolean;
+  data?: Record<string, unknown>;
   error?: string;
 }
 
@@ -62,7 +63,8 @@ export async function updateDocument({
     }
 
     return {
-      success: true
+      success: true,
+      data: { id: documentId, ...data }
     };
     
   } catch (error) {

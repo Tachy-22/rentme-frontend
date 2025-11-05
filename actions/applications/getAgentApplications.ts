@@ -1,110 +1,101 @@
 'use server';
 
-import { queryDocuments } from '@/actions/firebase/queryDocuments';
-import { getDocument } from '@/actions/firebase/getDocument';
-import { serializeFirestoreData } from '@/lib/firestore-serializer';
-import { Application, User, Property } from '@/types';
+import { cookies } from 'next/headers';
+import { queryDocuments, getDocument } from '@/actions/firebase';
 
-interface EnrichedApplication extends Application {
-  renter?: User;
-  property?: Property;
-}
-
-interface GetAgentApplicationsResult {
-  success: boolean;
-  applications: EnrichedApplication[];
-  error?: string;
-}
-
-export async function getAgentApplications(
-  agentId: string, 
-  limit: number = 20
-): Promise<GetAgentApplicationsResult> {
+export async function getAgentApplications() {
   try {
-    if (!agentId) {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+    const userRole = cookieStore.get('user-role')?.value;
+
+    if (!userId || userRole !== 'agent') {
       return {
         success: false,
-        applications: [],
-        error: 'Agent ID is required'
+        error: 'Unauthorized access'
       };
     }
 
     // Get applications for this agent's properties
-    const result = await queryDocuments({
+    const applicationsResult = await queryDocuments({
       collectionName: 'applications',
       filters: [
-        {
-          field: 'agentId',
-          operator: '==',
-          value: agentId
-        }
+        { field: 'agentId', operator: '==', value: userId }
       ],
       orderByField: 'submittedAt',
-      orderDirection: 'desc',
-      limitCount: limit
+      orderDirection: 'desc'
     });
 
-    if (!result.success) {
+    if (!applicationsResult.success || !applicationsResult.data) {
       return {
-        success: false,
-        applications: [],
-        error: result.error || 'Failed to fetch applications'
+        success: true,
+        data: []
       };
     }
 
-    const applications = result.data || [];
-    const enrichedApplications: EnrichedApplication[] = [];
-
-    // Enrich applications with renter and property data
-    for (const app of applications) {
-      const applicationData = {
-        id: app.id as string,
-        ...(app as Record<string, unknown>)
-      } as Application;
-
-      try {
-        // Get renter information
-        const renterResult = await getDocument({
-          collectionName: 'users',
-          documentId: applicationData.renterId
-        });
-
-        // Get property information
+    // Enrich applications with property and renter details
+    const enrichedApplications = await Promise.all(
+      applicationsResult.data.map(async (application: any) => {
+        // Get property details
         const propertyResult = await getDocument({
           collectionName: 'properties',
-          documentId: applicationData.propertyId
+          documentId: application.propertyId
         });
 
-        const enrichedApp: EnrichedApplication = {
-          ...(serializeFirestoreData(applicationData) as Application),
-          renter: renterResult.success ? {
-            id: applicationData.renterId,
-            ...(serializeFirestoreData(renterResult.data) as Record<string, unknown>)
-          } as User : undefined,
-          property: propertyResult.success ? {
-            id: applicationData.propertyId,
-            ...(serializeFirestoreData(propertyResult.data) as Record<string, unknown>)
-          } as Property : undefined
-        };
+        // Get renter details
+        const renterResult = await getDocument({
+          collectionName: 'users',
+          documentId: application.renterId
+        });
 
-        enrichedApplications.push(enrichedApp);
-      } catch (error) {
-        console.error('Error enriching application data:', error);
-        // Still add the application even if enrichment fails
-        enrichedApplications.push(applicationData);
-      }
-    }
+        let property = null;
+        let renter = null;
+
+        if (propertyResult.success && propertyResult.data) {
+          property = {
+            id: application.propertyId,
+            title: propertyResult.data.title,
+            location: propertyResult.data.location,
+            price: propertyResult.data.price,
+            images: propertyResult.data.images || []
+          };
+        }
+
+        if (renterResult.success && renterResult.data) {
+          const userData = renterResult.data as any;
+          const firstName = userData.profile?.firstName || '';
+          const lastName = userData.profile?.lastName || '';
+          const fullName = `${firstName} ${lastName}`.trim() || 'Unknown User';
+          
+          renter = {
+            id: application.renterId,
+            name: fullName,
+            email: userData.email,
+            phone: userData.profile?.phone,
+            profilePicture: userData.profile?.profilePicture,
+            verificationStatus: userData.profile?.verificationStatus || 'unverified'
+          };
+        }
+
+        return {
+          id: application.id,
+          ...application,
+          property,
+          renter
+        };
+      })
+    );
 
     return {
       success: true,
-      applications: enrichedApplications
+      data: enrichedApplications
     };
+
   } catch (error) {
-    console.error('Error fetching agent applications:', error);
+    console.error('Error getting agent applications:', error);
     return {
       success: false,
-      applications: [],
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: error instanceof Error ? error.message : 'Failed to get applications'
     };
   }
 }

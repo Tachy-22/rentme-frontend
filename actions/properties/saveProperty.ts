@@ -1,109 +1,168 @@
 'use server';
 
-import { getDocument } from '@/actions/firebase/getDocument';
-import { updateDocument } from '@/actions/firebase/updateDocument';
+import { cookies } from 'next/headers';
+import { addDocument, deleteDocument, queryDocuments } from '@/actions/firebase';
 
-interface SavePropertyResult {
-  success: boolean;
-  isSaved?: boolean;
-  error?: string;
+interface SavePropertyParams {
+  propertyId: string;
+  notes?: string;
 }
 
-export async function saveProperty(userId: string, propertyId: string): Promise<SavePropertyResult> {
+export async function saveProperty(params: SavePropertyParams | string) {
+  // Handle both string and object parameters
+  const propertyId = typeof params === 'string' ? params : params.propertyId;
+  const notes = typeof params === 'string' ? '' : (params.notes || '');
   try {
-    if (!userId || !propertyId) {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+
+    if (!userId) {
       return {
         success: false,
-        error: 'User ID and Property ID are required'
+        error: 'User not authenticated'
       };
     }
 
-    // Get current user data
-    const userResult = await getDocument({
-      collectionName: 'users',
-      documentId: userId
+    // Check if already saved
+    const existingResult = await queryDocuments({
+      collectionName: 'savedProperties',
+      filters: [
+        { field: 'userId', operator: '==', value: userId },
+        { field: 'propertyId', operator: '==', value: propertyId }
+      ]
     });
 
-    if (!userResult.success || !userResult.data) {
+    if (existingResult.success && existingResult.data && existingResult.data.length > 0) {
       return {
         success: false,
-        error: 'User not found'
+        error: 'Property already saved'
       };
     }
 
-    const userData = userResult.data as Record<string, unknown>;
-    const currentSavedProperties = (userData.savedProperties as string[]) || [];
-    
-    let updatedSavedProperties: string[];
-    let isSaved: boolean;
+    const savedProperty = {
+      userId,
+      propertyId: propertyId,
+      notes: notes,
+      savedAt: new Date().toISOString()
+    };
 
-    if (currentSavedProperties.includes(propertyId)) {
-      // Remove from saved properties
-      updatedSavedProperties = currentSavedProperties.filter(id => id !== propertyId);
-      isSaved = false;
-    } else {
-      // Add to saved properties
-      updatedSavedProperties = [...currentSavedProperties, propertyId];
-      isSaved = true;
-    }
-
-    // Update user document
-    const updateResult = await updateDocument({
-      collectionName: 'users',
-      documentId: userId,
-      data: {
-        savedProperties: updatedSavedProperties,
-        updatedAt: new Date().toISOString()
-      }
+    const result = await addDocument({
+      collectionName: 'savedProperties',
+      data: savedProperty
     });
 
-    if (updateResult.success) {
-      // Update property save count
-      await updatePropertySaveCount(propertyId, isSaved);
-
-      return {
-        success: true,
-        isSaved
-      };
-    } else {
-      return {
-        success: false,
-        error: updateResult.error || 'Failed to save property'
-      };
-    }
+    return result;
   } catch (error) {
     console.error('Error saving property:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: error instanceof Error ? error.message : 'Failed to save property'
     };
   }
 }
 
-async function updatePropertySaveCount(propertyId: string, increment: boolean): Promise<void> {
+export async function unsaveProperty(propertyId: string) {
   try {
-    // Get current property to update save count
-    const result = await getDocument({
-      collectionName: 'properties',
-      documentId: propertyId
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User not authenticated'
+      };
+    }
+
+    // Find the saved property
+    const existingResult = await queryDocuments({
+      collectionName: 'savedProperties',
+      filters: [
+        { field: 'userId', operator: '==', value: userId },
+        { field: 'propertyId', operator: '==', value: propertyId }
+      ]
     });
 
-    if (result.success && result.data) {
-      const propertyData = result.data as Record<string, unknown>;
-      const currentSaveCount = (propertyData.saveCount as number) || 0;
-      const newSaveCount = increment ? currentSaveCount + 1 : Math.max(0, currentSaveCount - 1);
-      
-      await updateDocument({
-        collectionName: 'properties',
-        documentId: propertyId,
-        data: {
-          saveCount: newSaveCount,
-          updatedAt: new Date().toISOString()
-        }
-      });
+    if (!existingResult.success || !existingResult.data || existingResult.data.length === 0) {
+      return {
+        success: false,
+        error: 'Saved property not found'
+      };
     }
+
+    const savedPropertyDoc = existingResult.data[0] as any;
+    const result = await deleteDocument({
+      collectionName: 'savedProperties',
+      documentId: savedPropertyDoc.id
+    });
+
+    return result;
   } catch (error) {
-    console.error('Error updating property save count:', error);
-    // Don't throw error as this is not critical for the main functionality
+    console.error('Error unsaving property:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to unsave property'
+    };
+  }
+}
+
+export async function getSavedProperties() {
+  try {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+
+    if (!userId) {
+      return {
+        success: false,
+        error: 'User not authenticated'
+      };
+    }
+
+    const result = await queryDocuments({
+      collectionName: 'savedProperties',
+      filters: [{ field: 'userId', operator: '==', value: userId }],
+      orderByField: 'savedAt',
+      orderDirection: 'desc'
+    });
+
+    return result;
+  } catch (error) {
+    console.error('Error getting saved properties:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to get saved properties'
+    };
+  }
+}
+
+export async function checkIfPropertySaved(propertyId: string) {
+  try {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+
+    if (!userId) {
+      return {
+        success: true,
+        isSaved: false
+      };
+    }
+
+    const result = await queryDocuments({
+      collectionName: 'savedProperties',
+      filters: [
+        { field: 'userId', operator: '==', value: userId },
+        { field: 'propertyId', operator: '==', value: propertyId }
+      ]
+    });
+
+    return {
+      success: true,
+      isSaved: result.success && result.data && result.data.length > 0
+    };
+  } catch (error) {
+    console.error('Error checking if property is saved:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to check saved status'
+    };
   }
 }

@@ -1,80 +1,67 @@
 'use server';
 
-import { queryDocuments } from '@/actions/firebase/queryDocuments';
-import { getDocument } from '@/actions/firebase/getDocument';
-import { serializeFirestoreData } from '@/lib/firestore-serializer';
-import { Application, Property } from '@/types';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, doc, getDoc, orderBy } from 'firebase/firestore';
+import { cookies } from 'next/headers';
+import { Application } from '@/types';
 
-interface EnrichedApplication extends Application {
-  property?: Property;
-}
-
-interface GetRenterApplicationsResult {
-  success: boolean;
-  applications: EnrichedApplication[];
-  error?: string;
-}
-
-export async function getRenterApplications(
-  renterId: string,
-  limit?: number
-): Promise<GetRenterApplicationsResult> {
+export async function getRenterApplications() {
   try {
-    // Get applications for this renter
-    const applicationsResult = await queryDocuments({
-      collectionName: 'applications',
-      filters: [
-        { field: 'renterId', operator: '==', value: renterId }
-      ],
-      orderByField: 'submittedAt',
-      orderDirection: 'desc',
-      limitCount: limit
-    });
-
-    if (!applicationsResult.success) {
-      return {
-        success: false,
-        applications: [],
-        error: applicationsResult.error
-      };
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+    
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
     }
 
-    const applications: EnrichedApplication[] = [];
+    // Get applications for this renter
+    const applicationsRef = collection(db, 'applications');
+    const applicationsQuery = query(
+      applicationsRef,
+      where('renterId', '==', userId),
+      orderBy('submittedAt', 'desc')
+    );
     
-    if (applicationsResult.data) {
-      for (const applicationData of applicationsResult.data as unknown as Application[]) {
-        // Fetch property details
-        let property: Property | undefined;
-        try {
-          const propertyResult = await getDocument({
-            collectionName: 'properties',
-            documentId: applicationData.propertyId
-          });
-          
-          if (propertyResult.success && propertyResult.data) {
-            property = serializeFirestoreData(propertyResult.data) as Property;
-          }
-        } catch (error) {
-          console.error('Error fetching property for application:', error);
-        }
+    const applicationsSnapshot = await getDocs(applicationsQuery);
+    
+    if (applicationsSnapshot.empty) {
+      return { success: true, data: [] };
+    }
+
+    // Get application details with property information
+    const applications: Application[] = [];
+    
+    for (const appDoc of applicationsSnapshot.docs) {
+      const appData = appDoc.data();
+      
+      // Get property details
+      const propertyRef = doc(db, 'properties', appData.propertyId);
+      const propertySnapshot = await getDoc(propertyRef);
+      
+      if (propertySnapshot.exists()) {
+        const propertyData = propertySnapshot.data();
         
         applications.push({
-          ...(serializeFirestoreData(applicationData) as Application),
-          property
-        });
+          id: appDoc.id,
+          ...appData,
+          property: {
+            id: propertySnapshot.id,
+            title: propertyData.title,
+            location: propertyData.location,
+            price: propertyData.price,
+            images: propertyData.images || [],
+            agent: propertyData.agent
+          }
+        } as any);
       }
     }
 
-    return {
-      success: true,
-      applications
-    };
+    return { success: true, data: applications };
   } catch (error) {
     console.error('Error getting renter applications:', error);
-    return {
-      success: false,
-      applications: [],
-      error: error instanceof Error ? error.message : 'Failed to get applications'
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to get applications' 
     };
   }
 }

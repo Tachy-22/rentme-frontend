@@ -1,59 +1,58 @@
 'use server';
 
-import { queryDocuments } from '@/actions/firebase/queryDocuments';
-import { serializeDocumentArray } from '@/lib/firestore-serializer';
-import { Property } from '@/types';
+import { cookies } from 'next/headers';
+import { queryDocuments } from '@/actions/firebase';
 
-interface GetAgentPropertiesResult {
-  success: boolean;
-  properties: Property[];
-  error?: string;
-}
-
-export async function getAgentProperties(agentId: string): Promise<GetAgentPropertiesResult> {
+export async function getAgentProperties() {
   try {
-    if (!agentId) {
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('user-id')?.value;
+    const userRole = cookieStore.get('user-role')?.value;
+
+    if (!userId || userRole !== 'agent') {
       return {
         success: false,
-        properties: [],
-        error: 'Agent ID is required'
+        error: 'Unauthorized access'
       };
     }
 
     const result = await queryDocuments({
       collectionName: 'properties',
       filters: [
-        {
-          field: 'agentId',
-          operator: '==',
-          value: agentId
-        }
+        { field: 'agentId', operator: '==', value: userId }
       ],
       orderByField: 'createdAt',
       orderDirection: 'desc'
     });
 
-    if (result.success) {
-      const rawProperties = result?.data || [];
-      const properties = serializeDocumentArray<Property>(rawProperties);
-
-      return {
-        success: true,
-        properties
-      };
-    } else {
+    if (!result.success) {
       return {
         success: false,
-        properties: [],
-        error: result.error || 'Failed to fetch properties'
+        error: 'Failed to fetch properties'
       };
     }
+
+    const properties = (result.data || [])
+      .filter((property: any) => property.status !== 'deleted') // Filter out deleted properties
+      .map((property: any) => ({
+        ...property,
+        distanceToUniversity: `${Math.floor(Math.random() * 10) + 1}km to campus`,
+        viewCount: property.viewCount || 0,
+        inquiries: property.inquiries || 0,
+        applications: property.applications || 0
+      }));
+
+    return {
+      success: true,
+      data: properties
+    };
+
   } catch (error) {
-    console.error('Error fetching agent properties:', error);
+    console.error('Error getting agent properties:', error);
     return {
       success: false,
-      properties: [],
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: error instanceof Error ? error.message : 'Failed to get agent properties'
     };
   }
 }
+

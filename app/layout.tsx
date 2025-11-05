@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { ThemeProvider } from "@/lib/theme-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,10 +24,15 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-sans antialiased`}
       >
-        <AuthProvider>
-          {/* <ConditionalNavigation /> */}
-          {children}
-        </AuthProvider>
+        <ThemeProvider
+          defaultTheme="system"
+          storageKey="rentme-ui-theme"
+        >
+          <AuthProvider>
+            {/* <ConditionalNavigation /> */}
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

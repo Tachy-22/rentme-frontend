@@ -20,6 +20,7 @@ export interface User {
   isActive: boolean;
   emailVerified: boolean;
   lastLoginAt?: string;
+  identityVerified?: boolean
 }
 
 export interface RenterProfile {
@@ -55,6 +56,12 @@ export interface RenterProfile {
   };
   savedSearches: string[];
   viewedProperties: string[];
+  address?: string;
+  city?: string;
+  state?: string;
+  university?: string;
+  studentId?: string;
+  preferredContactMethod?: string;
 }
 
 export interface AgentProfile {
@@ -83,6 +90,7 @@ export interface AgentProfile {
   totalReviews: number;
   totalProperties: number;
   totalDeals: number;
+  identityVerified: boolean;
   responseTime: number; // in hours
   verificationStatus: 'pending' | 'verified' | 'rejected';
   verificationDocuments: string[];
@@ -94,6 +102,13 @@ export interface AgentProfile {
       endTime?: string;
     };
   };
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  preferredContactMethod?: string;
+  university?: string;
+  studentId?: string;
 }
 
 export interface AdminProfile {
@@ -105,6 +120,16 @@ export interface AdminProfile {
   department: string;
   permissions: string[];
   employeeId: string;
+  identityVerified: boolean;
+  bio?: string;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  university?: string;
+  studentId?: string;
+  preferredContactMethod?: string;
+
 }
 
 export interface Property {
@@ -170,6 +195,7 @@ export interface Property {
   viewCount: number;
   saveCount: number;
   applicationCount: number;
+  savedAt?: any; // For saved properties
 }
 
 export interface CloudinaryImage {
@@ -240,6 +266,21 @@ export interface Application {
   reviewedAt: string | null;
   reviewedBy: string | null;
   notes: string | null;
+  property?: {
+    id: string;
+    title: string;
+    location: {
+      city: string;
+      state: string;
+    };
+    price: {
+      amount: number;
+      currency: string;
+      period: string;
+    };
+    images: any[];
+    agent?: any;
+  };
 }
 
 export interface ApplicationDocument {
@@ -483,10 +524,12 @@ export interface PropertyCard {
   distanceToUniversity: string;
   isSaved: boolean;
   agent: {
+    id?: string;
     name: string;
     profilePicture: string;
     rating: number;
   };
+  agentId?: string;
 }
 
 export interface ChatRoom {

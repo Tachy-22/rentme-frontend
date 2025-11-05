@@ -1,30 +1,29 @@
-import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { getRenterApplications } from '@/actions/applications/getRenterApplications';
-import { ApplicationsClient } from '@/components/applications/ApplicationsClient';
-
-export const dynamic = 'force-dynamic';
+import ApplicationsClient from '@/components/applications/ApplicationsClient';
+import RenterLayout from '@/components/layout/RenterLayout';
+import { redirect } from 'next/navigation';
 
 export default async function ApplicationsPage() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect('/auth/login');
+  const userResult = await getCurrentUser();
+  
+  if (!userResult.success || !userResult.user) {
+    redirect('/auth');
   }
 
-  // Only renters can access this page
+  const user = userResult.user;
+
   if (user.role !== 'renter') {
     redirect('/dashboard');
   }
 
-  // Fetch all user applications
-  const applicationsResult = await getRenterApplications(user.id);
-  const applications = applicationsResult.success ? applicationsResult.applications : [];
+  // Get renter applications
+  const applicationsResult = await getRenterApplications();
+  const applications = applicationsResult.success ? (applicationsResult.data || []) : [];
 
   return (
-    <ApplicationsClient 
-      user={user} 
-      applications={applications}
-    />
+    <RenterLayout>
+      <ApplicationsClient user={user} initialApplications={applications} />
+    </RenterLayout>
   );
 }
