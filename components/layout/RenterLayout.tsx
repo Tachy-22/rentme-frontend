@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { usePathname } from 'next/navigation';
 import RenterNavigation from './RenterNavigation';
 import { Loader2 } from 'lucide-react';
 
@@ -11,6 +12,8 @@ interface RenterLayoutProps {
 
 export default function RenterLayout({ children }: RenterLayoutProps) {
   const { loading } = useAuth();
+  const pathname = usePathname();
+  const isMessagesPage = pathname === '/messages';
 
   if (loading) {
     return (
@@ -23,7 +26,7 @@ export default function RenterLayout({ children }: RenterLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <RenterNavigation />
-        <main className="flex flex-col h-[calc(100vh-4rem)] max-w-7xl mx-auto overflow-hidden p-6 max-h-[calc(100vh-4rem)]  b600">
+      <main className={`flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] max-w-7xl mx-auto overflow-hidden lg:p-6 max-h-[calc(100vh-4rem)] md:max-h-[calc(100vh-4rem)] ${isMessagesPage ? 'pb-0' : 'pb-16 md:pb-0'}`}>
         {children}
       </main>
     </div>

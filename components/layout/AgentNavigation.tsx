@@ -9,7 +9,9 @@ import {
   MessageCircle, 
   FileText,
   Plus,
-  User
+  User,
+  Users,
+  BarChart3
 } from 'lucide-react';
 import {
   Sidebar,
@@ -26,6 +28,8 @@ const navigation = [
   { name: 'Listings', href: '/agent/properties', icon: Building2 },
   { name: 'Applications', href: '/agent/applications', icon: FileText },
   { name: 'Messages', href: '/agent/messages', icon: MessageCircle },
+  { name: 'Matched Renters', href: '/agent/renters', icon: Users },
+  { name: 'Analytics', href: '/agent/analytics', icon: BarChart3 },
   { name: 'Profile', href: '/agent/profile', icon: User },
 ];
 
@@ -37,9 +41,11 @@ export default function AgentNavigation() {
     <Sidebar>
       <SidebarHeader>
         <Link href="/agent/dashboard" className="flex items-center space-x-2 px-2">
-          <div className="font-bold text-xl bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-            RentMe
-          </div>
+          <img 
+            src="/logo-white.png" 
+            alt="RentMe Logo" 
+            className="h-4  w-auto"
+          />
           <Badge variant="secondary" className="text-xs">Agent</Badge>
         </Link>
       </SidebarHeader>

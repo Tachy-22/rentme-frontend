@@ -153,7 +153,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
   }).length;
 
   const FilterContent = () => (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       {/* Location Filter */}
       <div>
         <Label className="text-sm font-medium">City</Label>
@@ -161,7 +161,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
           <SelectTrigger className="mt-2">
             <SelectValue placeholder="Select city" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[100]">
             <SelectItem value="all">All Cities</SelectItem>
             {NIGERIAN_CITIES.map((city) => (
               <SelectItem key={city} value={city}>{city}</SelectItem>
@@ -177,7 +177,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
           <SelectTrigger className="mt-2">
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[100]">
             <SelectItem value="all">All Types</SelectItem>
             {PROPERTY_TYPES.map((type) => (
               <SelectItem key={type} value={type} className="capitalize">
@@ -193,26 +193,25 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
         <Label className="text-sm font-medium">
           Price Range: ₦{filters.minPrice.toLocaleString()} - ₦{filters.maxPrice.toLocaleString()}
         </Label>
-        <div className="mt-3 space-y-3">
-          <div>
-            <Label className="text-xs text-muted-foreground">Minimum Price</Label>
-            <Slider
-              value={[filters.minPrice]}
-              onValueChange={([value]) => handleFilterChange('minPrice', value)}
-              max={500000}
-              step={10000}
-              className="mt-2"
-            />
-          </div>
-          <div>
-            <Label className="text-xs text-muted-foreground">Maximum Price</Label>
-            <Slider
-              value={[filters.maxPrice]}
-              onValueChange={([value]) => handleFilterChange('maxPrice', value)}
-              max={1000000}
-              step={10000}
-              className="mt-2"
-            />
+        <div className="mt-3">
+          <Slider
+            value={[filters.minPrice, filters.maxPrice]}
+            onValueChange={([min, max]) => {
+              setFilters(prev => ({
+                ...prev,
+                minPrice: min,
+                maxPrice: max
+              }));
+              setCurrentPage(1);
+            }}
+            max={1000000}
+            min={0}
+            step={10000}
+            className="mt-2"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground mt-2">
+            <span>₦0</span>
+            <span>₦1,000,000</span>
           </div>
         </div>
       </div>
@@ -225,7 +224,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
             <SelectTrigger className="mt-2">
               <SelectValue placeholder="Any" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[100]">
               <SelectItem value="any">Any</SelectItem>
               <SelectItem value="1">1+</SelectItem>
               <SelectItem value="2">2+</SelectItem>
@@ -241,7 +240,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
             <SelectTrigger className="mt-2">
               <SelectValue placeholder="Any" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[100]">
               <SelectItem value="any">Any</SelectItem>
               <SelectItem value="1">1+</SelectItem>
               <SelectItem value="2">2+</SelectItem>
@@ -261,7 +260,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
           <SelectTrigger className="mt-2">
             <SelectValue placeholder="Any" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="z-[100]">
             <SelectItem value="any">Any</SelectItem>
             <SelectItem value="true">Furnished</SelectItem>
             <SelectItem value="false">Unfurnished</SelectItem>
@@ -295,8 +294,8 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
   );
 
   return (
-    <div className="l g:pl-64 min-h-screen bg-background">
-      <div className="p-6 lg:p-8">
+    <div className="l g:pl-64 min-h-screen bg-background overflow-auto pb-[10rem]">
+      <div className="p-4 lg:p-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Property Listings</h1>
@@ -310,8 +309,8 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
           {/* Desktop Sidebar Filters */}
           <div className="hidden lg:block w-80 space-y-6">
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+              <CardContent className="p-6 flex flex-col">
+                <div className="flex items-center justify-start gap-2 ">
                   <h3 className="font-semibold">Filters</h3>
                   {activeFiltersCount > 0 && (
                     <Badge variant="secondary">{activeFiltersCount}</Badge>
@@ -351,11 +350,11 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
                     )}
                   </Button>
                 </SheetTrigger>
-                <SheetContent>
+                <SheetContent className="flex flex-col">
                   <SheetHeader>
                     <SheetTitle>Filters</SheetTitle>
                   </SheetHeader>
-                  <div className="mt-6">
+                  <div className="flex-1 overflow-auto mt-6">
                     <FilterContent />
                   </div>
                 </SheetContent>

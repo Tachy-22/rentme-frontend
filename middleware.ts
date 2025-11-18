@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentAppModeForMiddleware } from '@/lib/appMode';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -12,6 +13,19 @@ export async function middleware(request: NextRequest) {
     pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot)$/)
   ) {
     return NextResponse.next();
+  }
+
+  // Check app mode - if in waitlist mode, redirect all routes to waitlist except admin
+  const appMode = await getCurrentAppModeForMiddleware();
+  
+  if (appMode === 'waitlist') {
+    // Always allow access to waitlist and admin pages
+    if (pathname === '/waitlist' || pathname === '/ww-admin') {
+      return NextResponse.next();
+    }
+    
+    // Redirect all other pages to waitlist
+    return NextResponse.redirect(new URL('/waitlist', request.url));
   }
 
   // Get auth token and user role from cookies

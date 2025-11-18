@@ -245,18 +245,19 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+      <div className=" max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <Button variant="ghost" asChild className="mb-4">
             <Link href="/agent/properties">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Properties
+              <span className="hidden sm:inline">Back to Properties</span>
+              <span className="sm:hidden">Back</span>
             </Link>
           </Button>
 
-          <h1 className="text-3xl font-bold">Add New Property</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold">Add New Property</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             Create a new property listing for your portfolio
           </p>
         </div>
@@ -273,8 +274,23 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
         )}
 
         {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 md:mb-8">
+          {/* Mobile Progress - Simple Step Indicator */}
+          <div className="sm:hidden">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm text-muted-foreground">Step {currentStep} of {steps.length}</span>
+              <span className="text-sm font-medium">{steps[currentStep - 1].title}</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2">
+              <div 
+                className="bg-primary h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(currentStep / steps.length) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Desktop Progress - Full Steps */}
+          <div className="hidden sm:flex items-center justify-between">
             {steps.map((step, index) => {
               const Icon = step.icon;
               const isActive = currentStep === step.number;
@@ -286,7 +302,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
                     <div className={`p-2 rounded-full border-2 ${isActive ? 'border-primary bg-primary/10' : isCompleted ? 'border-green-600 bg-green-100' : 'border-muted'}`}>
                       {isCompleted ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
                     </div>
-                    <span className="font-medium">{step.title}</span>
+                    <span className="text-sm font-medium">{step.title}</span>
                   </div>
                   {index < steps.length - 1 && (
                     <div className={`mx-4 h-px w-24 ${isCompleted ? 'bg-green-600' : 'bg-muted'}`} />
@@ -299,10 +315,10 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
 
         {/* Form Content */}
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 md:p-6">
             {currentStep === 1 && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4 md:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div className="md:col-span-2">
                     <Label htmlFor="title">Property Title *</Label>
                     <Input
@@ -378,8 +394,8 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
             )}
 
             {currentStep === 2 && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4 md:space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div>
                     <Label htmlFor="bedrooms">Bedrooms *</Label>
                     <Select value={formData.bedrooms} onValueChange={(value) => setFormData(prev => ({ ...prev, bedrooms: value }))}>
@@ -442,7 +458,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
 
                   <div>
                     <Label>Lease Duration (months)</Label>
-                    <div className="flex gap-2 items-center">
+                    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                       <Select value={formData.leaseDurationMin} onValueChange={(value) => setFormData(prev => ({ ...prev, leaseDurationMin: value }))}>
                         <SelectTrigger>
                           <SelectValue />
@@ -482,7 +498,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
             )}
 
             {currentStep === 3 && (
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 <div>
                   <Label htmlFor="description">Property Description *</Label>
                   <Textarea
@@ -490,8 +506,12 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Describe your property, its features, and what makes it special..."
-                    rows={4}
+                    rows={6}
+                    className="resize-none"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formData.description.length}/500 characters
+                  </p>
                 </div>
 
                 <div>
@@ -515,7 +535,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
                     </label>
 
                     {formData.images.length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                         {formData.images.map((image, index) => (
                           <div key={index} className="relative group">
                             <div className="aspect-video bg-muted rounded-lg overflow-hidden">
@@ -544,15 +564,15 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
 
                 <div>
                   <Label>Amenities</Label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                     {AMENITIES.map((amenity) => (
-                      <div key={amenity} className="flex items-center space-x-2">
+                      <div key={amenity} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
                         <Checkbox
                           id={amenity}
                           checked={formData.amenities.includes(amenity)}
                           onCheckedChange={() => toggleAmenity(amenity)}
                         />
-                        <Label htmlFor={amenity} className="text-sm">{amenity}</Label>
+                        <Label htmlFor={amenity} className="text-sm font-medium cursor-pointer flex-1">{amenity}</Label>
                       </div>
                     ))}
                   </div>
@@ -561,40 +581,86 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
             )}
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between pt-6 border-t">
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                disabled={currentStep === 1}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Button>
+            <div className="pt-4 md:pt-6 border-t">
+              {/* Mobile Navigation */}
+              <div className="sm:hidden space-y-3">
+                {currentStep < 3 ? (
+                  <>
+                    <Button onClick={handleNext} className="w-full" size="lg">
+                      Continue to {steps[currentStep]?.title}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                    {currentStep > 1 && (
+                      <Button
+                        variant="ghost"
+                        onClick={handleBack}
+                        className="w-full"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Back to {steps[currentStep - 2]?.title}
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full" size="lg">
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 mr-2 animate-spin rounded-full border-2 border-background border-t-transparent" />
+                          Publishing...
+                        </>
+                      ) : (
+                        'Publish Property'
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={handleBack}
+                      className="w-full"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Back to {steps[currentStep - 2]?.title}
+                    </Button>
+                  </>
+                )}
+              </div>
 
-              {currentStep < 3 ? (
-                <Button onClick={handleNext}>
-                  Next
-                  <ArrowRight className="w-4 h-4 ml-2" />
+              {/* Desktop Navigation */}
+              <div className="hidden sm:flex justify-between">
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  disabled={currentStep === 1}
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
                 </Button>
-              ) : (
-                <Button onClick={handleSubmit} disabled={isSubmitting}>
-                  {isSubmitting ? 'Publishing...' : 'Publish Property'}
-                </Button>
-              )}
+
+                {currentStep < 3 ? (
+                  <Button onClick={handleNext}>
+                    Next
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button onClick={handleSubmit} disabled={isSubmitting}>
+                    {isSubmitting ? 'Publishing...' : 'Publish Property'}
+                  </Button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Verification Benefits Card */}
         {!isVerified && (
-          <Card className="border-blue-200 bg-blue-50">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
+          <Card className="border-blue-200 bg-blue-50 mt-6">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex flex-col md:flex-row items-start gap-4">
+                <div className="p-3 bg-blue-100 rounded-lg self-center md:self-start">
                   <Shield className="w-6 h-6 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-blue-900 mb-2">Get Verified for More Benefits</h3>
+                  <h3 className="font-semibold text-blue-900 mb-2 text-center md:text-left">Get Verified for More Benefits</h3>
                   <div className="space-y-2 text-sm text-blue-800">
                     <div className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-blue-600" />
@@ -613,7 +679,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
                       <span>Priority in search results</span>
                     </div>
                   </div>
-                  <Button asChild className="mt-4" size="sm">
+                  <Button asChild className="mt-4 w-full sm:w-auto" size="sm">
                     <Link href="/verification">
                       <Shield className="w-4 h-4 mr-2" />
                       Get Verified Now
@@ -627,11 +693,11 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
 
         {/* Property Limit Warning */}
         {!isVerified && accessRules.propertyLimit && (
-          <Card className="border-yellow-200 bg-yellow-50">
+          <Card className="border-yellow-200 bg-yellow-50 mt-6">
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                <div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+                <div className="text-center sm:text-left">
                   <p className="font-medium text-yellow-800">
                     Property Limit: {propertyCount}/{accessRules.propertyLimit}
                   </p>

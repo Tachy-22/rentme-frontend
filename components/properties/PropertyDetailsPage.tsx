@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { User } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -70,24 +70,36 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
     }
   };
 
+  const handleGoBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = '/properties';
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="s overflow-auto">
       {/* Back Button */}
-      <Button variant="ghost" asChild className="mb-4">
-        <Link href="/properties">
+      <div className="p-4 md:p-0">
+        <Button 
+          variant="ghost" 
+          onClick={handleGoBack}
+          className="mb-4 hover:bg-gray-100"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Properties
-        </Link>
-      </Button>
+          Back
+        </Button>
+      </div>
 
       {/* Image Gallery */}
-      <Card>
-        <CardContent className="p-0">
+      <Card className="p-0 rounded-none overflow-hidden">
+        <CardContent className="p-0 rounded-none">
           <div className="relative">
-            <Carousel className="w-full">
-              <CarouselContent>
+            <Carousel className="w-full rounded-none">
+              <CarouselContent className='rounded-none md:rounded-lg'>
                 {property.images?.length > 0 ? property.images.map((image: any, index: number) => (
-                  <CarouselItem key={index}>
+                  <CarouselItem key={index} className='rounded-none md:rounded-lg'>
                     <div className="relative h-96 md:h-[500px]">
                       <Image
                         src={image.url}
@@ -132,124 +144,155 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 p-4 md:p-0">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-8">
           {/* Property Header */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <h1 className="text-3xl font-bold">{property.title}</h1>
-                  <div className="flex items-center gap-2 text-muted-foreground mt-2">
-                    <MapPin className="w-4 h-4" />
-                    <span>{property.location.address}, {property.location.city}</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    🚌 {property.distanceToUniversity}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-2">
-                    <Bed className="w-5 h-5 text-muted-foreground" />
-                    <span className="font-medium">{property.details.bedrooms} Bedrooms</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Bath className="w-5 h-5 text-muted-foreground" />
-                    <span className="font-medium">{property.details.bathrooms} Bathrooms</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Ruler className="w-5 h-5 text-muted-foreground" />
-                    <span className="font-medium">{property.details.area.value} {property.details.area.unit}</span>
-                  </div>
-                </div>
-
-                <div className="text-2xl font-bold">
-                  ₦{property.price.amount.toLocaleString()}/{property.price.period}
-                </div>
+          <div className="space-y-4">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold">{property.title}</h1>
+              <div className="flex items-center gap-2 text-muted-foreground mt-2">
+                <MapPin className="w-4 h-4" />
+                <span className="text-sm md:text-base">{property.location.address}, {property.location.city}</span>
               </div>
-            </CardContent>
-          </Card>
+              <div className="text-sm text-muted-foreground mt-1">
+                🚌 {property.distanceToUniversity}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4 md:gap-6">
+              <div className="flex items-center gap-2">
+                <Bed className="w-5 h-5 text-muted-foreground" />
+                <span className="font-medium text-sm md:text-base">{property.details.bedrooms} Bedrooms</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Bath className="w-5 h-5 text-muted-foreground" />
+                <span className="font-medium text-sm md:text-base">{property.details.bathrooms} Bathrooms</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Ruler className="w-5 h-5 text-muted-foreground" />
+                <span className="font-medium text-sm md:text-base">{property.details.area.value} {property.details.area.unit}</span>
+              </div>
+            </div>
+
+            <div className="text-xl md:text-2xl font-bold">
+              ₦{property.price.amount.toLocaleString()}/{property.price.period}
+            </div>
+          </div>
+
+          <Separator />
 
           {/* Description */}
-          <Card>
-            <CardHeader>
-              <CardTitle>About This Property</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground leading-relaxed">
-                {property.description}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">About This Property</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {property.description}
+            </p>
+          </div>
+
+          {/* Contact Agent - Mobile Only (after About section) */}
+          <div className="block lg:hidden bg-gray-50 rounded-lg p-4 space-y-4">
+            <h2 className="text-lg font-semibold">Contact Agent</h2>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={property.agent.profilePicture} />
+                <AvatarFallback>
+                  {property.agent.name.split(' ').map((n: string) => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium">{property.agent.name}</div>
+                <div className="text-sm text-muted-foreground">{property.agent.company}</div>
+                <div className="flex items-center gap-1 text-sm">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                  <span>{property.agent.rating}</span>
+                  <span className="text-muted-foreground">({property.agent.totalReviews} reviews)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-sm text-muted-foreground">
+              Typically responds in {property.agent.responseTime} hours
+            </div>
+
+            <div className="space-y-2">
+              <Button className="w-full" asChild>
+                <Link href={`/messages?agent=${property.agent.id}&property=${property.id}`}>
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Send Message
+                </Link>
+              </Button>
+              <Button variant="outline" className="w-full" asChild>
+                <Link href={`/apply/${property.id}`}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Apply Now
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
 
           {/* Property Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Property Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-sm font-medium">Property Type:</span>
-                  <p className="capitalize">{property.type || 'Not specified'}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium">Furnished:</span>
-                  <p>{property.details?.furnished ? 'Yes' : 'No'}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium">Available From:</span>
-                  <p>
-                    {property.details?.availableFrom ? 
-                      new Date(property.details.availableFrom).toLocaleDateString() : 
-                      'Not specified'
-                    }
-                  </p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium">Lease Duration:</span>
-                  <p>
-                    {property.details?.leaseDuration ? 
-                      `${property.details.leaseDuration.min}-${property.details.leaseDuration.max} ${property.details.leaseDuration.unit}` : 
-                      'Not specified'
-                    }
-                  </p>
-                </div>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Property Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-gray-600">Property Type:</span>
+                <p className="capitalize font-medium">{property.type || 'Not specified'}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-gray-600">Furnished:</span>
+                <p className="font-medium">{property.details?.furnished ? 'Yes' : 'No'}</p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-gray-600">Available From:</span>
+                <p className="font-medium">
+                  {property.details?.availableFrom ? 
+                    new Date(property.details.availableFrom).toLocaleDateString() : 
+                    'Not specified'
+                  }
+                </p>
+              </div>
+              <div className="space-y-1">
+                <span className="text-sm font-medium text-gray-600">Lease Duration:</span>
+                <p className="font-medium">
+                  {property.details?.leaseDuration ? 
+                    `${property.details.leaseDuration.min}-${property.details.leaseDuration.max} ${property.details.leaseDuration.unit}` : 
+                    'Not specified'
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
 
           {/* Amenities */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Amenities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {property.amenities?.length > 0 ? property.amenities.map((amenity: string, index: number) => (
-                  <div key={index} className="flex items-center gap-3">
-                    {getAmenityIcon(amenity)}
-                    <span>{amenity}</span>
-                  </div>
-                )) : (
-                  <div className="text-sm text-muted-foreground">No amenities listed</div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Amenities</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {property.amenities?.length > 0 ? property.amenities.map((amenity: string, index: number) => (
+                <div key={index} className="flex items-center gap-3 py-2">
+                  {getAmenityIcon(amenity)}
+                  <span className="text-sm md:text-base">{amenity}</span>
+                </div>
+              )) : (
+                <div className="text-sm text-muted-foreground">No amenities listed</div>
+              )}
+            </div>
+          </div>
+
+          <Separator />
 
           {/* Utilities & Rules */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Utilities</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Utilities</h2>
+              <div className="space-y-4">
                 <div>
                   <span className="text-sm font-medium text-green-600">Included:</span>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  <ul className="list-disc list-inside text-sm text-muted-foreground mt-2">
                     {property.utilities?.included?.map((utility: string, index: number) => (
                       <li key={index}>{utility}</li>
                     )) || <li>None specified</li>}
@@ -257,102 +300,90 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
                 </div>
                 <div>
                   <span className="text-sm font-medium text-orange-600">Not Included:</span>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  <ul className="list-disc list-inside text-sm text-muted-foreground mt-2">
                     {property.utilities?.excluded?.map((utility: string, index: number) => (
                       <li key={index}>{utility}</li>
                     )) || <li>None specified</li>}
                   </ul>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>House Rules</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  {property.rules?.length > 0 ? property.rules.map((rule: string, index: number) => (
-                    <li key={index} className="text-sm text-muted-foreground">
-                      • {rule}
-                    </li>
-                  )) : (
-                    <li className="text-sm text-muted-foreground">No specific rules</li>
-                  )}
-                </ul>
-              </CardContent>
-            </Card>
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">House Rules</h2>
+              <ul className="space-y-2">
+                {property.rules?.length > 0 ? property.rules.map((rule: string, index: number) => (
+                  <li key={index} className="text-sm text-muted-foreground">
+                    • {rule}
+                  </li>
+                )) : (
+                  <li className="text-sm text-muted-foreground">No specific rules</li>
+                )}
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Agent Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Contact Agent</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={property.agent.profilePicture} />
-                  <AvatarFallback>
-                    {property.agent.name.split(' ').map((n: string) => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium">{property.agent.name}</div>
-                  <div className="text-sm text-muted-foreground">{property.agent.company}</div>
-                  <div className="flex items-center gap-1 text-sm">
-                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    <span>{property.agent.rating}</span>
-                    <span className="text-muted-foreground">({property.agent.totalReviews} reviews)</span>
-                  </div>
+        {/* Sidebar - Desktop Only */}
+        <div className="hidden lg:block space-y-8">
+          {/* Agent Contact */}
+          <div className="bg-gray-50 rounded-lg p-6 space-y-4 sticky top-4">
+            <h2 className="text-lg font-semibold">Contact Agent</h2>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={property.agent.profilePicture} />
+                <AvatarFallback>
+                  {property.agent.name.split(' ').map((n: string) => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <div className="font-medium">{property.agent.name}</div>
+                <div className="text-sm text-muted-foreground">{property.agent.company}</div>
+                <div className="flex items-center gap-1 text-sm">
+                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                  <span>{property.agent.rating}</span>
+                  <span className="text-muted-foreground">({property.agent.totalReviews} reviews)</span>
                 </div>
               </div>
+            </div>
 
-              <div className="text-sm text-muted-foreground">
-                Typically responds in {property.agent.responseTime} hours
-              </div>
+            <div className="text-sm text-muted-foreground">
+              Typically responds in {property.agent.responseTime} hours
+            </div>
 
-              <div className="space-y-2">
-                <Button className="w-full" asChild>
-                  <Link href={`/messages?agent=${property.agent.id}&property=${property.id}`}>
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Send Message
-                  </Link>
-                </Button>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link href={`/apply/${property.id}`}>
-                    <FileText className="w-4 h-4 mr-2" />
-                    Apply Now
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            <div className="space-y-2">
+              <Button className="w-full" asChild>
+                <Link href={`/messages?agent=${property.agent.id}&property=${property.id}`}>
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Send Message
+                </Link>
+              </Button>
+              <Button variant="outline" className="w-full" asChild>
+                <Link href={`/apply/${property.id}`}>
+                  <FileText className="w-4 h-4 mr-2" />
+                  Apply Now
+                </Link>
+              </Button>
+            </div>
+          </div>
 
           {/* Nearby Places */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Nearby Places</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {property.nearbyPlaces?.length > 0 ? property.nearbyPlaces.map((place: any, index: number) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-sm">{place.name}</div>
-                      <div className="text-xs text-muted-foreground capitalize">{place.type}</div>
-                    </div>
-                    <div className="text-sm text-muted-foreground">{place.distance}</div>
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Nearby Places</h2>
+            <div className="space-y-3">
+              {property.nearbyPlaces?.length > 0 ? property.nearbyPlaces.map((place: any, index: number) => (
+                <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <div>
+                    <div className="font-medium text-sm">{place.name}</div>
+                    <div className="text-xs text-muted-foreground capitalize">{place.type}</div>
                   </div>
-                )) : (
-                  <div className="text-sm text-muted-foreground">No nearby places listed</div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  <div className="text-sm text-muted-foreground">{place.distance}</div>
+                </div>
+              )) : (
+                <div className="text-sm text-muted-foreground">No nearby places listed</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

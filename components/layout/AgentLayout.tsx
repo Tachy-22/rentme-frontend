@@ -27,7 +27,7 @@ export default function AgentLayout({ children }: AgentLayoutProps) {
       <AgentNavigation />
       <SidebarInset>
         <AppHeader userRole="agent" />
-        <main className="flex flex-col h-full w-full overflow-hidden p-6 max-h-[calc(100vh-4rem)]  b600">
+        <main className="flex flex-col h-full w-full overflow-hidde p-6 max-h-[calc(100vh-4rem)]  b600">
           {children}
         </main>
       </SidebarInset>

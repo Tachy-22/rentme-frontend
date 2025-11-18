@@ -173,35 +173,47 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Complete Your Profile</CardTitle>
-          <CardDescription>
+    <div className="min-h-screen bg-black flex">
+      {/* Left Column - Form */}
+      <div className="w-full lg:w-1/2 flex flex-col p-4 md:p-8 lg:p-12 max-h-screen overflow-auto">
+        <div className="mb-6 md:mb-8">
+          <img 
+            src="/logo.png" 
+            alt="RentMe Logo" 
+            className="h-8 md:h-6 w-auto"
+          />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <Card className="w-full max-w-lg bg-black/80 border border-white/10 backdrop-blur-sm">
+        <CardHeader className="px-4 md:px-6 pt-4 md:pt-6">
+          <CardTitle className="text-white text-xl md:text-2xl">Complete Your Profile</CardTitle>
+          <CardDescription className="text-gray-400 text-sm md:text-base">
             Step {step} of {formData.role === 'renter' ? 3 : 3}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 md:space-y-6 px-4 md:px-6 pb-4 md:pb-6">
           {step === 1 && (
             <div className="space-y-4">
-              <Label className="text-lg font-medium">What best describes you?</Label>
+              <Label className="text-base md:text-lg font-medium text-white">What best describes you?</Label>
               <RadioGroup value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50">
-                  <RadioGroupItem value="renter" id="renter" />
+                <div className="flex items-center space-x-3 p-3 md:p-4 border border-white/10 rounded-lg hover:bg-orange-500/10 cursor-pointer transition-colors"
+                     onClick={() => setFormData({ ...formData, role: 'renter' })}>
+                  <RadioGroupItem value="renter" id="renter" className="text-orange-500 border-orange-500/30" />
                   <Label htmlFor="renter" className="flex-1 cursor-pointer">
-                    <div className="font-medium">Student Renter</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium text-white text-sm md:text-base">Student Renter</div>
+                    {/* <div className="text-sm text-gray-400">
                       Looking for accommodation near your university
-                    </div>
+                    </div> */}
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50">
-                  <RadioGroupItem value="agent" id="agent" />
+                <div className="flex items-center space-x-3 p-3 md:p-4 border border-white/10 rounded-lg hover:bg-orange-500/10 cursor-pointer transition-colors"
+                     onClick={() => setFormData({ ...formData, role: 'agent' })}>
+                  <RadioGroupItem value="agent" id="agent" className="text-orange-500 border-orange-500/30" />
                   <Label htmlFor="agent" className="flex-1 cursor-pointer">
-                    <div className="font-medium">Real Estate Agent</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium text-white text-sm md:text-base">Real Estate Agent</div>
+                    {/* <div className="text-sm text-gray-400">
                       Manage properties and connect with student renters
-                    </div>
+                    </div> */}
                   </Label>
                 </div>
               </RadioGroup>
@@ -210,64 +222,70 @@ export default function OnboardingPage() {
 
           {step === 2 && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name *</Label>
+                  <Label htmlFor="firstName" className="text-white text-sm md:text-base">First Name *</Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     placeholder="Enter your first name"
+                    className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name *</Label>
+                  <Label htmlFor="lastName" className="text-white text-sm md:text-base">Last Name *</Label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     placeholder="Enter your last name"
+                    className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Phone Number *</Label>
+                <Label htmlFor="phoneNumber" className="text-white text-sm md:text-base">Phone Number *</Label>
                 <Input
                   id="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   placeholder="e.g., +234 801 234 5678"
+                  className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                 />
               </div>
 
               {formData.role === 'agent' && (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="company">Company/Agency</Label>
+                    <Label htmlFor="company" className="text-white text-sm md:text-base">Company/Agency</Label>
                     <Input
                       id="company"
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       placeholder="Enter your company name"
+                      className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="position">Position</Label>
+                    <Label htmlFor="position" className="text-white text-sm md:text-base">Position</Label>
                     <Input
                       id="position"
                       value={formData.position}
                       onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                       placeholder="e.g., Real Estate Agent, Property Manager"
+                      className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="licenseNumber">License Number (Optional)</Label>
+                    <Label htmlFor="licenseNumber" className="text-white text-sm md:text-base">License Number (Optional)</Label>
                     <Input
                       id="licenseNumber"
                       value={formData.licenseNumber}
                       onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
                       placeholder="Enter your license number"
+                      className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                     />
                   </div>
                 </>
@@ -278,45 +296,47 @@ export default function OnboardingPage() {
           {step === 3 && formData.role === 'renter' && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="university">University</Label>
+                <Label htmlFor="university" className="text-white">University</Label>
                 <Select value={formData.university} onValueChange={(value) => setFormData({ ...formData, university: value })}>
-                  <SelectTrigger>
+                  <SelectTrigger className="text-white bg-white/5 border-white/20 data-[placeholder]:text-gray-400">
                     <SelectValue placeholder="Select your university" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-black border-white/20">
                     {NIGERIAN_UNIVERSITIES.map((uni) => (
-                      <SelectItem key={uni} value={uni}>{uni}</SelectItem>
+                      <SelectItem key={uni} value={uni} className="text-white hover:bg-white/10 focus:bg-white/10">{uni}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="budgetMin">Min Budget (₦/month)</Label>
+                  <Label htmlFor="budgetMin" className="text-white text-sm md:text-base">Min Budget (₦/month)</Label>
                   <Input
                     id="budgetMin"
                     type="number"
                     value={formData.preferredBudgetMin}
                     onChange={(e) => setFormData({ ...formData, preferredBudgetMin: e.target.value })}
                     placeholder="50000"
+                    className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="budgetMax">Max Budget (₦/month)</Label>
+                  <Label htmlFor="budgetMax" className="text-white text-sm md:text-base">Max Budget (₦/month)</Label>
                   <Input
                     id="budgetMax"
                     type="number"
                     value={formData.preferredBudgetMax}
                     onChange={(e) => setFormData({ ...formData, preferredBudgetMax: e.target.value })}
                     placeholder="200000"
+                    className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Preferred Property Types</Label>
-                <div className="grid grid-cols-2 gap-2">
+                <Label className="text-white text-sm md:text-base">Preferred Property Types</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {PROPERTY_TYPES.map((type) => (
                     <div key={type} className="flex items-center space-x-2">
                       <Checkbox
@@ -336,15 +356,15 @@ export default function OnboardingPage() {
                           }
                         }}
                       />
-                      <Label htmlFor={type} className="capitalize">{type.replace('_', ' ')}</Label>
+                      <Label htmlFor={type} className="capitalize text-white text-sm">{type.replace('_', ' ')}</Label>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Preferred Locations</Label>
-                <div className="grid grid-cols-2 gap-2">
+                <Label className="text-white text-sm md:text-base">Preferred Locations</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {NIGERIAN_STATES.map((state) => (
                     <div key={state} className="flex items-center space-x-2">
                       <Checkbox
@@ -364,7 +384,7 @@ export default function OnboardingPage() {
                           }
                         }}
                       />
-                      <Label htmlFor={state}>{state}</Label>
+                      <Label htmlFor={state} className="text-white text-sm">{state}</Label>
                     </div>
                   ))}
                 </div>
@@ -375,17 +395,18 @@ export default function OnboardingPage() {
           {step === 3 && formData.role === 'agent' && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="officeAddress">Office Address</Label>
+                <Label htmlFor="officeAddress" className="text-white">Office Address</Label>
                 <Textarea
                   id="officeAddress"
                   value={formData.officeAddress}
                   onChange={(e) => setFormData({ ...formData, officeAddress: e.target.value })}
                   placeholder="Enter your office address"
+                  className="text-white bg-white/5 border-white/20 placeholder:text-gray-400"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Property Specialties</Label>
+                <Label className="text-white">Property Specialties</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {PROPERTY_TYPES.map((type) => (
                     <div key={type} className="flex items-center space-x-2">
@@ -406,14 +427,14 @@ export default function OnboardingPage() {
                           }
                         }}
                       />
-                      <Label htmlFor={`specialty-${type}`} className="capitalize">{type.replace('_', ' ')}</Label>
+                      <Label htmlFor={`specialty-${type}`} className="capitalize text-white">{type.replace('_', ' ')}</Label>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Service Areas</Label>
+                <Label className="text-white">Service Areas</Label>
                 <div className="grid grid-cols-2 gap-2">
                   {NIGERIAN_STATES.map((state) => (
                     <div key={state} className="flex items-center space-x-2">
@@ -434,7 +455,7 @@ export default function OnboardingPage() {
                           }
                         }}
                       />
-                      <Label htmlFor={`area-${state}`}>{state}</Label>
+                      <Label htmlFor={`area-${state}`} className="text-white">{state}</Label>
                     </div>
                   ))}
                 </div>
@@ -442,9 +463,9 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          <div className="flex justify-between pt-6">
+          <div className="flex justify-between pt-4 md:pt-6">
             {step > 1 && (
-              <Button variant="outline" onClick={handleBack}>
+              <Button variant="outline" onClick={handleBack} className="text-sm md:text-base">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
@@ -452,12 +473,12 @@ export default function OnboardingPage() {
             
             <div className="ml-auto">
               {step < 3 ? (
-                <Button onClick={handleNext}>
+                <Button onClick={handleNext} className="bg-orange-500 hover:bg-orange-600 text-white text-sm md:text-base">
                   Next
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               ) : (
-                <Button onClick={handleSubmit} disabled={isLoading}>
+                <Button onClick={handleSubmit} disabled={isLoading} className="bg-orange-500 hover:bg-orange-600 text-white text-sm md:text-base">
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -471,7 +492,25 @@ export default function OnboardingPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
+          </Card>
+        </div>
+      </div>
+
+      {/* Right Column - Image Gallery */}
+      <div className="hidden lg:block w-1/2 relative">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+            alt="Student accommodation"
+            className="w-full h-full object-cover opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-8 left-8 right-8">
+            <h3 className="text-white text-2xl font-bold mb-2">Find Your Perfect Student Home</h3>
+            <p className="text-gray-200">Discover comfortable, affordable accommodation near your university with verified agents and secure booking.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

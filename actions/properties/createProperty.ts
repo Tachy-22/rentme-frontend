@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { addDocument } from '@/actions/firebase';
+import { addDocument, getDocument, queryDocuments } from '@/actions/firebase';
 import { uploadImage } from '@/actions/upload/uploadImage';
 
 interface CreatePropertyParams {
@@ -54,6 +54,54 @@ export async function createProperty(params: CreatePropertyParams) {
       };
     }
 
+    // Get agent verification status and check listing limits
+    const agentResult = await getDocument({
+      collectionName: 'users',
+      documentId: userId
+    });
+
+    if (!agentResult.success || !agentResult.data) {
+      return {
+        success: false,
+        error: 'Agent profile not found'
+      };
+    }
+
+    const agent = agentResult.data as {
+      profile?: {
+        verificationStatus?: string;
+      };
+    };
+
+    const isVerified = agent.profile?.verificationStatus === 'verified';
+
+    // Check current property count
+    const propertiesResult = await queryDocuments({
+      collectionName: 'properties',
+      filters: [
+        { field: 'agentId', operator: '==', value: userId },
+        { field: 'status', operator: 'in', value: ['available', 'pending'] }
+      ]
+    });
+
+    const currentPropertyCount = propertiesResult.success ? (propertiesResult.data?.length || 0) : 0;
+    
+    // Apply listing limits based on verification status
+    const maxListings = isVerified ? 50 : 3; // Verified: 50 listings, Unverified: 3 listings
+    
+    if (currentPropertyCount >= maxListings) {
+      return {
+        success: false,
+        error: isVerified 
+          ? 'You have reached the maximum number of active listings (50)'
+          : 'VERIFICATION_REQUIRED_FOR_MORE_LISTINGS',
+        message: isVerified 
+          ? 'Please remove some existing listings before creating new ones'
+          : `Unverified agents can list up to 3 properties. Get verified to list up to 50 properties.`,
+        requiresVerification: !isVerified
+      };
+    }
+
     // Upload images
     const uploadedImages = [];
     for (const image of params.images) {
@@ -80,7 +128,7 @@ export async function createProperty(params: CreatePropertyParams) {
       };
     }
 
-    // Create property document
+    // Create property document with verification-based features
     const propertyData = {
       title: params.title,
       type: params.type,
@@ -102,8 +150,11 @@ export async function createProperty(params: CreatePropertyParams) {
       viewCount: 0,
       inquiries: 0,
       applications: 0,
-      featured: false,
-      verified: false
+      featured: isVerified, // Only verified agents get featured listings
+      verified: false,
+      agentVerificationStatus: isVerified ? 'verified' : 'unverified',
+      visibilityBoost: isVerified ? 1.5 : 1.0, // Verified agents get 50% visibility boost
+      searchPriority: isVerified ? 'high' : 'normal'
     };
 
     const result = await addDocument({

@@ -73,7 +73,7 @@ export async function searchProperties(params: SearchPropertiesParams) {
       return result;
     }
 
-    // Add search relevance scoring for 'relevance' sort
+    // Add search relevance scoring and verification boost for 'relevance' sort
     if (sortBy === 'relevance' && searchQuery.trim()) {
       const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 2);
       
@@ -93,10 +93,14 @@ export async function searchProperties(params: SearchPropertiesParams) {
           score += titleMatches + descriptionMatches;
         });
 
-        return { ...property, relevanceScore: score };
+        // Apply verification boost to search ranking
+        const verificationBoost = property.agentVerificationStatus === 'verified' ? 1.5 : 1.0;
+        const finalScore = score * verificationBoost;
+
+        return { ...property, relevanceScore: finalScore };
       });
 
-      // Sort by relevance score
+      // Sort by relevance score with verification boost
       scoredProperties?.sort((a, b) => {
         if (sortOrder === 'desc') {
           return b.relevanceScore - a.relevanceScore;
@@ -105,6 +109,32 @@ export async function searchProperties(params: SearchPropertiesParams) {
       });
 
       result.data = scoredProperties;
+    } else {
+      // Apply verification ranking boost even for non-relevance sorts
+      const rankedProperties = result?.data?.map((property: any) => {
+        const verificationBoost = property.agentVerificationStatus === 'verified' ? 1 : 0;
+        return { ...property, verificationBoost };
+      });
+
+      // For non-relevance sorts, do a secondary sort by verification status
+      rankedProperties?.sort((a, b) => {
+        // First sort by verification status (verified first)
+        if (a.verificationBoost !== b.verificationBoost) {
+          return b.verificationBoost - a.verificationBoost;
+        }
+        
+        // Then by the requested sort field
+        const field = sortBy === 'relevance' ? 'createdAt' : sortBy;
+        const aValue = a[field] || 0;
+        const bValue = b[field] || 0;
+        
+        if (sortOrder === 'desc') {
+          return bValue - aValue;
+        }
+        return aValue - bValue;
+      });
+
+      result.data = rankedProperties;
     }
 
     return {

@@ -19,6 +19,7 @@ import {
     MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { LampContainer } from "@/components/ui/lamp";
+import Image from "next/image";
 
 export default function Home() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -115,13 +116,14 @@ export default function Home() {
                 {/* Desktop Navigation */}
                 <NavBody>
                     <NavbarLogo>
-                        <div className="flex items-center space-x-2">
-                            <span className="text-xl font-bold text-stone-500">Rent<span className="text-orange-400">me</span></span>
+                        <div className="flex items-center space-x-2 ">
+                            <Image src="/logo.png" alt="Rentme Logo" width={1324} height={300} className="w-[6rem] h-auto " />
+                            {/* <span className="text-xl font-bold text-stone-200">Rent<span className="text-orange-400">me</span></span> */}
                         </div>
                     </NavbarLogo>
                     <NavItems items={navItems} />
-                    <div className="flex items-center gap-4">
-                        <NavbarButton variant="secondary" href="/auth">Login</NavbarButton>
+                    <div className="flex items-center gap-4 ">
+                        <NavbarButton variant="gradient" href="/auth">Login</NavbarButton>
                         <NavbarButton variant="primary" href="/auth">Join Rentme</NavbarButton>
                     </div>
                 </NavBody>
@@ -131,46 +133,53 @@ export default function Home() {
                     <MobileNavHeader>
                         <NavbarLogo>
                             <div className="flex items-center space-x-2">
-                                <span className="text-xl font-bold">Rent<span className="text-orange-400">me</span></span>
+                                <Image src="/logo.png" alt="Rentme Logo" width={1320} height={320} className=" w-[5rem] h-auto " />
                             </div>
                         </NavbarLogo>
-                        <MobileNavToggle
-                            isOpen={isMobileMenuOpen}
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        />
+                        <div className="text-white ">
+                            <MobileNavToggle
+                                isOpen={isMobileMenuOpen}
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            />
+                        </div>
                     </MobileNavHeader>
 
                     <MobileNavMenu
                         isOpen={isMobileMenuOpen}
                         onClose={() => setIsMobileMenuOpen(false)}
                     >
-                        {navItems.map((item, idx) => (
-                            <a
-                                key={`mobile-link-${idx}`}
-                                href={item.link}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="relative text-neutral-600 dark:text-neutral-300"
-                            >
-                                <span className="block">{item.name}</span>
-                            </a>
-                        ))}
-                        <div className="flex w-full flex-col gap-4">
-                            <NavbarButton
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                variant="secondary"
-                                className="w-full"
-                                href="/auth"
-                            >
-                                Login
-                            </NavbarButton>
-                            <NavbarButton
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                variant="primary"
-                                className="w-full"
-                                href="/auth"
-                            >
-                                Join Rentme
-                            </NavbarButton>
+                        <div className="flex flex-col gap-4 px-4 py-6 w-full">
+                            {navItems.map((item, idx) => (
+                                <a
+                                    key={`mobile-link-${idx}`}
+                                    href={item.link}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="block text-black text-lg font-medium hover:text-orange-500 transition-colors py-2"
+                                >
+                                    {item.name}
+                                </a>
+                            ))}
+
+                            <div className="pt-6 border-t border-gray-200">
+                                <div className="space-y-4">
+                                    <NavbarButton
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        variant="secondary"
+                                        className="w-full bg-gray-100 hover:bg-gray-200 border-gray-300 text-black"
+                                        href="/auth"
+                                    >
+                                        Login
+                                    </NavbarButton>
+                                    <NavbarButton
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        variant="primary"
+                                        className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
+                                        href="/auth"
+                                    >
+                                        Join Rentme
+                                    </NavbarButton>
+                                </div>
+                            </div>
                         </div>
                     </MobileNavMenu>
                 </MobileNav>
@@ -192,20 +201,20 @@ export default function Home() {
                                 duration: 0.8,
                                 ease: "easeInOut",
                             }}
-                            className="text-center max-w-5xl mx-auto px-8 relative z-10"
+                            className="text-center max-w-5xl mx-auto px-6 md:px-8 relative z-10"
                         >
                             {/* Enhanced typography with subtle effects */}
                             <motion.div
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
-                                className="relative"
+                                className="relative items-center flex justify-center"
                             >
                                 <TextMorph />
                             </motion.div>
 
                             <motion.p
-                                className="text-xl md:text-2xl text-gray-400 leading-relaxed mb-12 max-w-3xl mx-auto"
+                                className="text-lg md:text-xl lg:text-2xl text-gray-400 leading-relaxed mb-8 md:mb-12 max-w-3xl mx-auto"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.6, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
@@ -223,7 +232,7 @@ export default function Home() {
 
                             {/* Elegant feature highlights */}
                             <motion.div
-                                className="flex flex-wrap justify-center gap-8 mb-16"
+                                className="flex flex-wrap justify-center gap-4 md:gap-8 mb-12 md:mb-16"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 1, duration: 0.8 }}
@@ -231,7 +240,7 @@ export default function Home() {
                                 {["Verified Students", "Trusted Agents", "Nigerian Campuses"].map((feature, i) => (
                                     <motion.div
                                         key={i}
-                                        className="flex items-center space-x-2 text-gray-500 text-sm"
+                                        className="flex items-center space-x-2 text-gray-500 text-xs md:text-sm"
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: 1.2 + i * 0.1, duration: 0.6 }}
@@ -308,7 +317,7 @@ export default function Home() {
                                 scale: productScale,
                                 opacity: productOpacity,
                             }}
-                            className="relative w-[90vw] max-w-6xl h-[60vh] rounded-2xl overflow-hidden"
+                            className="relative w-[95vw] md:w-[90vw] max-w-6xl h-[50vh] md:h-[60vh] rounded-2xl overflow-hidden mx-4 md:mx-0"
                         >
                             {/* Image sequence canvas */}
                             <motion.img
@@ -330,11 +339,11 @@ export default function Home() {
                                     }}
                                     transition={{ duration: 0.5, ease: "easeOut" }}
                                 >
-                                    <h2 className="text-4xl md:text-6xl font-thin mb-4">
+                                    <h2 className="text-2xl md:text-4xl lg:text-6xl font-thin mb-4">
                                         {currentFrame < 40 ? "Search" :
                                             currentFrame < 70 ? "Connect" : "Move In"}
                                     </h2>
-                                    <p className="text-lg text-white/90">
+                                    <p className="text-sm md:text-lg text-white/90 px-4 md:px-0">
                                         {currentFrame < 40 ? "Browse verified listings near your campus" :
                                             currentFrame < 70 ? "Chat with trusted real estate agents" : "Secure your perfect student accommodation"}
                                     </p>
@@ -364,11 +373,11 @@ export default function Home() {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
                         viewport={{ once: true, amount: 0.3 }}
-                        className="text-center max-w-4xl mx-auto px-8"
+                        className="text-center max-w-4xl mx-auto px-4 md:px-8"
                     >
                         {/* Apple-style scroll reveal for heading */}
                         <motion.h2
-                            className="text-4xl md:text-6xl font-thin mb-8"
+                            className="text-3xl md:text-5xl lg:text-6xl font-thin mb-6 md:mb-8"
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
@@ -378,7 +387,7 @@ export default function Home() {
                         </motion.h2>
 
                         {/* Paragraph with staggered reveals */}
-                        <motion.div className="text-xl text-gray-400 leading-relaxed mb-16">
+                        <motion.div className="text-lg md:text-xl text-gray-400 leading-relaxed mb-12 md:mb-16">
                             <motion.p
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
@@ -398,7 +407,7 @@ export default function Home() {
                         </motion.div>
 
                         {/* Feature grid with cool scroll-driven reveals */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                             {[
                                 { title: "Verified", desc: "Only authenticated students" },
                                 { title: "Trusted", desc: "Pre-screened real estate agents" },
@@ -503,16 +512,16 @@ export default function Home() {
                         <div className="w-full">
                             {/* Section header */}
                             <motion.div
-                                className="text-center mb-16 px-8"
+                                className="text-center mb-12 md:mb-16 px-4 md:px-8"
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
                                 viewport={{ once: true, amount: 0.3 }}
                             >
-                                <h2 className="text-5xl md:text-7xl font-thin mb-6">
+                                <h2 className="text-4xl md:text-6xl lg:text-7xl font-thin mb-4 md:mb-6">
                                     Your Journey Starts Here
                                 </h2>
-                                <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                                <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
                                     Discover the story of students finding their perfect homes
                                 </p>
                             </motion.div>
@@ -520,7 +529,7 @@ export default function Home() {
                             {/* Horizontal scrolling container */}
                             <motion.div
                                 style={{ x: bookX }}
-                                className="flex gap-8"
+                                className="flex gap-4 md:gap-8"
                             >
                                 {[
                                     {
@@ -614,7 +623,7 @@ export default function Home() {
                                                 rotateY: cardRotateY,
                                                 transformStyle: "preserve-3d",
                                             }}
-                                            className="flex-none w-[450px] h-[550px] relative cursor-pointer"
+                                            className="flex-none w-[300px] md:w-[450px] h-[400px] md:h-[550px] relative cursor-pointer"
                                             whileHover={{ scale: 1.02 }}
                                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                         >
@@ -659,7 +668,7 @@ export default function Home() {
                                                 </div>
 
                                                 {/* Main content */}
-                                                <div className="relative h-full flex flex-col justify-between p-8">
+                                                <div className="relative h-full flex flex-col justify-between p-4 md:p-8">
                                                     {/* Brand section */}
                                                     <motion.div
                                                         className="space-y-6"
@@ -677,7 +686,7 @@ export default function Home() {
                                                             transition={{ duration: 0.3 }}
                                                         >
                                                             <motion.div
-                                                                className="w-16 h-16 mx-auto mb-4 border-2 border-white/40 flex items-center justify-center"
+                                                                className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 border-2 border-white/40 flex items-center justify-center"
                                                                 animate={{
                                                                     rotate: isHovered ? 90 : 0,
                                                                     scale: isHovered ? 1.1 : 1,
@@ -697,7 +706,7 @@ export default function Home() {
                                                             </motion.div>
 
                                                             <motion.h1
-                                                                className="text-xl font-thin tracking-[0.3em] text-white mb-2"
+                                                                className="text-lg md:text-xl font-thin tracking-[0.3em] text-white mb-2"
                                                                 animate={{
                                                                     letterSpacing: isHovered ? "0.4em" : "0.3em",
                                                                 }}
@@ -735,7 +744,7 @@ export default function Home() {
                                                             </motion.p>
 
                                                             <motion.p
-                                                                className="text-sm text-white/90 leading-relaxed px-4"
+                                                                className="text-xs md:text-sm text-white/90 leading-relaxed px-2 md:px-4"
                                                                 animate={{
                                                                     scale: isHovered ? 1.02 : 1,
                                                                     opacity: isHovered ? 1 : 0.9,
@@ -850,8 +859,8 @@ export default function Home() {
                 </section>
 
                 {/* Dive In Section */}
-                <section className="py-20 bg-black text-white">
-                    <div className="max-w-4xl mx-auto px-8 text-center">
+                <section className="py-16 md:py-20 bg-black text-white">
+                    <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -859,7 +868,7 @@ export default function Home() {
                             viewport={{ once: true, amount: 0.3 }}
                         >
                             <motion.h2
-                                className="text-5xl md:text-7xl font-thin mb-8"
+                                className="text-4xl md:text-6xl lg:text-7xl font-thin mb-6 md:mb-8"
                                 initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
@@ -867,7 +876,7 @@ export default function Home() {
                             >
                                 Let's Dive In
                             </motion.h2>
-                            <div className="text-xl text-gray-400 leading-relaxed mb-12 max-w-3xl mx-auto">
+                            <div className="text-lg md:text-xl text-gray-400 leading-relaxed mb-8 md:mb-12 max-w-3xl mx-auto">
                                 <TextGenerateEffect words="Experience the seamless journey of finding your perfect student accommodation. Every scroll brings you closer to home. Discover verified agents, secure payments, and trusted connections across Nigerian universities." />
                             </div>
 
@@ -911,25 +920,25 @@ export default function Home() {
 
                 {/* Product Features - Scroll-driven reveals */}
                 <section className="py-8 ">
-                    <div className="max-w-7xl mx-auto px-8">
+                    <div className="max-w-7xl mx-auto px-4 md:px-8">
                         {/* Section header */}
                         <motion.div
-                            className="text-center mb-20"
+                            className="text-center mb-12 md:mb-20"
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
                             viewport={{ once: true, amount: 0.3 }}
                         >
-                            <h2 className="text-5xl md:text-7xl font-thin mb-6">
+                            <h2 className="text-4xl md:text-6xl lg:text-7xl font-thin mb-4 md:mb-6">
                                 How Rentme Works
                             </h2>
-                            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
                                 Three simple steps to your perfect student accommodation
                             </p>
                         </motion.div>
 
                         {/* Feature blocks */}
-                        <div className="space-y-32">
+                        <div className="space-y-20 md:space-y-32">
                             {[
                                 {
                                     title: "Create Your Profile",
@@ -952,7 +961,7 @@ export default function Home() {
                             ].map((feature, index) => (
                                 <motion.div
                                     key={index}
-                                    className={`grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${feature.reverse ? 'lg:grid-flow-col-dense' : ''
+                                    className={`grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center ${feature.reverse ? 'lg:grid-flow-col-dense' : ''
                                         }`}
                                     initial={{ opacity: 0, y: 50 }}
                                     whileInView={{ opacity: 1, y: 0 }}
@@ -966,7 +975,7 @@ export default function Home() {
                                     {/* Text content */}
                                     <div className={feature.reverse ? 'lg:col-start-2' : ''}>
                                         <motion.h3
-                                            className="text-3xl md:text-4xl font-thin mb-6"
+                                            className="text-2xl md:text-3xl lg:text-4xl font-thin mb-4 md:mb-6"
                                             initial={{ opacity: 0, x: feature.reverse ? 30 : -30 }}
                                             whileInView={{ opacity: 1, x: 0 }}
                                             transition={{ duration: 0.6, delay: 0.4 }}
@@ -975,7 +984,7 @@ export default function Home() {
                                             {feature.title}
                                         </motion.h3>
                                         <motion.p
-                                            className="text-lg text-gray-400 leading-relaxed"
+                                            className="text-base md:text-lg text-gray-400 leading-relaxed"
                                             initial={{ opacity: 0, x: feature.reverse ? 30 : -30 }}
                                             whileInView={{ opacity: 1, x: 0 }}
                                             transition={{ duration: 0.6, delay: 0.6 }}
@@ -994,7 +1003,7 @@ export default function Home() {
                                         viewport={{ once: true }}
                                         whileHover={{ scale: 1.02 }}
                                     >
-                                        <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
+                                        <div className="relative h-64 md:h-96 rounded-2xl overflow-hidden shadow-2xl">
                                             <img
                                                 src={feature.image}
                                                 alt={feature.title}
@@ -1010,18 +1019,18 @@ export default function Home() {
                 </section>
 
                 {/* Student Stories - Draggable Cards */}
-                <section className="py-20 bg-gray-900/30 relative">
+                <section className="py-16 md:py-20 bg-gray-900/30 relative">
                     <motion.div
-                        className="text-center mb-16 relative z-20"
+                        className="text-center mb-12 md:mb-16 relative z-20 px-4"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-4xl md:text-6xl font-thin mb-6">
+                        <h2 className="text-3xl md:text-5xl lg:text-6xl font-thin mb-4 md:mb-6">
                             Student Success Stories
                         </h2>
-                        <p className="text-xl text-gray-400">
+                        <p className="text-lg md:text-xl text-gray-400">
                             Real students, real experiences with Rentme
                         </p>
                     </motion.div>
@@ -1087,24 +1096,24 @@ export default function Home() {
                 </section>
 
                 {/* Final CTA */}
-                <section className="py-20">
+                <section className="py-16 md:py-20">
                     <motion.div
-                        className="text-center max-w-4xl mx-auto px-8"
+                        className="text-center max-w-4xl mx-auto px-4 md:px-8"
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-5xl md:text-7xl font-thin mb-8">
+                        <h2 className="text-4xl md:text-6xl lg:text-7xl font-thin mb-6 md:mb-8">
                             Ready to Find Your Home?
                         </h2>
-                        <p className="text-xl text-gray-400 mb-12 leading-relaxed">
+                        <p className="text-lg md:text-xl text-gray-400 mb-8 md:mb-12 leading-relaxed">
                             Join thousands of students who've already found their perfect
                             <br />
                             off-campus accommodation through Rentme.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 md:px-0">
                             <motion.button
                                 className="px-8 py-3 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-colors"
                                 whileHover={{ scale: 1.02 }}
@@ -1126,8 +1135,8 @@ export default function Home() {
                 </section>
 
                 {/* Footer */}
-                <footer className="border-t border-white/10 py-12">
-                    <div className="max-w-7xl mx-auto px-8">
+                <footer className="border-t border-white/10 py-8 md:py-12">
+                    <div className="max-w-7xl mx-auto px-4 md:px-8">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                             <div>
                                 <h3 className="font-medium mb-4">For Students</h3>
@@ -1250,7 +1259,7 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm text-gray-500">
+                        <div className="border-t border-white/10 mt-8 md:mt-12 pt-6 md:pt-8 text-center text-sm text-gray-500">
                             <motion.p
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
@@ -1501,8 +1510,8 @@ const TextMorph = () => {
     const words = [
         "Home",
         "Trust",
-        "Connect",
-        "Secure"
+        "Meet",
+        "Safe"
     ];
 
     useEffect(() => {
@@ -1515,11 +1524,11 @@ const TextMorph = () => {
 
     return (
         <motion.div
-            className="text-7xl md:text-9xl font-thin tracking-tight mb-8 relative"
+            className="text-5xl md:text-7xl lg:text-9xl font-thin tracking-tight mb-6 md:mb-8 relative justify-center flex"
             // whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
-            <span className="relative inline">
+            <span className="relative inline ">
                 Rent<span className="text-orange-400">me</span>
                 {/* Subtle text glow for Rentme */}
                 <motion.div
@@ -1537,7 +1546,7 @@ const TextMorph = () => {
                 </motion.div>
             </span>
 
-            <span className="text-gray-400 ml-6 inline-block relative align-top" style={{ minWidth: '300px', lineHeight: '1' }}>
+            <span className="text-gray-400 ml-2 md:ml-6 inline-block relative align-top  min-w-[130px] md:min-w-[330px]" style={{ lineHeight: '1' }}>
                 {words.map((word, i) => (
                     <motion.span
                         key={i}
@@ -1551,7 +1560,7 @@ const TextMorph = () => {
                             duration: 0.5,
                             ease: [0.25, 0.1, 0.25, 1]
                         }}
-                        className="absolute left-0 top-0 text-nowrap"
+                        className="absolute left-0 top-0 text-nowrap  "
                         style={{ lineHeight: '1' }}
                     >
                         - {word}
@@ -1615,7 +1624,7 @@ const DraggableTestimonials = () => {
     ];
 
     return (
-        <DraggableCardContainer className="relative flex h-[500px] w-full items-center justify-center overflow-hidden">
+        <DraggableCardContainer className="relative flex h-[400px] md:h-[500px] w-full items-center justify-center overflow-hidden">
             {/* <motion.p
         className="absolute top-1/2 mx-auto max-w-lg -translate-y-1/2 text-center text-xl font-thin text-white/60 md:text-2xl z-10"
         initial={{ opacity: 0 }}

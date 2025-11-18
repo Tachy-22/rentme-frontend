@@ -199,13 +199,31 @@ export default function MessagesPage({
     setShowConversations(true);
   };
 
+  const handleGoBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = '/properties';
+    }
+  };
+
   return (
-    <div className="h-full max-h-screen bg-background">
-      <div className="flex h-full">
+    <div className="h-full max-h-screen bg-background w-full">
+      <div className="flex h-full w-full ">
         {/* Conversations List */}
         <div className={`${showConversations ? 'flex' : 'hidden'} md:flex w-full md:w-80 h-full border-r bg-card flex-col`}>
           <div className="p-3 md:p-4 border-b">
-            <h2 className="text-lg font-semibold mb-3 md:hidden">Messages</h2>
+            <div className="flex items-center gap-3 mb-3 md:hidden">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleGoBack}
+                className="p-2 h-8 w-8 hover:bg-gray-100"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <h2 className="text-lg font-semibold">Messages</h2>
+            </div>
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -291,7 +309,7 @@ export default function MessagesPage({
         </div>
 
         {/* Chat Area */}
-        <div className={`${!showConversations ? 'flex' : 'hidden'} md:flex flex-1 h-full flex-col`}>
+        <div className={`${!showConversations ? 'flex' : 'hidden'} md:flex flex-1 h-full flex-col w-full`}>
           {selectedConversation && selectedConv ? (
             <>
               {/* Chat Header */}

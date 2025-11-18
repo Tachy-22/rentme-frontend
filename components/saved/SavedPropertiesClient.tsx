@@ -80,7 +80,7 @@ export default function SavedPropertiesClient({ user, initialProperties }: Saved
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-y-auto p-4 md:p-0">
       <div>
         <h1 className="text-3xl font-bold">Saved Properties</h1>
         <p className="text-muted-foreground">

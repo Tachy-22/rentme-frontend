@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { Trash2, Download, RefreshCw } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Trash2, Download, RefreshCw, Globe, Clock } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { getWaitlistData } from '@/actions/waitlist/getWaitlistData'
 import { deleteRenter } from '@/actions/waitlist/deleteRenter'
 import { exportToCSV, exportToExcel } from '@/lib/exportUtils'
+import { getAppMode } from '@/actions/system/getAppMode'
+import { setAppMode } from '@/actions/system/setAppMode'
+import { isDevelopmentLiveMode } from '@/lib/appMode'
 
 interface WaitlistEntry {
   id: string
@@ -26,8 +29,25 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [currentAppMode, setCurrentAppMode] = useState<'live' | 'waitlist'>('waitlist')
+  const [isTogglingMode, setIsTogglingMode] = useState(false)
+  const [modeError, setModeError] = useState('')
+  const [showModeToggle, setShowModeToggle] = useState(true)
 
   const ADMIN_PASSKEY = '1Rentme.com'
+
+  useEffect(() => {
+    // Check if we should show mode toggle (hide in development if forced live mode)
+    if (isDevelopmentLiveMode()) {
+      setShowModeToggle(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchAppMode()
+    }
+  }, [isAuthenticated])
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -84,6 +104,42 @@ export default function AdminPage() {
     exportToExcel(waitlistData, `rentme-waitlist-${new Date().toISOString().split('T')[0]}`)
   }
 
+  const fetchAppMode = async () => {
+    try {
+      const result = await getAppMode()
+      if (result.success && result.mode) {
+        setCurrentAppMode(result.mode)
+      }
+    } catch (error) {
+      console.error('Failed to fetch app mode:', error)
+    }
+  }
+
+  const handleModeToggle = async () => {
+    const newMode = currentAppMode === 'live' ? 'waitlist' : 'live'
+    
+    if (!confirm(`Are you sure you want to switch to ${newMode.toUpperCase()} mode?`)) {
+      return
+    }
+
+    setIsTogglingMode(true)
+    setModeError('')
+    
+    try {
+      const result = await setAppMode(newMode, 'admin')
+      if (result.success) {
+        setCurrentAppMode(newMode)
+      } else {
+        setModeError(result.error || 'Failed to update app mode')
+      }
+    } catch (error) {
+      console.error('Failed to toggle app mode:', error)
+      setModeError('An error occurred while updating app mode')
+    } finally {
+      setIsTogglingMode(false)
+    }
+  }
+
   const formatDate = (date: Date | string) => {
     const d = new Date(date)
     return d.toLocaleDateString() + ' ' + d.toLocaleTimeString()
@@ -127,6 +183,47 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
+        {showModeToggle && (
+          <div className="bg-card border border-border rounded-lg p-6 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-2">App Mode Control</h2>
+                <div className="flex items-center gap-2">
+                  {currentAppMode === 'live' ? (
+                    <>
+                      <Globe className="w-5 h-5 text-green-600" />
+                      <span className="text-green-600 font-medium">LIVE MODE</span>
+                      <span className="text-sm text-muted-foreground">- Full app access enabled</span>
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="w-5 h-5 text-orange-600" />
+                      <span className="text-orange-600 font-medium">WAITLIST MODE</span>
+                      <span className="text-sm text-muted-foreground">- Only waitlist page accessible</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              
+              <button
+                onClick={handleModeToggle}
+                disabled={isTogglingMode}
+                className={`px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 ${
+                  currentAppMode === 'live'
+                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+              >
+                {isTogglingMode ? 'Switching...' : `Switch to ${currentAppMode === 'live' ? 'Waitlist' : 'Live'} Mode`}
+              </button>
+            </div>
+            
+            {modeError && (
+              <p className="text-destructive text-sm mt-2">{modeError}</p>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <h1 className="text-3xl font-bold text-foreground">RentMe Waitlist</h1>
 

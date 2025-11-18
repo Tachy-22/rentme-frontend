@@ -117,7 +117,7 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
     setIsDeleting(true);
     try {
       const result = await deleteProperty(deletePropertyId);
-      
+
       if (result.success) {
         toast.success('Property deleted successfully');
         // Remove the property from the local state
@@ -137,7 +137,7 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-auto ">
       <div className="p-6 lg:p-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -346,7 +346,7 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
                             <Copy className="w-4 h-4 mr-2" />
                             Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
+                          <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => setDeletePropertyId(property.id)}
                           >
@@ -448,7 +448,7 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
               <AlertDialogCancel disabled={isDeleting}>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction 
+              <AlertDialogAction
                 onClick={handleDeleteProperty}
                 disabled={isDeleting}
                 className="bg-destructive hover:bg-destructive/90"
