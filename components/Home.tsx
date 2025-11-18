@@ -21,6 +21,299 @@ import {
 import { LampContainer } from "@/components/ui/lamp";
 import Image from "next/image";
 
+interface StoryData {
+    page: number;
+    title: string;
+    subtitle: string;
+    content: string;
+    image: string;
+}
+
+interface StoryCardProps {
+    story: StoryData;
+    index: number;
+}
+
+function StoryCard({ story, index }: StoryCardProps) {
+    const [isHovered, setIsHovered] = useState(false);
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    // Individual card mouse tracking
+    const cardMouseX = useMotionValue(0);
+    const cardMouseY = useMotionValue(0);
+
+    const cardMouseXSpring = useSpring(cardMouseX);
+    const cardMouseYSpring = useSpring(cardMouseY);
+
+    const cardRotateX = useTransform(cardMouseYSpring, [-0.5, 0.5], ["17.5deg", "-17.5deg"]);
+    const cardRotateY = useTransform(cardMouseXSpring, [-0.5, 0.5], ["-17.5deg", "17.5deg"]);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!cardRef.current) return;
+
+        const rect = cardRef.current.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+
+        cardMouseX.set(xPct);
+        cardMouseY.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        cardMouseX.set(0);
+        cardMouseY.set(0);
+        setIsHovered(false);
+    };
+
+    return (
+        <motion.div
+            key={index}
+            ref={cardRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            onHoverStart={() => setIsHovered(true)}
+            style={{
+                rotateX: cardRotateX,
+                rotateY: cardRotateY,
+                transformStyle: "preserve-3d",
+            }}
+            className="flex-none w-[300px] md:w-[450px] h-[400px] md:h-[550px] relative cursor-pointer"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        >
+            <motion.div
+                className="relative w-full h-full bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-sm shadow-2xl overflow-hidden"
+                animate={{
+                    boxShadow: isHovered
+                        ? "0 50px 100px -20px rgba(0, 0, 0, 0.5)"
+                        : "0 20px 40px -10px rgba(0, 0, 0, 0.3)",
+                }}
+                transition={{ duration: 0.3 }}
+                style={{
+                    transform: "translateZ(50px)",
+                }}
+            >
+                {/* Elegant border animations */}
+                <motion.div
+                    className="absolute inset-0 border border-black/10"
+                    animate={{
+                        opacity: isHovered ? 0.3 : 0.1,
+                    }}
+                />
+
+                {/* Top geometric accent */}
+                <motion.div
+                    className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-black to-transparent"
+                    animate={{
+                        scaleX: isHovered ? 1 : 0.5,
+                        opacity: isHovered ? 1 : 0.3,
+                    }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                />
+
+                {/* Background image */}
+                <div
+                    className="absolute inset-0 bg-cover bg-center opacity-100"
+                    style={{
+                        backgroundImage: `url(${story.image})`,
+                    }}
+                >
+                    <div className="absolute inset-0 bg-black/50" />
+                </div>
+
+                {/* Main content */}
+                <div className="relative h-full flex flex-col justify-between p-4 md:p-8">
+                    {/* Brand section */}
+                    <motion.div
+                        className="space-y-6"
+                        animate={{
+                            y: isHovered ? -5 : 0,
+                        }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {/* Page number logo */}
+                        <motion.div
+                            className="text-center"
+                            animate={{
+                                y: isHovered ? -5 : 0,
+                            }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <motion.div
+                                className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 border-2 border-white/40 flex items-center justify-center"
+                                animate={{
+                                    rotate: isHovered ? 90 : 0,
+                                    scale: isHovered ? 1.1 : 1,
+                                    borderColor: isHovered ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.4)",
+                                }}
+                                transition={{ duration: 0.5, ease: "easeOut" }}
+                            >
+                                <motion.div
+                                    className="text-white font-bold text-xl"
+                                    animate={{
+                                        rotate: isHovered ? -90 : 0,
+                                    }}
+                                    transition={{ duration: 0.5, ease: "easeOut" }}
+                                >
+                                    {story.page}
+                                </motion.div>
+                            </motion.div>
+
+                            <motion.h1
+                                className="text-lg md:text-xl font-thin tracking-[0.3em] text-white mb-2"
+                                animate={{
+                                    letterSpacing: isHovered ? "0.4em" : "0.3em",
+                                }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                {story.title.toUpperCase()}
+                            </motion.h1>
+
+                            <motion.div
+                                className="w-24 h-px bg-white/60 mx-auto"
+                                animate={{
+                                    scaleX: isHovered ? 1.5 : 1,
+                                    backgroundColor: isHovered ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.6)",
+                                }}
+                                transition={{ duration: 0.5 }}
+                            />
+                        </motion.div>
+
+                        {/* Content showcase */}
+                        <motion.div
+                            className="text-center space-y-4"
+                            animate={{
+                                y: isHovered ? -10 : 0,
+                            }}
+                            transition={{ duration: 0.4, delay: 0.1 }}
+                        >
+                            <motion.p
+                                className="text-xs tracking-widest text-gray-300 uppercase"
+                                animate={{
+                                    opacity: isHovered ? 1 : 0.8,
+                                    color: isHovered ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.7)",
+                                }}
+                            >
+                                {story.subtitle}
+                            </motion.p>
+
+                            <motion.p
+                                className="text-xs md:text-sm text-white/90 leading-relaxed px-2 md:px-4"
+                                animate={{
+                                    scale: isHovered ? 1.02 : 1,
+                                    opacity: isHovered ? 1 : 0.9,
+                                }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                {story.content}
+                            </motion.p>
+                        </motion.div>
+                    </motion.div>
+
+                    {/* Bottom section */}
+                    <motion.div
+                        className="space-y-6"
+                        animate={{
+                            y: isHovered ? 10 : 0,
+                        }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        {/* Animated lines */}
+                        <div className="space-y-2">
+                            {[...Array(3)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                                    animate={{
+                                        scaleX: isHovered ? [0, 1, 0.7][i] : [0.3, 0.6, 0.4][i],
+                                        opacity: isHovered ? 0.9 : 0.5,
+                                    }}
+                                    transition={{
+                                        duration: 0.8,
+                                        delay: i * 0.1,
+                                        ease: "easeOut"
+                                    }}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Call to action */}
+                        <motion.div
+                            className="text-center"
+                            animate={{
+                                opacity: isHovered ? 1 : 0.8,
+                            }}
+                        >
+                            <motion.p
+                                className="text-xs tracking-[0.2em] text-gray-300 uppercase mb-4"
+                                animate={{
+                                    letterSpacing: isHovered ? "0.25em" : "0.2em",
+                                    color: isHovered ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.6)",
+                                }}
+                            >
+                                Chapter {story.page}
+                            </motion.p>
+
+                            <motion.div
+                                className="w-8 h-8 mx-auto border border-white/40 flex items-center justify-center"
+                                animate={{
+                                    rotate: isHovered ? 45 : 0,
+                                    borderColor: isHovered ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.4)",
+                                }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div className="w-3 h-3 border-t border-r border-white/60 transform rotate-45" />
+                            </motion.div>
+                        </motion.div>
+                    </motion.div>
+                </div>
+
+                {/* Subtle shimmer effect */}
+                <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
+                    animate={{
+                        x: isHovered ? ["-100%", "100%"] : "-100%",
+                        opacity: isHovered ? [0, 0.5, 0] : 0,
+                    }}
+                    transition={{
+                        duration: isHovered ? 1.5 : 0,
+                        ease: "easeOut",
+                    }}
+                />
+
+                {/* Background depth layers */}
+                <motion.div
+                    className="absolute inset-0 bg-white/5 rounded-sm -m-2"
+                    style={{
+                        transform: "translateZ(-25px)",
+                    }}
+                    animate={{
+                        scale: isHovered ? 1.02 : 1,
+                        opacity: isHovered ? 0.8 : 0.3,
+                    }}
+                />
+
+                <motion.div
+                    className="absolute inset-0 bg-white/3 rounded-sm -m-4"
+                    style={{
+                        transform: "translateZ(-50px)",
+                    }}
+                    animate={{
+                        scale: isHovered ? 1.04 : 1,
+                        opacity: isHovered ? 0.6 : 0.2,
+                    }}
+                />
+            </motion.div>
+        </motion.div>
+    );
+}
+
 export default function Home() {
     const containerRef = useRef<HTMLDivElement>(null);
     const imageSequenceRef = useRef<HTMLDivElement>(null);
@@ -575,282 +868,8 @@ export default function Home() {
                                         image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=800&fit=crop&crop=center",
                                     }
                                 ].map((story, index) => {
-                                    const [isHovered, setIsHovered] = useState(false);
-                                    const cardRef = useRef<HTMLDivElement>(null);
-
-                                    // Individual card mouse tracking
-                                    const cardMouseX = useMotionValue(0);
-                                    const cardMouseY = useMotionValue(0);
-
-                                    const cardMouseXSpring = useSpring(cardMouseX);
-                                    const cardMouseYSpring = useSpring(cardMouseY);
-
-                                    const cardRotateX = useTransform(cardMouseYSpring, [-0.5, 0.5], ["17.5deg", "-17.5deg"]);
-                                    const cardRotateY = useTransform(cardMouseXSpring, [-0.5, 0.5], ["-17.5deg", "17.5deg"]);
-
-                                    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-                                        if (!cardRef.current) return;
-
-                                        const rect = cardRef.current.getBoundingClientRect();
-                                        const width = rect.width;
-                                        const height = rect.height;
-
-                                        const mouseX = e.clientX - rect.left;
-                                        const mouseY = e.clientY - rect.top;
-
-                                        const xPct = mouseX / width - 0.5;
-                                        const yPct = mouseY / height - 0.5;
-
-                                        cardMouseX.set(xPct);
-                                        cardMouseY.set(yPct);
-                                    };
-
-                                    const handleMouseLeave = () => {
-                                        cardMouseX.set(0);
-                                        cardMouseY.set(0);
-                                        setIsHovered(false);
-                                    };
-
                                     return (
-                                        <motion.div
-                                            key={index}
-                                            ref={cardRef}
-                                            onMouseMove={handleMouseMove}
-                                            onMouseLeave={handleMouseLeave}
-                                            onHoverStart={() => setIsHovered(true)}
-                                            style={{
-                                                rotateX: cardRotateX,
-                                                rotateY: cardRotateY,
-                                                transformStyle: "preserve-3d",
-                                            }}
-                                            className="flex-none w-[300px] md:w-[450px] h-[400px] md:h-[550px] relative cursor-pointer"
-                                            whileHover={{ scale: 1.02 }}
-                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                        >
-                                            <motion.div
-                                                className="relative w-full h-full bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-sm shadow-2xl overflow-hidden"
-                                                animate={{
-                                                    boxShadow: isHovered
-                                                        ? "0 50px 100px -20px rgba(0, 0, 0, 0.5)"
-                                                        : "0 20px 40px -10px rgba(0, 0, 0, 0.3)",
-                                                }}
-                                                transition={{ duration: 0.3 }}
-                                                style={{
-                                                    transform: "translateZ(50px)",
-                                                }}
-                                            >
-                                                {/* Elegant border animations */}
-                                                <motion.div
-                                                    className="absolute inset-0 border border-black/10"
-                                                    animate={{
-                                                        opacity: isHovered ? 0.3 : 0.1,
-                                                    }}
-                                                />
-
-                                                {/* Top geometric accent */}
-                                                <motion.div
-                                                    className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-black to-transparent"
-                                                    animate={{
-                                                        scaleX: isHovered ? 1 : 0.5,
-                                                        opacity: isHovered ? 1 : 0.3,
-                                                    }}
-                                                    transition={{ duration: 0.8, ease: "easeOut" }}
-                                                />
-
-                                                {/* Background image */}
-                                                <div
-                                                    className="absolute inset-0 bg-cover bg-center opacity-100"
-                                                    style={{
-                                                        backgroundImage: `url(${story.image})`,
-                                                    }}
-                                                >
-                                                    <div className="absolute inset-0 bg-black/50" />
-                                                </div>
-
-                                                {/* Main content */}
-                                                <div className="relative h-full flex flex-col justify-between p-4 md:p-8">
-                                                    {/* Brand section */}
-                                                    <motion.div
-                                                        className="space-y-6"
-                                                        animate={{
-                                                            y: isHovered ? -5 : 0,
-                                                        }}
-                                                        transition={{ duration: 0.3 }}
-                                                    >
-                                                        {/* Page number logo */}
-                                                        <motion.div
-                                                            className="text-center"
-                                                            animate={{
-                                                                y: isHovered ? -5 : 0,
-                                                            }}
-                                                            transition={{ duration: 0.3 }}
-                                                        >
-                                                            <motion.div
-                                                                className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 border-2 border-white/40 flex items-center justify-center"
-                                                                animate={{
-                                                                    rotate: isHovered ? 90 : 0,
-                                                                    scale: isHovered ? 1.1 : 1,
-                                                                    borderColor: isHovered ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.4)",
-                                                                }}
-                                                                transition={{ duration: 0.5, ease: "easeOut" }}
-                                                            >
-                                                                <motion.div
-                                                                    className="text-white font-bold text-xl"
-                                                                    animate={{
-                                                                        rotate: isHovered ? -90 : 0,
-                                                                    }}
-                                                                    transition={{ duration: 0.5, ease: "easeOut" }}
-                                                                >
-                                                                    {story.page}
-                                                                </motion.div>
-                                                            </motion.div>
-
-                                                            <motion.h1
-                                                                className="text-lg md:text-xl font-thin tracking-[0.3em] text-white mb-2"
-                                                                animate={{
-                                                                    letterSpacing: isHovered ? "0.4em" : "0.3em",
-                                                                }}
-                                                                transition={{ duration: 0.3 }}
-                                                            >
-                                                                {story.title.toUpperCase()}
-                                                            </motion.h1>
-
-                                                            <motion.div
-                                                                className="w-24 h-px bg-white/60 mx-auto"
-                                                                animate={{
-                                                                    scaleX: isHovered ? 1.5 : 1,
-                                                                    backgroundColor: isHovered ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.6)",
-                                                                }}
-                                                                transition={{ duration: 0.5 }}
-                                                            />
-                                                        </motion.div>
-
-                                                        {/* Content showcase */}
-                                                        <motion.div
-                                                            className="text-center space-y-4"
-                                                            animate={{
-                                                                y: isHovered ? -10 : 0,
-                                                            }}
-                                                            transition={{ duration: 0.4, delay: 0.1 }}
-                                                        >
-                                                            <motion.p
-                                                                className="text-xs tracking-widest text-gray-300 uppercase"
-                                                                animate={{
-                                                                    opacity: isHovered ? 1 : 0.8,
-                                                                    color: isHovered ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.7)",
-                                                                }}
-                                                            >
-                                                                {story.subtitle}
-                                                            </motion.p>
-
-                                                            <motion.p
-                                                                className="text-xs md:text-sm text-white/90 leading-relaxed px-2 md:px-4"
-                                                                animate={{
-                                                                    scale: isHovered ? 1.02 : 1,
-                                                                    opacity: isHovered ? 1 : 0.9,
-                                                                }}
-                                                                transition={{ duration: 0.3 }}
-                                                            >
-                                                                {story.content}
-                                                            </motion.p>
-                                                        </motion.div>
-                                                    </motion.div>
-
-                                                    {/* Bottom section */}
-                                                    <motion.div
-                                                        className="space-y-6"
-                                                        animate={{
-                                                            y: isHovered ? 10 : 0,
-                                                        }}
-                                                        transition={{ duration: 0.4 }}
-                                                    >
-                                                        {/* Animated lines */}
-                                                        <div className="space-y-2">
-                                                            {[...Array(3)].map((_, i) => (
-                                                                <motion.div
-                                                                    key={i}
-                                                                    className="h-px bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                                                                    animate={{
-                                                                        scaleX: isHovered ? [0, 1, 0.7][i] : [0.3, 0.6, 0.4][i],
-                                                                        opacity: isHovered ? 0.9 : 0.5,
-                                                                    }}
-                                                                    transition={{
-                                                                        duration: 0.8,
-                                                                        delay: i * 0.1,
-                                                                        ease: "easeOut"
-                                                                    }}
-                                                                />
-                                                            ))}
-                                                        </div>
-
-                                                        {/* Call to action */}
-                                                        <motion.div
-                                                            className="text-center"
-                                                            animate={{
-                                                                opacity: isHovered ? 1 : 0.8,
-                                                            }}
-                                                        >
-                                                            <motion.p
-                                                                className="text-xs tracking-[0.2em] text-gray-300 uppercase mb-4"
-                                                                animate={{
-                                                                    letterSpacing: isHovered ? "0.25em" : "0.2em",
-                                                                    color: isHovered ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.6)",
-                                                                }}
-                                                            >
-                                                                Chapter {story.page}
-                                                            </motion.p>
-
-                                                            <motion.div
-                                                                className="w-8 h-8 mx-auto border border-white/40 flex items-center justify-center"
-                                                                animate={{
-                                                                    rotate: isHovered ? 45 : 0,
-                                                                    borderColor: isHovered ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.4)",
-                                                                }}
-                                                                transition={{ duration: 0.3 }}
-                                                            >
-                                                                <div className="w-3 h-3 border-t border-r border-white/60 transform rotate-45" />
-                                                            </motion.div>
-                                                        </motion.div>
-                                                    </motion.div>
-                                                </div>
-
-                                                {/* Subtle shimmer effect */}
-                                                <motion.div
-                                                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
-                                                    animate={{
-                                                        x: isHovered ? ["-100%", "100%"] : "-100%",
-                                                        opacity: isHovered ? [0, 0.5, 0] : 0,
-                                                    }}
-                                                    transition={{
-                                                        duration: isHovered ? 1.5 : 0,
-                                                        ease: "easeOut",
-                                                    }}
-                                                />
-
-                                                {/* Background depth layers */}
-                                                <motion.div
-                                                    className="absolute inset-0 bg-white/5 rounded-sm -m-2"
-                                                    style={{
-                                                        transform: "translateZ(-25px)",
-                                                    }}
-                                                    animate={{
-                                                        scale: isHovered ? 1.02 : 1,
-                                                        opacity: isHovered ? 0.8 : 0.3,
-                                                    }}
-                                                />
-
-                                                <motion.div
-                                                    className="absolute inset-0 bg-white/3 rounded-sm -m-4"
-                                                    style={{
-                                                        transform: "translateZ(-50px)",
-                                                    }}
-                                                    animate={{
-                                                        scale: isHovered ? 1.04 : 1,
-                                                        opacity: isHovered ? 0.6 : 0.2,
-                                                    }}
-                                                />
-                                            </motion.div>
-                                        </motion.div>
+                                        <StoryCard key={story.page} story={story} index={index} />
                                     );
                                 })}
                             </motion.div>
