@@ -326,10 +326,10 @@ export default function Home() {
     // Award-winning principle: Image sequence animation like Apple
     const totalFrames = 120; // Simulated frames for smooth animation
 
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end end"]
-    });
+    // const { scrollYProgress } = useScroll({
+    //     target: containerRef,
+    //     offset: ["start start", "end end"]
+    // });
 
     // Smooth scroll progress - Award-winning: Natural movement
     // const smoothProgress = useSpring(scrollYProgress, {
