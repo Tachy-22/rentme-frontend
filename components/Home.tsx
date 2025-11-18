@@ -345,7 +345,7 @@ export default function Home() {
     });
 
     // Hero section - Subtle fade only
-    const heroOpacity = useTransform(smoothProgress, [0, 0.3], [1, 0]);
+    // const heroOpacity = useTransform(smoothProgress, [0, 0.3], [1, 0]);
 
     // Product reveal - One element at a time, like Apple
     const productScale = useTransform(imageSequenceProgress.scrollYProgress, [0, 0.5], [0.8, 1]);
@@ -893,7 +893,7 @@ export default function Home() {
                                 transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
                                 viewport={{ once: true }}
                             >
-                                Let's Dive In
+                                Let&apos;s Dive In
                             </motion.h2>
                             <div className="text-lg md:text-xl text-gray-400 leading-relaxed mb-8 md:mb-12 max-w-3xl mx-auto">
                                 <TextGenerateEffect words="Experience the seamless journey of finding your perfect student accommodation. Every scroll brings you closer to home. Discover verified agents, secure payments, and trusted connections across Nigerian universities." />
@@ -1127,7 +1127,7 @@ export default function Home() {
                             Ready to Find Your Home?
                         </h2>
                         <p className="text-lg md:text-xl text-gray-400 mb-8 md:mb-12 leading-relaxed">
-                            Join thousands of students who've already found their perfect
+                            Join thousands of students who&apos;ve already found their perfect
                             <br />
                             off-campus accommodation through Rentme.
                         </p>
@@ -1669,7 +1669,7 @@ const DraggableTestimonials = () => {
                             </div>
                         </div>
                         <p className="text-gray-700 leading-relaxed text-sm mb-4">
-                            "{testimonial.quote}"
+                            &ldquo;{testimonial.quote}&rdquo;
                         </p>
                         <div className="flex text-orange-400">
                             {[...Array(5)].map((_, i) => (
