@@ -332,11 +332,11 @@ export default function Home() {
     });
 
     // Smooth scroll progress - Award-winning: Natural movement
-    const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-        restDelta: 0.001
-    });
+    // const smoothProgress = useSpring(scrollYProgress, {
+    //     stiffness: 100,
+    //     damping: 30,
+    //     restDelta: 0.001
+    // });
 
     // Image sequence scroll-driven animation - Apple's signature technique
     const imageSequenceProgress = useScroll({
