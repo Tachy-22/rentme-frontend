@@ -23,6 +23,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 import { getUserAccessRules, getVerificationStatus } from '@/lib/access-control';
+import { User } from '@/types';
 import { saveProperty, unsaveProperty, checkIfPropertySaved } from '@/actions/properties/saveProperty';
 import { toast } from 'sonner';
 
@@ -66,7 +67,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   const accessRules = getUserAccessRules(user);
-  const agentVerification = getVerificationStatus(property.agent as any);
+  const agentVerification = getVerificationStatus(property.agent as unknown as User);
 
   useEffect(() => {
     // Check if property is saved on mount

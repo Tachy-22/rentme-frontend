@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { User, Property } from '@/types';
+
+// Type for Firebase Timestamp
+interface FirebaseTimestamp {
+  toDate: () => Date;
+}
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,7 +80,7 @@ export default function SavedPropertiesClient({ user, initialProperties }: Saved
 
   const formatDate = (date: unknown) => {
     if (!date) return '';
-    const dateObj = (date as any)?.toDate ? (date as any).toDate() : new Date(date as string);
+    const dateObj = (date as FirebaseTimestamp)?.toDate ? (date as FirebaseTimestamp).toDate() : new Date(date as string);
     return dateObj.toLocaleDateString();
   };
 
@@ -84,7 +89,7 @@ export default function SavedPropertiesClient({ user, initialProperties }: Saved
       <div>
         <h1 className="text-3xl font-bold">Saved Properties</h1>
         <p className="text-muted-foreground">
-          Properties you've saved for later review
+          Properties you&apos;ve saved for later review
         </p>
       </div>
 

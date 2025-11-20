@@ -49,7 +49,7 @@ export async function getAgentRecentActivities(): Promise<{
 
           if (propertyResult.success && propertyResult.data) {
             const property = propertyResult.data;
-            const personalInfo = application.personalInfo as any;
+            const personalInfo = application.personalInfo as Record<string, unknown> | undefined;
             const firstName = personalInfo?.firstName || 'Someone';
             activities.push({
               id: `app-${application.id}`,
@@ -78,7 +78,7 @@ export async function getAgentRecentActivities(): Promise<{
     if (conversationsResult.success && conversationsResult.data) {
       for (const conversation of conversationsResult.data) {
         const updatedDate = new Date(conversation.updatedAt as string);
-        const lastMessage = conversation.lastMessage as any;
+        const lastMessage = conversation.lastMessage as Record<string, unknown> | undefined;
         if (updatedDate >= sevenDaysAgo && lastMessage) {
           // Only show if the last message was from someone else
           if (lastMessage.senderId !== userId) {
@@ -93,7 +93,7 @@ export async function getAgentRecentActivities(): Promise<{
 
               if (participantResult.success && participantResult.data) {
                 const participant = participantResult.data;
-                const profile = participant.profile as any;
+                const profile = participant.profile as Record<string, unknown> | undefined;
                 const participantName = profile?.firstName || 'Someone';
                 
                 activities.push({

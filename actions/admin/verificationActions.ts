@@ -39,12 +39,13 @@ export async function getAllVerificationRequests() {
 
         let user = null;
         if (userResult.success && userResult.data) {
-          const userData = userResult.data as any;
+          const userData = userResult.data as Record<string, unknown>;
+          const profile = userData.profile as Record<string, unknown> | undefined;
           user = {
             id: request.userId,
-            name: userData.profile?.fullName || userData.name || 'Unknown User',
+            name: profile?.fullName || userData.name || 'Unknown User',
             email: userData.email,
-            profilePicture: userData.profile?.profilePicture || null,
+            profilePicture: profile?.profilePicture || null,
             profile: userData.profile
           };
         }
@@ -102,7 +103,7 @@ export async function updateVerificationStatus(params: UpdateVerificationStatusP
       };
     }
 
-    const verification = verificationResult.data as any;
+    const verification = verificationResult.data as Record<string, unknown>;
 
     // Update verification request
     const updateVerificationResult = await updateDocument({

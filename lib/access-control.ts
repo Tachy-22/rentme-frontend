@@ -1,4 +1,4 @@
-import { User, UserRole } from '@/types';
+import { User, UserRole, RenterProfile, AgentProfile, AdminProfile } from '@/types';
 
 export interface AccessRules {
   canMessageAgents: boolean;
@@ -30,7 +30,7 @@ export function getUserAccessRules(user: User | null): AccessRules {
   }
 
   // Check verification status from profile.verificationStatus
-  const profile = user.profile as any;
+  const profile = user.profile as RenterProfile | AgentProfile | AdminProfile;
   const isVerified = profile?.verificationStatus === 'verified';
 
   if (user.role === 'renter') {
@@ -93,7 +93,7 @@ export function getVerificationStatus(user: User | null): {
   }
 
   // Check verification status from profile.verificationStatus
-  const profile = user.profile as any;
+  const profile = user.profile as RenterProfile | AgentProfile | AdminProfile;
   const verificationStatus = profile?.verificationStatus || 'unverified';
 
   // Use verification documents status

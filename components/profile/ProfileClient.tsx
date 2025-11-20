@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User } from '@/types';
+import { User, RenterProfile, AgentProfile, AdminProfile } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,7 +44,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
     preferredContactMethod: user.profile?.preferredContactMethod || 'email'
   });
 
-  const profile = user.profile as any;
+  const profile = user.profile as RenterProfile | AgentProfile | AdminProfile;
   const isVerified = profile?.verificationStatus || false;
 
   const handleInputChange = (field: string, value: string) => {

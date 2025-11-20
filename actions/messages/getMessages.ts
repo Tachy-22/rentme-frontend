@@ -34,8 +34,9 @@ export async function getMessages(params: GetMessagesParams) {
       };
     }
 
-    const conversation = conversationResult.data as any;
-    if (!conversation.participants.includes(userId)) {
+    const conversation = conversationResult.data as Record<string, unknown>;
+    const participants = conversation.participants as string[] | undefined;
+    if (!participants?.includes(userId)) {
       return {
         success: false,
         error: 'Unauthorized access to conversation'
@@ -79,9 +80,10 @@ export async function getMessages(params: GetMessagesParams) {
 
         let sender = null;
         if (senderResult.success && senderResult.data) {
-          const userData = senderResult.data as any;
-          const firstName = userData.profile?.firstName || '';
-          const lastName = userData.profile?.lastName || '';
+          const userData = senderResult.data as Record<string, unknown>;
+          const profile = userData.profile as Record<string, unknown> | undefined;
+          const firstName = profile?.firstName || '';
+          const lastName = profile?.lastName || '';
           const fullName = `${firstName} ${lastName}`.trim() || userData.name || 'Unknown User';
           
           sender = {

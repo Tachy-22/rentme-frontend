@@ -62,9 +62,10 @@ export async function getAgentApplications() {
         }
 
         if (renterResult.success && renterResult.data) {
-          const userData = renterResult.data as any;
-          const firstName = userData.profile?.firstName || '';
-          const lastName = userData.profile?.lastName || '';
+          const userData = renterResult.data as Record<string, unknown>;
+          const profile = userData.profile as Record<string, unknown> | undefined;
+          const firstName = profile?.firstName || '';
+          const lastName = profile?.lastName || '';
           const fullName = `${firstName} ${lastName}`.trim() || 'Unknown User';
           
           renter = {

@@ -23,6 +23,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 import { getUserAccessRules, getVerificationStatus } from '@/lib/access-control';
+import { User } from '@/types';
 import { createConversation } from '@/actions/messages/createConversation';
 import { useFirestoreRealTimeMessages } from '@/hooks/useFirestoreRealTimeMessages';
 import { useRealTimeConversations } from '@/hooks/useRealTimeConversations';
@@ -344,11 +345,11 @@ export default function MessagesPage({
                         <Badge
                           className={cn(
                             "text-xs",
-                            getVerificationStatus(selectedConv.otherParticipant as any).bgColor,
-                            getVerificationStatus(selectedConv.otherParticipant as any).color
+                            getVerificationStatus(selectedConv.otherParticipant as unknown as User).bgColor,
+                            getVerificationStatus(selectedConv.otherParticipant as unknown as User).color
                           )}
                         >
-                          {getVerificationStatus(selectedConv.otherParticipant as any).status}
+                          {getVerificationStatus(selectedConv.otherParticipant as unknown as User).status}
                         </Badge>
                       </div>
                     </div>

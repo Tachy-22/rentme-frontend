@@ -52,19 +52,22 @@ const AMENITIES = ['WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 
 const NIGERIAN_CITIES = ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt', 'Benin City', 'Kaduna', 'Ilorin'];
 
 // Helper function to enhance properties with required fields
-const enhanceProperty = (property: any): EnhancedProperty => ({
-  ...property,
-  distanceToUniversity: property.distanceToUniversity || 'Distance not calculated',
-  isSaved: property.isSaved || false,
-  agent: property.agent || {
-    id: property.agentId,
-    name: 'Unknown Agent',
-    profilePicture: '',
-    rating: 0
-  }
-});
+const enhanceProperty = (property: Property): EnhancedProperty => {
+  const propertyWithExtras = property as Property & Record<string, unknown>;
+  return {
+    ...property,
+    distanceToUniversity: (propertyWithExtras.distanceToUniversity as string) || 'Distance not calculated',
+    isSaved: (propertyWithExtras.isSaved as boolean) || false,
+    agent: (propertyWithExtras.agent as EnhancedProperty['agent']) || {
+      id: property.agentId,
+      name: 'Unknown Agent',
+      profilePicture: '',
+      rating: 0
+    }
+  };
+};
 
-export default function PropertiesPageClient({ user, initialProperties = [] }: PropertiesPageClientProps) {
+export default function PropertiesPageClient({ user: _user, initialProperties = [] }: PropertiesPageClientProps) {
   const [properties, setProperties] = useState(initialProperties.map(enhanceProperty));
   const [filteredProperties, setFilteredProperties] = useState(initialProperties.map(enhanceProperty));
   const [isLoading, setIsLoading] = useState(false);
@@ -73,6 +76,10 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  
+  // Suppress unused variable warnings
+  void properties;
+  void hasMore;
 
   const [filters, setFilters] = useState({
     city: 'all',
@@ -109,7 +116,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
       });
 
       if (result.success) {
-        const enhancedProperties = (result.data || []).map(enhanceProperty);
+        const enhancedProperties = (result.data || []).map((item: unknown) => enhanceProperty(item as Property));
         setProperties(enhancedProperties);
         setFilteredProperties(enhancedProperties);
         setTotalPages((result as { totalPages?: number }).totalPages || 1);
@@ -280,7 +287,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
         <Label className="text-sm font-medium">Furnishing</Label>
         <Select 
           value={filters.furnished === undefined ? 'any' : filters.furnished.toString()} 
-          onValueChange={(value) => handleFilterChange('furnished', value === 'any' ? undefined as any : value === 'true')}
+          onValueChange={(value) => handleFilterChange('furnished', value === 'any' ? 'any' : value === 'true')}
         >
           <SelectTrigger className="mt-2">
             <SelectValue placeholder="Any" />

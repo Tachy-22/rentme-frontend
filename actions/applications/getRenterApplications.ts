@@ -41,7 +41,7 @@ export async function getRenterApplications() {
       if (propertySnapshot.exists()) {
         const propertyData = propertySnapshot.data();
         
-        applications.push({
+        (applications as unknown[]).push({
           id: appDoc.id,
           ...appData,
           property: {
@@ -52,7 +52,7 @@ export async function getRenterApplications() {
             images: propertyData.images || [],
             agent: propertyData.agent
           }
-        } as any);
+        });
       }
     }
 

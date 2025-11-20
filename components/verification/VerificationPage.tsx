@@ -1,7 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User } from '@/types';
+import { User, RenterProfile, AgentProfile, AdminProfile } from '@/types';
+
+// Interface for verification data from API
+interface VerificationData {
+  status?: string;
+  documents?: Record<string, string>;
+  university?: string;
+  agencyName?: string;
+  [key: string]: unknown;
+}
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,7 +69,7 @@ const LEVELS = ['100 Level', '200 Level', '300 Level', '400 Level', '500 Level',
 
 export default function VerificationPage({ user }: VerificationPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [verificationData, setVerificationData] = useState<any>(null);
+  const [verificationData, setVerificationData] = useState<VerificationData | null>(null);
   const [formData, setFormData] = useState({
     // Renter fields
     university: '',
@@ -80,7 +89,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
   });
 
   const verificationStatus = getVerificationStatus(user);
-  const profile = user.profile as any;
+  const profile = user.profile as RenterProfile | AgentProfile | AdminProfile;
 
   useEffect(() => {
     fetchVerificationData();
@@ -253,7 +262,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
   };
 
   const FileUploadField = ({ field, label, accept }: { field: string; label: string; accept: string }) => {
-    const file = (formData as any)[field] as File | null;
+    const file = (formData as Record<string, unknown>)[field] as File | null;
     const maxSizeMB = 5;
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 

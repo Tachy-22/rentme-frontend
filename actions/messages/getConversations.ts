@@ -49,9 +49,10 @@ export async function getConversations() {
 
         let otherParticipant = null;
         if (participantResult.success && participantResult.data) {
-          const userData = participantResult.data as any;
-          const firstName = userData.profile?.firstName || '';
-          const lastName = userData.profile?.lastName || '';
+          const userData = participantResult.data as Record<string, unknown>;
+          const profile = userData.profile as Record<string, unknown> | undefined;
+          const firstName = profile?.firstName || '';
+          const lastName = profile?.lastName || '';
           const fullName = `${firstName} ${lastName}`.trim() || userData.name || 'Unknown User';
           
           otherParticipant = {

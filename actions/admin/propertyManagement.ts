@@ -38,15 +38,16 @@ export async function getAllProperties() {
 
         let agent = null;
         if (agentResult.success && agentResult.data) {
-          const agentData = agentResult.data as any;
+          const agentData = agentResult.data as Record<string, unknown>;
+          const profile = agentData.profile as Record<string, unknown> | undefined;
           agent = {
             id: property.agentId,
-            name: agentData.profile?.firstName && agentData.profile?.lastName 
-              ? `${agentData.profile.firstName} ${agentData.profile.lastName}`
-              : agentData.profile?.fullName || 'Unknown Agent',
+            name: profile?.firstName && profile?.lastName 
+              ? `${profile.firstName} ${profile.lastName}`
+              : profile?.fullName || 'Unknown Agent',
             email: agentData.email,
-            company: agentData.profile?.company || null,
-            verificationStatus: agentData.profile?.verificationStatus || 'unverified'
+            company: profile?.company || null,
+            verificationStatus: profile?.verificationStatus || 'unverified'
           };
         }
 
