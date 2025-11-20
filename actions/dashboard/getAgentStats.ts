@@ -38,31 +38,31 @@ export async function getAgentStats() {
 
     // Calculate stats from properties
     const properties = propertiesResult.success 
-      ? (propertiesResult.data || []).filter((prop: any) => prop.status !== 'deleted')
+      ? (propertiesResult.data || []).filter((prop: Record<string, unknown>) => prop.status !== 'deleted')
       : [];
-    const totalViews = properties.reduce((sum: number, prop: any) => sum + (prop.viewCount || 0), 0);
-    const totalInquiries = properties.reduce((sum: number, prop: any) => sum + (prop.inquiries || 0), 0);
+    const totalViews = properties.reduce((sum: number, prop: Record<string, unknown>) => sum + ((prop.viewCount as number) || 0), 0);
+    const totalInquiries = properties.reduce((sum: number, prop: Record<string, unknown>) => sum + ((prop.inquiries as number) || 0), 0);
     
     // Properties added this week
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    const propertiesThisWeek = properties.filter((prop: any) => 
-      new Date(prop.createdAt) >= weekAgo
+    const propertiesThisWeek = properties.filter((prop: Record<string, unknown>) => 
+      new Date(prop.createdAt as string) >= weekAgo
     ).length;
 
     const stats = {
       totalProperties: properties.length,
-      activeProperties: properties.filter((prop: any) => prop.status === 'available').length,
-      rentedProperties: properties.filter((prop: any) => prop.status === 'rented').length,
+      activeProperties: properties.filter((prop: Record<string, unknown>) => prop.status === 'available').length,
+      rentedProperties: properties.filter((prop: Record<string, unknown>) => prop.status === 'rented').length,
       totalViews,
       totalInquiries,
       applications: applicationsResult.success ? (applicationsResult.data?.length || 0) : 0,
       conversations: conversationsResult.success ? (conversationsResult.data?.length || 0) : 0,
       propertiesThisWeek,
       pendingApplications: applicationsResult.success ? 
-        (applicationsResult.data?.filter((app: any) => app.status === 'pending').length || 0) : 0,
+        (applicationsResult.data?.filter((app: Record<string, unknown>) => app.status === 'pending').length || 0) : 0,
       approvedApplications: applicationsResult.success ? 
-        (applicationsResult.data?.filter((app: any) => app.status === 'approved').length || 0) : 0,
+        (applicationsResult.data?.filter((app: Record<string, unknown>) => app.status === 'approved').length || 0) : 0,
       averageRating: 4.5, // TODO: Calculate from reviews
     };
 

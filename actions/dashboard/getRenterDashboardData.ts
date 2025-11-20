@@ -46,8 +46,8 @@ export async function getRenterDashboardData() {
     
     // Calculate pending and approved applications
     const applicationData = applicationsResult.success ? (applicationsResult.data || []) : [];
-    const pendingApplications = applicationData.filter((app: any) => app.status === 'pending').length;
-    const approvedApplications = applicationData.filter((app: any) => app.status === 'approved').length;
+    const pendingApplications = applicationData.filter((app: Record<string, unknown>) => app.status === 'pending').length;
+    const approvedApplications = applicationData.filter((app: Record<string, unknown>) => app.status === 'approved').length;
 
     // Calculate messages this week (simplified for now)
     const messagesThisWeek = conversations * 2; // Rough estimate
@@ -66,7 +66,7 @@ export async function getRenterDashboardData() {
     
     // Add recent applications to activities
     const recentApplications = applicationData
-      .sort((a: any, b: any) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+      .sort((a: Record<string, unknown>, b: Record<string, unknown>) => new Date(b.submittedAt as string).getTime() - new Date(a.submittedAt as string).getTime())
       .slice(0, 2);
     
     for (const app of recentApplications) {

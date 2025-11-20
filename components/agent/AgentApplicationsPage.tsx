@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ApplicationStatus } from '@/types';
+import { ApplicationStatus, CloudinaryImage } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,17 +42,52 @@ interface Application {
   id: string;
   status: ApplicationStatus;
   submittedAt: string;
-  personalInfo: any;
-  employmentInfo: any;
-  rentalHistory: any;
-  references: any;
-  additionalInfo: any;
+  personalInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    dateOfBirth: string;
+  };
+  employmentInfo: {
+    employmentStatus: string;
+    employer?: string;
+    jobTitle?: string;
+    monthlyIncome: number;
+  };
+  rentalHistory: {
+    currentAddress: string;
+    landlordName?: string;
+    landlordPhone?: string;
+    reasonForMoving: string;
+  };
+  references: {
+    emergencyContactName: string;
+    emergencyContactPhone: string;
+    emergencyContactRelation: string;
+    personalReferenceName?: string;
+    personalReferencePhone?: string;
+  };
+  additionalInfo: {
+    hasPets: boolean;
+    petDescription?: string;
+    smokingPreference: string;
+    moveInDate: string;
+    leaseDuration: string;
+  };
   property: {
     id: string;
     title: string;
-    location: any;
-    price: any;
-    images: any[];
+    location: {
+      city: string;
+      state: string;
+    };
+    price: {
+      amount: number;
+      currency: string;
+      period: string;
+    };
+    images: CloudinaryImage[];
   };
   renter: {
     id: string;

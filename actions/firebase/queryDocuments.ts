@@ -11,7 +11,7 @@ interface QueryDocumentsParams {
   filters?: {
     field: string;
     operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'array-contains-any' | 'in' | 'not-in';
-    value: any;
+    value: string | number | boolean | string[] | number[];
   }[];
   orderByField?: string;
   orderDirection?: 'asc' | 'desc';

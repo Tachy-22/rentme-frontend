@@ -50,7 +50,7 @@ export async function getMatchedRenters() {
       };
     }
 
-    const agent = agentResult.data as any;
+    const agent = agentResult.data as Record<string, unknown>;
     const isVerified = agent.profile?.verificationStatus === 'verified';
 
     // Only verified agents can access matched renters
@@ -92,7 +92,7 @@ export async function getMatchedRenters() {
 
     // Calculate match scores and filter
     const matchedRenters: MatchedRenter[] = renters
-      .map((renter: any) => {
+      .map((renter: Record<string, unknown>) => {
         const matchScore = calculateMatchScore(renter, {
           priceRange: agentPriceRange,
           locations: agentLocations,
@@ -138,7 +138,7 @@ export async function getMatchedRenters() {
   }
 }
 
-function calculateAgentPriceRange(properties: any[]) {
+function calculateAgentPriceRange(properties: Record<string, unknown>[]) {
   if (properties.length === 0) return { min: 0, max: 1000000 };
 
   const prices = properties.map(p => p.price?.amount || 0).filter(p => p > 0);
@@ -150,7 +150,7 @@ function calculateAgentPriceRange(properties: any[]) {
   };
 }
 
-function extractAgentLocations(properties: any[]) {
+function extractAgentLocations(properties: Record<string, unknown>[]) {
   const locations = new Set<string>();
   properties.forEach(p => {
     if (p.location?.city) locations.add(p.location.city.toLowerCase());
@@ -159,7 +159,7 @@ function extractAgentLocations(properties: any[]) {
   return Array.from(locations);
 }
 
-function extractPropertyTypes(properties: any[]) {
+function extractPropertyTypes(properties: Record<string, unknown>[]) {
   const types = new Set<string>();
   properties.forEach(p => {
     if (p.propertyType) types.add(p.propertyType.toLowerCase());
@@ -167,7 +167,7 @@ function extractPropertyTypes(properties: any[]) {
   return Array.from(types);
 }
 
-function calculateMatchScore(renter: any, agentCriteria: any): number {
+function calculateMatchScore(renter: Record<string, unknown>, agentCriteria: { priceRange: { min: number; max: number }; locations: string[]; propertyTypes: string[] }): number {
   let score = 0;
   let factors = 0;
 

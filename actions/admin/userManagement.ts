@@ -72,12 +72,12 @@ export async function getUserStats() {
 
     const stats = {
       total: users.length,
-      renters: users.filter((u: any) => u.role === 'renter').length,
-      agents: users.filter((u: any) => u.role === 'agent').length,
-      admins: users.filter((u: any) => u.role === 'admin').length,
-      verified: users.filter((u: any) => u.profile?.verificationStatus === 'verified').length,
-      active: users.filter((u: any) => u.isActive !== false).length,
-      thisWeek: users.filter((u: any) => {
+      renters: users.filter((u: Record<string, unknown>) => u.role === 'renter').length,
+      agents: users.filter((u: Record<string, unknown>) => u.role === 'agent').length,
+      admins: users.filter((u: Record<string, unknown>) => u.role === 'admin').length,
+      verified: users.filter((u: Record<string, unknown>) => u.profile?.verificationStatus === 'verified').length,
+      active: users.filter((u: Record<string, unknown>) => u.isActive !== false).length,
+      thisWeek: users.filter((u: Record<string, unknown>) => {
         const userDate = new Date(u.createdAt);
         return userDate >= weekAgo;
       }).length

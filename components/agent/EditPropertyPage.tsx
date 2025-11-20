@@ -35,7 +35,7 @@ import { updateProperty } from '@/actions/properties/updateProperty';
 
 interface EditPropertyPageProps {
   user: User;
-  property: any;
+  property: Property;
 }
 
 const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];

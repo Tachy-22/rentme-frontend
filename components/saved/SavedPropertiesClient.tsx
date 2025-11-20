@@ -73,9 +73,9 @@ export default function SavedPropertiesClient({ user, initialProperties }: Saved
     }
   };
 
-  const formatDate = (date: any) => {
+  const formatDate = (date: unknown) => {
     if (!date) return '';
-    const dateObj = date.toDate ? date.toDate() : new Date(date);
+    const dateObj = (date as any)?.toDate ? (date as any).toDate() : new Date(date as string);
     return dateObj.toLocaleDateString();
   };
 

@@ -36,7 +36,7 @@ export async function updateApplicationStatus({ applicationId, status, notes }: 
       };
     }
 
-    const application = applicationResult.data as any;
+    const application = applicationResult.data as Record<string, unknown>;
 
     // Verify the agent owns this application
     if (application.agentId !== userId) {
@@ -47,7 +47,7 @@ export async function updateApplicationStatus({ applicationId, status, notes }: 
     }
 
     // Update application status
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       status,
       updatedAt: new Date().toISOString()
     };

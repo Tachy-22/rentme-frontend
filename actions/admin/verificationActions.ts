@@ -31,10 +31,10 @@ export async function getAllVerificationRequests() {
 
     // Enrich with user details
     const enrichedRequests = await Promise.all(
-      result.data.map(async (request: any) => {
+      result.data.map(async (request: Record<string, unknown>) => {
         const userResult = await getDocument({
           collectionName: 'users',
-          documentId: request.userId
+          documentId: request.userId as string
         });
 
         let user = null;
@@ -179,13 +179,13 @@ export async function getVerificationStats() {
     const requests = result.data;
     const stats = {
       total: requests.length,
-      pending: requests.filter((r: any) => r.status === 'pending').length,
-      verified: requests.filter((r: any) => r.status === 'verified').length,
-      rejected: requests.filter((r: any) => r.status === 'rejected').length,
-      renterRequests: requests.filter((r: any) => r.userRole === 'renter').length,
-      agentRequests: requests.filter((r: any) => r.userRole === 'agent').length,
-      thisWeek: requests.filter((r: any) => {
-        const requestDate = new Date(r.submittedAt);
+      pending: requests.filter((r: Record<string, unknown>) => r.status === 'pending').length,
+      verified: requests.filter((r: Record<string, unknown>) => r.status === 'verified').length,
+      rejected: requests.filter((r: Record<string, unknown>) => r.status === 'rejected').length,
+      renterRequests: requests.filter((r: Record<string, unknown>) => r.userRole === 'renter').length,
+      agentRequests: requests.filter((r: Record<string, unknown>) => r.userRole === 'agent').length,
+      thisWeek: requests.filter((r: Record<string, unknown>) => {
+        const requestDate = new Date(r.submittedAt as string);
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
         return requestDate >= weekAgo;

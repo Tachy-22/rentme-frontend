@@ -48,7 +48,7 @@ export async function searchProperties(params: SearchPropertiesParams) {
       searchQuery += ` ${location}`;
     }
 
-    const filters: any = {};
+    const filters: Record<string, unknown> = {};
 
     if (city) filters.city = city;
     if (state) filters.state = state;
@@ -77,7 +77,7 @@ export async function searchProperties(params: SearchPropertiesParams) {
     if (sortBy === 'relevance' && searchQuery.trim()) {
       const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term.length > 2);
       
-      const scoredProperties = result?.data?.map((property: any) => {
+      const scoredProperties = result?.data?.map((property: Record<string, unknown>) => {
         let score = 0;
         const searchableText = [
           property.title,
@@ -111,7 +111,7 @@ export async function searchProperties(params: SearchPropertiesParams) {
       result.data = scoredProperties;
     } else {
       // Apply verification ranking boost even for non-relevance sorts
-      const rankedProperties = result?.data?.map((property: any) => {
+      const rankedProperties = result?.data?.map((property: Record<string, unknown>) => {
         const verificationBoost = property.agentVerificationStatus === 'verified' ? 1 : 0;
         return { ...property, verificationBoost };
       });
@@ -169,25 +169,25 @@ export async function getPropertyStats() {
     
     const stats = {
       total: properties.length,
-      available: properties.filter((p: any) => p.status === 'available').length,
-      rented: properties.filter((p: any) => p.status === 'rented').length,
+      available: properties.filter((p: Record<string, unknown>) => p.status === 'available').length,
+      rented: properties.filter((p: Record<string, unknown>) => p.status === 'rented').length,
       averagePrice: properties.length > 0 
-        ? Math.round(properties.reduce((sum: number, p: any) => sum + (p.price?.amount || 0), 0) / properties.length)
+        ? Math.round(properties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.price as Record<string, unknown>)?.amount as number || 0), 0) / properties.length)
         : 0,
-      cityCounts: properties.reduce((acc: any, p: any) => {
-        const city = p.location?.city || 'Unknown';
+      cityCounts: properties.reduce((acc: Record<string, number>, p: Record<string, unknown>) => {
+        const city = ((p.location as Record<string, unknown>)?.city as string) || 'Unknown';
         acc[city] = (acc[city] || 0) + 1;
         return acc;
       }, {}),
-      typeCounts: properties.reduce((acc: any, p: any) => {
-        const type = p.type || 'Unknown';
+      typeCounts: properties.reduce((acc: Record<string, number>, p: Record<string, unknown>) => {
+        const type = (p.type as string) || 'Unknown';
         acc[type] = (acc[type] || 0) + 1;
         return acc;
       }, {}),
-      thisWeek: properties.filter((p: any) => {
+      thisWeek: properties.filter((p: Record<string, unknown>) => {
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
-        return new Date(p.createdAt) >= weekAgo;
+        return new Date(p.createdAt as string) >= weekAgo;
       }).length
     };
 

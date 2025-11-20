@@ -2,16 +2,16 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { User } from '@/types';
+import { User, Property, CloudinaryImage } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
-import { 
-  MapPin, 
-  Bed, 
-  Bath, 
+import {
+  MapPin,
+  Bed,
+  Bath,
   Heart,
   Share2,
   Star,
@@ -29,7 +29,20 @@ import Link from 'next/link';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 interface PropertyDetailsPageProps {
-  property: any;
+  property: Property & {
+    isSaved?: boolean;
+    distanceToUniversity?: string;
+    nearbyPlaces?: Array<{ name: string; distance: string; type: string }>;
+    agent?: {
+      id: string;
+      name: string;
+      profilePicture: string;
+      rating: number;
+      company?: string;
+      totalReviews?: number;
+      responseTime?: number;
+    };
+  };
   user: User;
 }
 
@@ -82,8 +95,8 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
     <div className="s overflow-auto">
       {/* Back Button */}
       <div className="p-4 md:p-0">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={handleGoBack}
           className="mb-4 hover:bg-gray-100"
         >
@@ -98,7 +111,7 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
           <div className="relative">
             <Carousel className="w-full rounded-none">
               <CarouselContent className='rounded-none md:rounded-lg'>
-                {property.images?.length > 0 ? property.images.map((image: any, index: number) => (
+                {property.images?.length > 0 ? property.images.map((image: CloudinaryImage, index: number) => (
                   <CarouselItem key={index} className='rounded-none md:rounded-lg'>
                     <div className="relative h-96 md:h-[500px]">
                       <Image
@@ -126,8 +139,8 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
               <Button size="sm" variant="secondary" onClick={handleShare}>
                 <Share2 className="w-4 h-4" />
               </Button>
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 variant="secondary"
                 onClick={handleSaveToggle}
                 className={isSaved ? 'text-red-500' : ''}
@@ -195,29 +208,29 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
             <h2 className="text-lg font-semibold">Contact Agent</h2>
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={property.agent.profilePicture} />
+                <AvatarImage src={property.agent?.profilePicture} />
                 <AvatarFallback>
-                  {property.agent.name.split(' ').map((n: string) => n[0]).join('')}
+                  {property.agent?.name.split(' ').map((n: string) => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-medium">{property.agent.name}</div>
-                <div className="text-sm text-muted-foreground">{property.agent.company}</div>
+                <div className="font-medium">{property.agent?.name}</div>
+                <div className="text-sm text-muted-foreground">{property.agent?.company}</div>
                 <div className="flex items-center gap-1 text-sm">
                   <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                  <span>{property.agent.rating}</span>
-                  <span className="text-muted-foreground">({property.agent.totalReviews} reviews)</span>
+                  <span>{property.agent?.rating}</span>
+                  <span className="text-muted-foreground">({property.agent?.totalReviews} reviews)</span>
                 </div>
               </div>
             </div>
 
             <div className="text-sm text-muted-foreground">
-              Typically responds in {property.agent.responseTime} hours
+              Typically responds in {property.agent?.responseTime} hours
             </div>
 
             <div className="space-y-2">
               <Button className="w-full" asChild>
-                <Link href={`/messages?agent=${property.agent.id}&property=${property.id}`}>
+                <Link href={`/messages?agent=${property.agent?.id}&property=${property.id}`}>
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Send Message
                 </Link>
@@ -248,8 +261,8 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
               <div className="space-y-1">
                 <span className="text-sm font-medium text-gray-600">Available From:</span>
                 <p className="font-medium">
-                  {property.details?.availableFrom ? 
-                    new Date(property.details.availableFrom).toLocaleDateString() : 
+                  {property.details?.availableFrom ?
+                    new Date(property.details.availableFrom).toLocaleDateString() :
                     'Not specified'
                   }
                 </p>
@@ -257,8 +270,8 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
               <div className="space-y-1">
                 <span className="text-sm font-medium text-gray-600">Lease Duration:</span>
                 <p className="font-medium">
-                  {property.details?.leaseDuration ? 
-                    `${property.details.leaseDuration.min}-${property.details.leaseDuration.max} ${property.details.leaseDuration.unit}` : 
+                  {property.details?.leaseDuration ?
+                    `${property.details.leaseDuration.min}-${property.details.leaseDuration.max} ${property.details.leaseDuration.unit}` :
                     'Not specified'
                   }
                 </p>
@@ -331,29 +344,29 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
             <h2 className="text-lg font-semibold">Contact Agent</h2>
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={property.agent.profilePicture} />
+                <AvatarImage src={property.agent?.profilePicture} />
                 <AvatarFallback>
-                  {property.agent.name.split(' ').map((n: string) => n[0]).join('')}
+                  {property.agent?.name.split(' ').map((n: string) => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-medium">{property.agent.name}</div>
-                <div className="text-sm text-muted-foreground">{property.agent.company}</div>
+                <div className="font-medium">{property.agent?.name}</div>
+                <div className="text-sm text-muted-foreground">{property.agent?.company}</div>
                 <div className="flex items-center gap-1 text-sm">
                   <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                  <span>{property.agent.rating}</span>
-                  <span className="text-muted-foreground">({property.agent.totalReviews} reviews)</span>
+                  <span>{property.agent?.rating}</span>
+                  <span className="text-muted-foreground">({property.agent?.totalReviews} reviews)</span>
                 </div>
               </div>
             </div>
 
             <div className="text-sm text-muted-foreground">
-              Typically responds in {property.agent.responseTime} hours
+              Typically responds in {property.agent?.responseTime} hours
             </div>
 
             <div className="space-y-2">
               <Button className="w-full" asChild>
-                <Link href={`/messages?agent=${property.agent.id}&property=${property.id}`}>
+                <Link href={`/messages?agent=${property.agent?.id}&property=${property.id}`}>
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Send Message
                 </Link>
@@ -371,7 +384,7 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">Nearby Places</h2>
             <div className="space-y-3">
-              {property.nearbyPlaces?.length > 0 ? property.nearbyPlaces.map((place: any, index: number) => (
+              {property.nearbyPlaces?.length && property.nearbyPlaces?.length > 0 ? property.nearbyPlaces.map((place: { name: string; distance: string; type: string }, index: number) => (
                 <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                   <div>
                     <div className="font-medium text-sm">{place.name}</div>

@@ -35,7 +35,7 @@ export async function getAgentApplications() {
 
     // Enrich applications with property and renter details
     const enrichedApplications = await Promise.all(
-      applicationsResult.data.map(async (application: any) => {
+      applicationsResult.data.map(async (application: Record<string, unknown>) => {
         // Get property details
         const propertyResult = await getDocument({
           collectionName: 'properties',

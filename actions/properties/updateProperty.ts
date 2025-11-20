@@ -72,7 +72,7 @@ export async function updateProperty(params: UpdatePropertyParams) {
       };
     }
 
-    const currentProperty = propertyResult.data as any;
+    const currentProperty = propertyResult.data as Record<string, unknown>;
 
     // Verify ownership (agents can only edit their own properties, admin can edit any)
     if (userRole === 'agent' && currentProperty.agentId !== userId) {
@@ -83,7 +83,7 @@ export async function updateProperty(params: UpdatePropertyParams) {
     }
 
     const { updates } = params;
-    const updatedData: any = {
+    const updatedData: Record<string, unknown> = {
       updatedAt: new Date().toISOString()
     };
 
@@ -93,8 +93,8 @@ export async function updateProperty(params: UpdatePropertyParams) {
 
       // Remove specified images
       if (updates.removeImages && updates.removeImages.length > 0) {
-        currentImages = currentImages.filter((img: any) => 
-          !updates.removeImages!.includes(img.url)
+        currentImages = currentImages.filter((img: Record<string, unknown>) => 
+          !updates.removeImages!.includes(img.url as string)
         );
       }
 

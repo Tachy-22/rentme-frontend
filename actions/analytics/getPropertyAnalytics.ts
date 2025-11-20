@@ -75,10 +75,10 @@ export async function getPropertyAnalytics() {
       };
     }
 
-    const properties = propertiesResult.data as any[];
+    const properties = propertiesResult.data as Record<string, unknown>[];
     
     // Calculate analytics for each property
-    const propertyAnalytics: PropertyAnalytics[] = properties.map((property: any) => {
+    const propertyAnalytics: PropertyAnalytics[] = properties.map((property: Record<string, unknown>) => {
       const views = property.viewCount || 0;
       const inquiries = property.inquiries || 0;
       const applications = property.applications || 0;
@@ -137,14 +137,14 @@ export async function getPropertyAnalytics() {
     
     // Note: In a real implementation, you'd track daily analytics
     // For now, we'll estimate based on creation dates
-    const recentProperties = properties.filter((p: any) => 
-      new Date(p.createdAt) >= weekAgo
+    const recentProperties = properties.filter((p: Record<string, unknown>) => 
+      new Date(p.createdAt as string) >= weekAgo
     );
     
     const recentActivity = {
-      viewsThisWeek: recentProperties.reduce((sum: number, p: any) => sum + (p.viewCount || 0), 0),
-      inquiriesThisWeek: recentProperties.reduce((sum: number, p: any) => sum + (p.inquiries || 0), 0),
-      applicationsThisWeek: recentProperties.reduce((sum: number, p: any) => sum + (p.applications || 0), 0)
+      viewsThisWeek: recentProperties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.viewCount as number) || 0), 0),
+      inquiriesThisWeek: recentProperties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.inquiries as number) || 0), 0),
+      applicationsThisWeek: recentProperties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.applications as number) || 0), 0)
     };
 
     // Generate monthly stats for last 6 months
@@ -155,16 +155,16 @@ export async function getPropertyAnalytics() {
       const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
       
-      const monthProperties = properties.filter((p: any) => {
-        const createdAt = new Date(p.createdAt);
+      const monthProperties = properties.filter((p: Record<string, unknown>) => {
+        const createdAt = new Date(p.createdAt as string);
         return createdAt >= monthStart && createdAt <= monthEnd;
       });
       
       monthlyStats.push({
         month: date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }),
-        views: monthProperties.reduce((sum: number, p: any) => sum + (p.viewCount || 0), 0),
-        inquiries: monthProperties.reduce((sum: number, p: any) => sum + (p.inquiries || 0), 0),
-        applications: monthProperties.reduce((sum: number, p: any) => sum + (p.applications || 0), 0)
+        views: monthProperties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.viewCount as number) || 0), 0),
+        inquiries: monthProperties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.inquiries as number) || 0), 0),
+        applications: monthProperties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.applications as number) || 0), 0)
       });
     }
 
@@ -219,8 +219,8 @@ export async function updatePropertyView(propertyId: string) {
       };
     }
 
-    const property = propertyResult.data as any;
-    const currentViews = property.viewCount || 0;
+    const property = propertyResult.data as Record<string, unknown>;
+    const currentViews = (property.viewCount as number) || 0;
 
     // Update view count and last viewed timestamp
     const { updateDocument } = await import('@/actions/firebase');
@@ -266,8 +266,8 @@ export async function updatePropertyInquiry(propertyId: string) {
       };
     }
 
-    const property = propertyResult.data as any;
-    const currentInquiries = property.inquiries || 0;
+    const property = propertyResult.data as Record<string, unknown>;
+    const currentInquiries = (property.inquiries as number) || 0;
 
     // Update inquiry count
     const { updateDocument } = await import('@/actions/firebase');

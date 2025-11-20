@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, PropertyStatus } from '@/types';
+import { User, PropertyStatus, Property, RenterProfile, AgentProfile, AdminProfile } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,12 +35,12 @@ import { toast } from 'sonner';
 
 interface AgentPropertiesPageProps {
   user: User;
-  properties?: any[];
+  properties?: Property[];
 }
 
 
 export default function AgentPropertiesPage({ user, properties = [] }: AgentPropertiesPageProps) {
-  const agentProfile = user.profile as any;
+  const agentProfile = user.profile as RenterProfile | AgentProfile;
   const isVerified = agentProfile?.verificationStatus === "verified" || false;
   const accessRules = getUserAccessRules(user);
   const [filteredProperties, setFilteredProperties] = useState(properties);
@@ -197,7 +197,7 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
           <Card>
             <CardContent className="p-4">
               <div className="text-2xl font-bold">
-                {properties.reduce((sum, p) => sum + p.inquiries, 0)}
+                {properties.reduce((sum, p) => sum + (p.inquiries || 0), 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Inquiries</div>
             </CardContent>
@@ -313,7 +313,7 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
                         <span>{property.viewCount}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{property.inquiries}</TableCell>
+                    <TableCell>{property.inquiries || 0}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3 text-muted-foreground" />

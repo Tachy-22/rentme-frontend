@@ -32,7 +32,7 @@ export async function createConversation(params: CreateConversationParams) {
 
     if (existingResult.success && existingResult.data) {
       // Find conversation with both participants
-      const existingConversation = existingResult.data.find((conv: any) => 
+      const existingConversation = existingResult.data.find((conv: Record<string, unknown>) => 
         conv.participants.includes(params.participantId)
       );
 

@@ -30,7 +30,7 @@ export async function getAllProperties() {
 
     // Enrich with agent details
     const enrichedProperties = await Promise.all(
-      result.data.map(async (property: any) => {
+      result.data.map(async (property: Record<string, unknown>) => {
         const agentResult = await getDocument({
           collectionName: 'users',
           documentId: property.agentId
@@ -101,17 +101,17 @@ export async function getPropertyStats() {
 
     const stats = {
       total: properties.length,
-      available: properties.filter((p: any) => p.status === 'available').length,
-      rented: properties.filter((p: any) => p.status === 'rented').length,
-      pending: properties.filter((p: any) => p.status === 'pending').length,
-      maintenance: properties.filter((p: any) => p.status === 'maintenance').length,
-      thisWeek: properties.filter((p: any) => {
+      available: properties.filter((p: Record<string, unknown>) => p.status === 'available').length,
+      rented: properties.filter((p: Record<string, unknown>) => p.status === 'rented').length,
+      pending: properties.filter((p: Record<string, unknown>) => p.status === 'pending').length,
+      maintenance: properties.filter((p: Record<string, unknown>) => p.status === 'maintenance').length,
+      thisWeek: properties.filter((p: Record<string, unknown>) => {
         const propertyDate = new Date(p.createdAt);
         return propertyDate >= weekAgo;
       }).length,
-      totalViews: properties.reduce((sum: number, p: any) => sum + (p.viewCount || 0), 0),
+      totalViews: properties.reduce((sum: number, p: Record<string, unknown>) => sum + (p.viewCount || 0), 0),
       averagePrice: properties.length > 0 
-        ? Math.round(properties.reduce((sum: number, p: any) => sum + (p.price?.amount || 0), 0) / properties.length)
+        ? Math.round(properties.reduce((sum: number, p: Record<string, unknown>) => sum + (p.price?.amount || 0), 0) / properties.length)
         : 0
     };
 

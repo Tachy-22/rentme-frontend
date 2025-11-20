@@ -19,7 +19,19 @@ import { toast } from 'sonner';
 
 interface ApplicationFormClientProps {
   user: User;
-  property: any;
+  property: {
+    id: string;
+    title: string;
+    agentId: string;
+    location: {
+      address: string;
+      city: string;
+    };
+    price: {
+      amount: number;
+      period: string;
+    };
+  };
 }
 
 export default function ApplicationFormClient({ user, property }: ApplicationFormClientProps) {
@@ -27,7 +39,7 @@ export default function ApplicationFormClient({ user, property }: ApplicationFor
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const renterProfile = user.role === 'renter' ? user.profile as any : null;
+  const renterProfile = user.role === 'renter' ? user.profile : null;
 
   const [formData, setFormData] = useState({
     personalInfo: {
@@ -89,7 +101,7 @@ export default function ApplicationFormClient({ user, property }: ApplicationFor
     { title: 'Documents & Agreements', icon: CheckCircle, description: 'Required documents and agreements' }
   ];
 
-  const handleInputChange = (section: string, field: string, value: any) => {
+  const handleInputChange = (section: string, field: string, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       [section]: {

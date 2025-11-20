@@ -37,7 +37,7 @@ export function useFirestoreRealTimeMessages({ conversationId, userId }: UseFire
   const unsubscribeRef = useRef<Unsubscribe | null>(null);
 
   // Get sender details from Firestore
-  const enrichMessageWithSender = async (message: any): Promise<Message> => {
+  const enrichMessageWithSender = async (message: Record<string, unknown>): Promise<Message> => {
     try {
       const userDoc = await getDoc(doc(db, 'users', message.senderId));
       let sender = {

@@ -33,7 +33,7 @@ export async function getProperties(params: GetPropertiesParams = {}) {
     } = params;
 
     // Build query conditions
-    const whereConditions: any[] = [
+    const whereConditions: { field: string; operator: string; value: string | number | boolean }[] = [
       { field: 'status', operator: '==', value: 'available' }
     ];
 
@@ -91,12 +91,12 @@ export async function getProperties(params: GetPropertiesParams = {}) {
     // Client-side search filtering (since Firestore doesn't support complex text search)
     if (search) {
       const searchLower = search.toLowerCase();
-      properties = properties.filter((property: any) => 
-        property.title?.toLowerCase().includes(searchLower) ||
-        property.description?.toLowerCase().includes(searchLower) ||
-        property.location?.address?.toLowerCase().includes(searchLower) ||
-        property.location?.city?.toLowerCase().includes(searchLower) ||
-        property.amenities?.some((amenity: string) => 
+      properties = properties.filter((property: Record<string, unknown>) => 
+        (property.title as string)?.toLowerCase().includes(searchLower) ||
+        (property.description as string)?.toLowerCase().includes(searchLower) ||
+        ((property.location as Record<string, unknown>)?.address as string)?.toLowerCase().includes(searchLower) ||
+        ((property.location as Record<string, unknown>)?.city as string)?.toLowerCase().includes(searchLower) ||
+        (property.amenities as string[])?.some((amenity: string) => 
           amenity.toLowerCase().includes(searchLower)
         )
       );
@@ -104,9 +104,9 @@ export async function getProperties(params: GetPropertiesParams = {}) {
 
     // Client-side amenities filtering
     if (filters.amenities && filters.amenities.length > 0) {
-      properties = properties.filter((property: any) => 
+      properties = properties.filter((property: Record<string, unknown>) => 
         filters.amenities!.every(amenity => 
-          property.amenities?.includes(amenity)
+          (property.amenities as string[])?.includes(amenity)
         )
       );
     }
@@ -115,7 +115,7 @@ export async function getProperties(params: GetPropertiesParams = {}) {
     const paginatedProperties = properties.slice(offset, offset + limit);
 
     // Return properties with their actual data
-    const enrichedProperties = paginatedProperties.map((property: any) => ({
+    const enrichedProperties = paginatedProperties.map((property: Record<string, unknown>) => ({
       ...property,
       distanceToUniversity: property.distanceToUniversity || 'Distance not calculated',
       isSaved: false, // Will be determined per user in client components

@@ -43,7 +43,13 @@ export async function getMessages(params: GetMessagesParams) {
     }
 
     // Get messages for this conversation
-    const queryOptions: any = {
+    const queryOptions: {
+      collectionName: string;
+      filters: Array<{ field: string; operator: string; value: string }>;
+      orderByField: string;
+      orderDirection: string;
+      limitCount: number;
+    } = {
       collectionName: 'messages',
       filters: [
         { field: 'conversationId', operator: '==', value: params.conversationId }
@@ -64,7 +70,7 @@ export async function getMessages(params: GetMessagesParams) {
 
     // Enrich messages with sender details
     const enrichedMessages = await Promise.all(
-      (result.data || []).map(async (message: any) => {
+      (result.data || []).map(async (message: Record<string, unknown>) => {
         // Get sender details
         const senderResult = await getDocument({
           collectionName: 'users',

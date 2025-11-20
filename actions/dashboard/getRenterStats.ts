@@ -52,9 +52,9 @@ export async function getRenterStats() {
       conversations: conversationsResult.success ? (conversationsResult.data?.length || 0) : 0,
       messagesThisWeek: messagesResult.success ? (messagesResult.data?.length || 0) : 0,
       pendingApplications: applicationsResult.success ? 
-        (applicationsResult.data?.filter((app: any) => app.status === 'pending').length || 0) : 0,
+        (applicationsResult.data?.filter((app: Record<string, unknown>) => app.status === 'pending').length || 0) : 0,
       approvedApplications: applicationsResult.success ? 
-        (applicationsResult.data?.filter((app: any) => app.status === 'approved').length || 0) : 0
+        (applicationsResult.data?.filter((app: Record<string, unknown>) => app.status === 'approved').length || 0) : 0
     };
 
     return {

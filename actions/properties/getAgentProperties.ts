@@ -33,8 +33,8 @@ export async function getAgentProperties() {
     }
 
     const properties = (result.data || [])
-      .filter((property: any) => property.status !== 'deleted') // Filter out deleted properties
-      .map((property: any) => ({
+      .filter((property: Record<string, unknown>) => property.status !== 'deleted') // Filter out deleted properties
+      .map((property: Record<string, unknown>) => ({
         ...property,
         distanceToUniversity: `${Math.floor(Math.random() * 10) + 1}km to campus`,
         viewCount: property.viewCount || 0,

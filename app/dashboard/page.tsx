@@ -33,7 +33,7 @@ export default async function DashboardPage() {
       user={user} 
       stats={dashboardData?.stats}
       recentActivities={dashboardData?.recentActivities}
-      recommendedProperties={dashboardData?.recommendedProperties as any}
+      recommendedProperties={dashboardData?.recommendedProperties || []}
     />
   );
 }

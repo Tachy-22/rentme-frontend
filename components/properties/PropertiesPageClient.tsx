@@ -1,7 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User, PropertyType } from '@/types';
+import { User, PropertyType, Property } from '@/types';
+
+type EnhancedProperty = Property & {
+  distanceToUniversity: string;
+  isSaved: boolean;
+  agent: {
+    id?: string;
+    name: string;
+    profilePicture: string;
+    rating: number;
+  };
+};
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,16 +44,29 @@ import { toast } from 'sonner';
 
 interface PropertiesPageClientProps {
   user: User;
-  initialProperties?: any[];
+  initialProperties?: Property[];
 }
 
 const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
 const AMENITIES = ['WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 'Security', 'Gym', 'Pool'];
 const NIGERIAN_CITIES = ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt', 'Benin City', 'Kaduna', 'Ilorin'];
 
+// Helper function to enhance properties with required fields
+const enhanceProperty = (property: any): EnhancedProperty => ({
+  ...property,
+  distanceToUniversity: property.distanceToUniversity || 'Distance not calculated',
+  isSaved: property.isSaved || false,
+  agent: property.agent || {
+    id: property.agentId,
+    name: 'Unknown Agent',
+    profilePicture: '',
+    rating: 0
+  }
+});
+
 export default function PropertiesPageClient({ user, initialProperties = [] }: PropertiesPageClientProps) {
-  const [properties, setProperties] = useState(initialProperties);
-  const [filteredProperties, setFilteredProperties] = useState(initialProperties);
+  const [properties, setProperties] = useState(initialProperties.map(enhanceProperty));
+  const [filteredProperties, setFilteredProperties] = useState(initialProperties.map(enhanceProperty));
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -85,9 +109,10 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
       });
 
       if (result.success) {
-        setProperties(result.data || []);
-        setFilteredProperties(result.data || []);
-        setTotalPages((result as any).totalPages || 1);
+        const enhancedProperties = (result.data || []).map(enhanceProperty);
+        setProperties(enhancedProperties);
+        setFilteredProperties(enhancedProperties);
+        setTotalPages((result as { totalPages?: number }).totalPages || 1);
         setHasMore(result.hasMore || false);
       } else {
         toast.error(result.error || 'Failed to search properties');
@@ -110,7 +135,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
     handleSearch(searchQuery);
   };
 
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: string, value: string | number | boolean | string[]) => {
     setFilters(prev => ({
       ...prev,
       [key]: value
@@ -255,7 +280,7 @@ export default function PropertiesPageClient({ user, initialProperties = [] }: P
         <Label className="text-sm font-medium">Furnishing</Label>
         <Select 
           value={filters.furnished === undefined ? 'any' : filters.furnished.toString()} 
-          onValueChange={(value) => handleFilterChange('furnished', value === 'any' ? undefined : value === 'true')}
+          onValueChange={(value) => handleFilterChange('furnished', value === 'any' ? undefined as any : value === 'true')}
         >
           <SelectTrigger className="mt-2">
             <SelectValue placeholder="Any" />

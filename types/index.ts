@@ -28,6 +28,7 @@ export interface RenterProfile {
   lastName: string;
   dateOfBirth: string;
   phoneNumber: string;
+
   phone: string;
   occupation: string;
   employer?: string;
@@ -40,6 +41,8 @@ export interface RenterProfile {
   preferredLocations: string[];
   bio: string;
   profilePicture: string;
+  verificationStatus: 'pending' | 'verified' | 'rejected';
+
   identityVerified: boolean;
   incomeVerified: boolean;
   emergencyContact: {
@@ -182,6 +185,7 @@ export interface Property {
       unit: 'months';
     };
   };
+  inquiries?: number;
   amenities: string[];
   images: CloudinaryImage[];
   virtualTourUrl?: string;
@@ -195,7 +199,7 @@ export interface Property {
   viewCount: number;
   saveCount: number;
   applicationCount: number;
-  savedAt?: any; // For saved properties
+  savedAt?: string; // For saved properties
 }
 
 export interface CloudinaryImage {
@@ -278,8 +282,13 @@ export interface Application {
       currency: string;
       period: string;
     };
-    images: any[];
-    agent?: any;
+    images: CloudinaryImage[];
+    agent?: {
+      id: string;
+      name: string;
+      profilePicture: string;
+      rating: number;
+    };
   };
 }
 

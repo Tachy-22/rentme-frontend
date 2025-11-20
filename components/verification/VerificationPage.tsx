@@ -170,7 +170,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
     setIsSubmitting(true);
 
     try {
-      const documents: any = {};
+      const documents: Record<string, File> = {};
       if (formData.studentId) documents.studentId = formData.studentId;
       if (formData.admissionLetter) documents.admissionLetter = formData.admissionLetter;
       if (formData.cacCertificate) documents.cacCertificate = formData.cacCertificate;

@@ -34,7 +34,7 @@ export async function getConversations() {
 
     // Enrich conversations with participant details
     const enrichedConversations = await Promise.all(
-      result.data.map(async (conversation: any) => {
+      result.data.map(async (conversation: Record<string, unknown>) => {
         const otherParticipantId = conversation.participants.find((id: string) => id !== userId);
         
         if (!otherParticipantId) {

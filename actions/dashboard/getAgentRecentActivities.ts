@@ -125,7 +125,7 @@ export async function getAgentRecentActivities(): Promise<{
     });
 
     if (propertiesResult.success && propertiesResult.data) {
-      const nonDeletedProperties = propertiesResult.data.filter((p: any) => p.status !== 'deleted');
+      const nonDeletedProperties = propertiesResult.data.filter((p: Record<string, unknown>) => p.status !== 'deleted');
       for (const property of nonDeletedProperties) {
         const createdDate = new Date(property.createdAt as string);
         if (createdDate >= sevenDaysAgo) {
