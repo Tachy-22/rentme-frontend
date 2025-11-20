@@ -83,7 +83,7 @@ export async function getAnalyticsData() {
     // Property type distribution
     const propertyTypeDistribution = properties
       .reduce((acc: Record<string, number>, property: Record<string, unknown>) => {
-        const type = property.type || 'unknown';
+        const type = (property.type as string) || 'unknown';
         acc[type] = (acc[type] || 0) + 1;
         return acc;
       }, {});
