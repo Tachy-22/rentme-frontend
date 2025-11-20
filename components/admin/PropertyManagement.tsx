@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { getAllProperties, updatePropertyStatus, deleteProperty } from '@/actions/admin/propertyManagement';
 import Link from 'next/link';
+import { PropertyStatus } from '@/types';
 
 interface Property {
   id: string;
@@ -71,7 +72,7 @@ export default function PropertyManagement() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [newStatus, setNewStatus] = useState('');
+  const [newStatus, setNewStatus] = useState<PropertyStatus | ''>('');
   const [statusReason, setStatusReason] = useState('');
 
   useEffect(() => {
@@ -133,7 +134,7 @@ export default function PropertyManagement() {
     try {
       const result = await updatePropertyStatus({
         propertyId: selectedProperty.id,
-        status: newStatus as any,
+        status: newStatus as PropertyStatus,
         reason: statusReason
       });
 
@@ -428,7 +429,7 @@ export default function PropertyManagement() {
           <DialogHeader>
             <DialogTitle>Update Property Status</DialogTitle>
             <DialogDescription>
-              Change the status of "{selectedProperty?.title}"
+              Change the status of &quot;{selectedProperty?.title}&quot;
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -477,7 +478,7 @@ export default function PropertyManagement() {
           <DialogHeader>
             <DialogTitle>Delete Property</DialogTitle>
             <DialogDescription>
-              Are you sure you want to permanently delete "{selectedProperty?.title}"?
+              Are you sure you want to permanently delete &quot;{selectedProperty?.title}&quot;?
               This action cannot be undone.
             </DialogDescription>
           </DialogHeader>

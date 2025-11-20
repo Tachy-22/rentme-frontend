@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User } from '@/types';
+import { User, RenterProfile } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { 
@@ -43,7 +43,7 @@ interface RenterDashboardProps {
 }
 
 export default function RenterDashboard({ user, stats, recentActivities = [], recommendedProperties = [] }: RenterDashboardProps) {
-  const renterProfile = user.profile as any;
+  const renterProfile = user.profile as RenterProfile;
   const isVerified = renterProfile?.verificationStatus || false;
   const [showVerificationBanner, setShowVerificationBanner] = useState(!isVerified);
 

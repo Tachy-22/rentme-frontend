@@ -24,6 +24,20 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
+// Helper function to safely convert Firebase timestamp to Date
+function toDate(timestamp: string | { toDate?: () => Date; seconds?: number; nanoseconds?: number }): Date {
+  if (typeof timestamp === 'string') {
+    return new Date(timestamp);
+  }
+  if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp && timestamp.toDate) {
+    return timestamp.toDate();
+  }
+  if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp && timestamp.seconds) {
+    return new Date(timestamp.seconds * 1000);
+  }
+  return new Date();
+}
+
 interface ApplicationsClientProps {
   user: User;
   initialApplications: Application[];
@@ -60,15 +74,15 @@ export default function ApplicationsClient({ user, initialApplications }: Applic
     switch (sortBy) {
       case 'newest':
         filtered.sort((a, b) => {
-          const dateA = (a.submittedAt as any)?.toDate ? (a.submittedAt as any).toDate() : new Date(a.submittedAt);
-          const dateB = (b.submittedAt as any)?.toDate ? (b.submittedAt as any).toDate() : new Date(b.submittedAt);
+          const dateA = toDate(a.submittedAt);
+          const dateB = toDate(b.submittedAt);
           return dateB.getTime() - dateA.getTime();
         });
         break;
       case 'oldest':
         filtered.sort((a, b) => {
-          const dateA = (a.submittedAt as any)?.toDate ? (a.submittedAt as any).toDate() : new Date(a.submittedAt);
-          const dateB = (b.submittedAt as any)?.toDate ? (b.submittedAt as any).toDate() : new Date(b.submittedAt);
+          const dateA = toDate(a.submittedAt);
+          const dateB = toDate(b.submittedAt);
           return dateA.getTime() - dateB.getTime();
         });
         break;
@@ -110,9 +124,9 @@ export default function ApplicationsClient({ user, initialApplications }: Applic
     }
   };
 
-  const formatDate = (date: unknown) => {
+  const formatDate = (date: string | { toDate?: () => Date; seconds?: number; nanoseconds?: number }) => {
     if (!date) return '';
-    const dateObj = (date as any)?.toDate ? (date as any).toDate() : new Date(date as string);
+    const dateObj = toDate(date);
     return dateObj.toLocaleDateString();
   };
 

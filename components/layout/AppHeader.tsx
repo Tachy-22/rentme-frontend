@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { AgentProfile, AdminProfile } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -63,7 +64,7 @@ export default function AppHeader({ userRole }: AppHeaderProps) {
     return 'Dashboard';
   };
 
-  const profile = user?.profile as any;
+  const profile = user?.profile as AgentProfile | AdminProfile;
   const isVerified = profile?.verificationStatus === "verified" || false;
 
   return (

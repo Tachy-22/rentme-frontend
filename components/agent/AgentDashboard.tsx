@@ -1,6 +1,6 @@
 'use client';
 
-import { User, DashboardActivity } from '@/types';
+import { User, DashboardActivity, AgentProfile } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +39,7 @@ interface AgentDashboardProps {
 }
 
 export default function AgentDashboard({ user, stats, recentActivities = [] }: AgentDashboardProps) {
-  const agentProfile = user.profile as any;
+  const agentProfile = user.profile as AgentProfile;
   const isVerified = agentProfile?.verificationStatus === "verified" || false;
 
   // Use real stats or fallback to zeros

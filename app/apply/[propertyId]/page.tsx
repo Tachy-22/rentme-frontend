@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getDocument } from '@/actions/firebase';
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import ApplicationFormClient from '@/components/applications/ApplicationFormClient';
+import { Property } from '@/types';
 
 interface ApplyPageProps {
   params: {
@@ -36,7 +37,7 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
     redirect('/properties?error=property-not-found');
   }
 
-  const property = propertyResult.data;
+  const property = propertyResult.data as unknown as Property;
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,13 +46,13 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
           <div className="mb-8">
             <h1 className="text-3xl font-bold">Apply for Property</h1>
             <p className="text-muted-foreground mt-2">
-              Complete the application form for {(property as any)?.title || 'this property'}
+              Complete the application form for {property?.title || 'this property'}
             </p>
           </div>
 
           <ApplicationFormClient 
             user={userResult.user}
-            property={property as any}
+            property={property}
           />
         </div>
       </div>

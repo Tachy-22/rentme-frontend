@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, PropertyType } from '@/types';
+import { User, PropertyType, AgentProfile } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -89,7 +89,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
     images: [] as File[]
   });
 
-  const agentProfile = user.profile as any;
+  const agentProfile = user.profile as AgentProfile;
   const isVerified = agentProfile.verificationStatus === "verified" || false;
   const accessRules = getUserAccessRules(user);
 
