@@ -47,35 +47,35 @@ export async function getAnalyticsData() {
     lastWeek.setDate(lastWeek.getDate() - 7);
 
     // User growth
-    const newUsersThisWeek = users.filter((u: Record<string, unknown>) => new Date(u.createdAt) >= lastWeek).length;
-    const newUsersLastMonth = users.filter((u: Record<string, unknown>) => new Date(u.createdAt) >= lastMonth).length;
+    const newUsersThisWeek = users.filter((u: Record<string, unknown>) => new Date(u.createdAt as string) >= lastWeek).length;
+    const newUsersLastMonth = users.filter((u: Record<string, unknown>) => new Date(u.createdAt as string) >= lastMonth).length;
 
     // Property growth
-    const newPropertiesThisWeek = properties.filter((p: Record<string, unknown>) => new Date(p.createdAt) >= lastWeek).length;
-    const newPropertiesLastMonth = properties.filter((p: Record<string, unknown>) => new Date(p.createdAt) >= lastMonth).length;
+    const newPropertiesThisWeek = properties.filter((p: Record<string, unknown>) => new Date(p.createdAt as string) >= lastWeek).length;
+    const newPropertiesLastMonth = properties.filter((p: Record<string, unknown>) => new Date(p.createdAt as string) >= lastMonth).length;
 
     // Engagement metrics
     const activeConversations = conversations.filter((c: Record<string, unknown>) => {
-      const lastActivity = new Date(c.updatedAt);
+      const lastActivity = new Date(c.updatedAt as string);
       return lastActivity >= lastWeek;
     }).length;
 
-    const newApplicationsThisWeek = applications.filter((a: Record<string, unknown>) => new Date(a.submittedAt) >= lastWeek).length;
+    const newApplicationsThisWeek = applications.filter((a: Record<string, unknown>) => new Date(a.submittedAt as string) >= lastWeek).length;
 
     // University distribution
     const universityDistribution = users
-      .filter((u: Record<string, unknown>) => u.role === 'renter' && u.profile?.university)
+      .filter((u: Record<string, unknown>) => u.role === 'renter' && (u.profile as Record<string, unknown>)?.university)
       .reduce((acc: Record<string, number>, user: Record<string, unknown>) => {
-        const university = user.profile.university;
+        const university = (user.profile as Record<string, unknown>).university as string;
         acc[university] = (acc[university] || 0) + 1;
         return acc;
       }, {});
 
     // Location distribution  
     const locationDistribution = properties
-      .filter((p: Record<string, unknown>) => p.location?.city)
+      .filter((p: Record<string, unknown>) => (p.location as Record<string, unknown>)?.city)
       .reduce((acc: Record<string, number>, property: Record<string, unknown>) => {
-        const city = property.location.city;
+        const city = (property.location as Record<string, unknown>).city as string;
         acc[city] = (acc[city] || 0) + 1;
         return acc;
       }, {});
