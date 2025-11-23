@@ -33,7 +33,7 @@ export async function getAllProperties() {
       result.data.map(async (property: Record<string, unknown>) => {
         const agentResult = await getDocument({
           collectionName: 'users',
-          documentId: property.agentId
+          documentId: property.agentId as string
         });
 
         let agent = null;
@@ -107,12 +107,12 @@ export async function getPropertyStats() {
       pending: properties.filter((p: Record<string, unknown>) => p.status === 'pending').length,
       maintenance: properties.filter((p: Record<string, unknown>) => p.status === 'maintenance').length,
       thisWeek: properties.filter((p: Record<string, unknown>) => {
-        const propertyDate = new Date(p.createdAt);
+        const propertyDate = new Date(p.createdAt as string);
         return propertyDate >= weekAgo;
       }).length,
-      totalViews: properties.reduce((sum: number, p: Record<string, unknown>) => sum + (p.viewCount || 0), 0),
+      totalViews: properties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.viewCount as number) || 0), 0),
       averagePrice: properties.length > 0 
-        ? Math.round(properties.reduce((sum: number, p: Record<string, unknown>) => sum + (p.price?.amount || 0), 0) / properties.length)
+        ? Math.round(properties.reduce((sum: number, p: Record<string, unknown>) => sum + (((p.price as Record<string, unknown>)?.amount as number) || 0), 0) / properties.length)
         : 0
     };
 

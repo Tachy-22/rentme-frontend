@@ -75,10 +75,10 @@ export async function getUserStats() {
       renters: users.filter((u: Record<string, unknown>) => u.role === 'renter').length,
       agents: users.filter((u: Record<string, unknown>) => u.role === 'agent').length,
       admins: users.filter((u: Record<string, unknown>) => u.role === 'admin').length,
-      verified: users.filter((u: Record<string, unknown>) => u.profile?.verificationStatus === 'verified').length,
+      verified: users.filter((u: Record<string, unknown>) => (u.profile as Record<string, unknown>)?.verificationStatus === 'verified').length,
       active: users.filter((u: Record<string, unknown>) => u.isActive !== false).length,
       thisWeek: users.filter((u: Record<string, unknown>) => {
-        const userDate = new Date(u.createdAt);
+        const userDate = new Date(u.createdAt as string);
         return userDate >= weekAgo;
       }).length
     };

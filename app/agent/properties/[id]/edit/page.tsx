@@ -26,7 +26,7 @@ export default async function PropertyEditPage({ params }: { params: { id: strin
   const property = propertyResult.data;
 
   // Verify ownership for agents (admins can edit any property)
-  if (user.role === 'agent' && property.agentId !== user.id) {
+  if (user.role === 'agent' && (property as Record<string, unknown>).agentId !== user.id) {
     redirect('/agent/properties');
   }
 

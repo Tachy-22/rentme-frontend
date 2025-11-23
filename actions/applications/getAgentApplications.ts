@@ -39,13 +39,13 @@ export async function getAgentApplications() {
         // Get property details
         const propertyResult = await getDocument({
           collectionName: 'properties',
-          documentId: application.propertyId
+          documentId: application.propertyId as string
         });
 
         // Get renter details
         const renterResult = await getDocument({
           collectionName: 'users',
-          documentId: application.renterId
+          documentId: application.renterId as string
         });
 
         let property = null;
@@ -72,9 +72,9 @@ export async function getAgentApplications() {
             id: application.renterId,
             name: fullName,
             email: userData.email,
-            phone: userData.profile?.phone,
-            profilePicture: userData.profile?.profilePicture,
-            verificationStatus: userData.profile?.verificationStatus || 'unverified'
+            phone: (userData.profile as Record<string, unknown>)?.phone as string,
+            profilePicture: (userData.profile as Record<string, unknown>)?.profilePicture as string,
+            verificationStatus: (userData.profile as Record<string, unknown>)?.verificationStatus as string || 'unverified'
           };
         }
 

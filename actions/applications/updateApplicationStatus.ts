@@ -57,7 +57,7 @@ export async function updateApplicationStatus({ applicationId, status, notes }: 
     }
 
     // Add status history
-    const statusHistory = application.statusHistory || [];
+    const statusHistory = (application.statusHistory as Record<string, unknown>[]) || [];
     statusHistory.push({
       status,
       updatedBy: userId,

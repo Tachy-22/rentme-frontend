@@ -42,8 +42,8 @@ export async function getSavedProperties() {
 
     // Sort by saved date (most recent first)
     properties.sort((a, b) => {
-      const dateA = a.savedAt?.toDate() || new Date(0);
-      const dateB = b.savedAt?.toDate() || new Date(0);
+      const dateA = a.savedAt ? new Date(a.savedAt as string) : new Date(0);
+      const dateB = b.savedAt ? new Date(b.savedAt as string) : new Date(0);
       return dateB.getTime() - dateA.getTime();
     });
 

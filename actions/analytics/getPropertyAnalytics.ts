@@ -79,38 +79,38 @@ export async function getPropertyAnalytics() {
     
     // Calculate analytics for each property
     const propertyAnalytics: PropertyAnalytics[] = properties.map((property: Record<string, unknown>) => {
-      const views = property.viewCount || 0;
-      const inquiries = property.inquiries || 0;
-      const applications = property.applications || 0;
+      const views = (property.viewCount as number) || 0;
+      const inquiries = (property.inquiries as number) || 0;
+      const applications = (property.applications as number) || 0;
       const conversionRate = views > 0 ? ((applications / views) * 100) : 0;
       
-      const createdAt = new Date(property.createdAt);
+      const createdAt = new Date(property.createdAt as string);
       const now = new Date();
       const daysListed = Math.ceil((now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
       
-      const pricePerView = views > 0 ? (property.price?.amount || 0) / views : undefined;
+      const pricePerView = views > 0 ? (((property.price as Record<string, unknown>)?.amount as number) || 0) / views : undefined;
 
       return {
-        propertyId: property.id,
-        title: property.title,
-        status: property.status,
+        propertyId: property.id as string,
+        title: property.title as string,
+        status: property.status as string,
         views,
         inquiries,
         applications,
         conversionRate: Math.round(conversionRate * 100) / 100,
-        createdAt: property.createdAt,
+        createdAt: property.createdAt as string,
         daysListed,
         pricePerView,
         location: {
-          city: property.location?.city || 'Unknown',
-          area: property.location?.area
+          city: ((property.location as Record<string, unknown>)?.city as string) || 'Unknown',
+          area: (property.location as Record<string, unknown>)?.area as string
         },
         price: {
-          amount: property.price?.amount || 0,
-          currency: property.price?.currency || 'USD'
+          amount: ((property.price as Record<string, unknown>)?.amount as number) || 0,
+          currency: ((property.price as Record<string, unknown>)?.currency as string) || 'USD'
         },
-        lastViewed: property.lastViewed,
-        averageViewTime: property.averageViewTime
+        lastViewed: property.lastViewed as string,
+        averageViewTime: property.averageViewTime as number
       };
     });
 

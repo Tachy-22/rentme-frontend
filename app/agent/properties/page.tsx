@@ -20,5 +20,5 @@ export default async function AgentPropertiesPageRoute() {
   const propertiesResult = await getAgentProperties();
   const properties = propertiesResult.success ? propertiesResult.data : [];
 
-  return <AgentPropertiesPage user={user} properties={properties} />;
+  return <AgentPropertiesPage user={user} properties={properties as unknown as Parameters<typeof AgentPropertiesPage>[0]['properties']} />;
 }

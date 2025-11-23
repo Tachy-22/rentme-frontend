@@ -20,5 +20,5 @@ export default async function AgentApplicationsPageRoute() {
   const applicationsResult = await getAgentApplications();
   const applications = applicationsResult.success ? applicationsResult.data : [];
 
-  return <AgentApplicationsPage applications={applications} />;
+  return <AgentApplicationsPage applications={applications as unknown as Parameters<typeof AgentApplicationsPage>[0]['applications']} />;
 }

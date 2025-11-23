@@ -25,7 +25,7 @@ export default async function PropertyPage({ params }: PropertyPageProps) {
 
   return (
     <RenterLayout>
-      <PropertyDetailsPage property={propertyResult.data} user={userResult.user} />
+      <PropertyDetailsPage property={propertyResult.data as unknown as Parameters<typeof PropertyDetailsPage>[0]['property']} user={userResult.user} />
     </RenterLayout>
   );
 }

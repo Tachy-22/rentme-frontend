@@ -24,7 +24,7 @@ export default async function PropertiesPageRoute() {
 
   return (
     <RenterLayout>
-      <PropertiesPageClient user={user} initialProperties={initialProperties} />
+      <PropertiesPageClient user={user} initialProperties={initialProperties as unknown as Parameters<typeof PropertiesPageClient>[0]['initialProperties']} />
     </RenterLayout>
   );
 }

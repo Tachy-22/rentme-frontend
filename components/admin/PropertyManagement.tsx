@@ -396,7 +396,7 @@ export default function PropertyManagement() {
                       variant="outline"
                       onClick={() => {
                         setSelectedProperty(property);
-                        setNewStatus(property.status);
+                        setNewStatus((property as Record<string, unknown>).status as PropertyStatus);
                         setShowStatusDialog(true);
                       }}
                     >

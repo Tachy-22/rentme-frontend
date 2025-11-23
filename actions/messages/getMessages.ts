@@ -56,11 +56,18 @@ export async function getMessages(params: GetMessagesParams) {
         { field: 'conversationId', operator: '==', value: params.conversationId }
       ],
       orderByField: 'sentAt',
-      orderDirection: 'desc',
+      orderDirection: 'desc' as const,
       limitCount: params.limit || 50
     };
 
-    const result = await queryDocuments(queryOptions);
+    const result = await queryDocuments({
+      ...queryOptions,
+      orderDirection: queryOptions.orderDirection as 'desc',
+      filters: queryOptions.filters.map(f => ({
+        ...f,
+        operator: f.operator as '=='
+      }))
+    });
 
     if (!result.success) {
       return {
@@ -75,7 +82,7 @@ export async function getMessages(params: GetMessagesParams) {
         // Get sender details
         const senderResult = await getDocument({
           collectionName: 'users',
-          documentId: message.senderId
+          documentId: message.senderId as string
         });
 
         let sender = null;
@@ -89,9 +96,9 @@ export async function getMessages(params: GetMessagesParams) {
           sender = {
             id: message.senderId,
             name: fullName,
-            profilePicture: userData.profile?.profilePicture || null,
+            profilePicture: (userData.profile as Record<string, unknown>)?.profilePicture as string || null,
             role: userData.role,
-            verificationStatus: userData.profile?.verificationStatus || 'unverified'
+            verificationStatus: (userData.profile as Record<string, unknown>)?.verificationStatus as string || 'unverified'
           };
         }
 
@@ -111,7 +118,7 @@ export async function getMessages(params: GetMessagesParams) {
       data: enrichedMessages,
       conversation: {
         ...conversation,
-        otherParticipantId: conversation.participants.find((id: string) => id !== userId)
+        otherParticipantId: (conversation.participants as string[]).find((id: string) => id !== userId)
       }
     };
 

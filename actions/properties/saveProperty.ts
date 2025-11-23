@@ -92,7 +92,7 @@ export async function unsaveProperty(propertyId: string) {
     const savedPropertyDoc = existingResult.data[0] as Record<string, unknown>;
     const result = await deleteDocument({
       collectionName: 'savedProperties',
-      documentId: savedPropertyDoc.id
+      documentId: savedPropertyDoc.id as string
     });
 
     return result;

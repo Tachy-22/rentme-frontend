@@ -20,5 +20,5 @@ export default async function AgentMessagesPage() {
   const conversationsResult = await getConversations();
   const initialConversations = conversationsResult.success ? conversationsResult.data : [];
 
-  return <MessagesPage initialConversations={initialConversations} />;
+  return <MessagesPage initialConversations={initialConversations as unknown as Parameters<typeof MessagesPage>[0]['initialConversations']} />;
 }

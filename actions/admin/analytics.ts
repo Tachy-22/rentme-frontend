@@ -95,7 +95,7 @@ export async function getAnalyticsData() {
       const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
       
       const monthUsers = users.filter((u: Record<string, unknown>) => {
-        const userDate = new Date(u.createdAt);
+        const userDate = new Date(u.createdAt as string);
         return userDate >= monthStart && userDate <= monthEnd;
       }).length;
 
@@ -112,7 +112,7 @@ export async function getAnalyticsData() {
       const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
       
       const monthProperties = properties.filter((p: Record<string, unknown>) => {
-        const propertyDate = new Date(p.createdAt);
+        const propertyDate = new Date(p.createdAt as string);
         return propertyDate >= monthStart && propertyDate <= monthEnd;
       }).length;
 
@@ -138,16 +138,16 @@ export async function getAnalyticsData() {
       userMetrics: {
         totalRenters: users.filter((u: Record<string, unknown>) => u.role === 'renter').length,
         totalAgents: users.filter((u: Record<string, unknown>) => u.role === 'agent').length,
-        verifiedUsers: users.filter((u: Record<string, unknown>) => u.profile?.verificationStatus === 'verified').length,
-        pendingVerifications: users.filter((u: Record<string, unknown>) => u.profile?.verificationStatus === 'pending').length
+        verifiedUsers: users.filter((u: Record<string, unknown>) => (u.profile as Record<string, unknown>)?.verificationStatus === 'verified').length,
+        pendingVerifications: users.filter((u: Record<string, unknown>) => (u.profile as Record<string, unknown>)?.verificationStatus === 'pending').length
       },
       propertyMetrics: {
         availableProperties: properties.filter((p: Record<string, unknown>) => p.status === 'available').length,
         rentedProperties: properties.filter((p: Record<string, unknown>) => p.status === 'rented').length,
         pendingProperties: properties.filter((p: Record<string, unknown>) => p.status === 'pending').length,
-        totalViews: properties.reduce((sum: number, p: Record<string, unknown>) => sum + (p.viewCount || 0), 0),
+        totalViews: properties.reduce((sum: number, p: Record<string, unknown>) => sum + ((p.viewCount as number) || 0), 0),
         averagePrice: properties.length > 0 
-          ? Math.round(properties.reduce((sum: number, p: Record<string, unknown>) => sum + (p.price?.amount || 0), 0) / properties.length)
+          ? Math.round(properties.reduce((sum: number, p: Record<string, unknown>) => sum + (((p.price as Record<string, unknown>)?.amount as number) || 0), 0) / properties.length)
           : 0
       },
       distributions: {
@@ -216,11 +216,11 @@ export async function getMessageStats() {
       totalConversations: conversations.length,
       totalMessages: messages.length,
       activeConversations: conversations.filter((c: Record<string, unknown>) => {
-        const lastActivity = new Date(c.updatedAt);
+        const lastActivity = new Date(c.updatedAt as string);
         return lastActivity >= weekAgo;
       }).length,
       messagesThisWeek: messages.filter((m: Record<string, unknown>) => {
-        const messageDate = new Date(m.sentAt);
+        const messageDate = new Date(m.sentAt as string);
         return messageDate >= weekAgo;
       }).length,
       averageMessagesPerConversation: conversations.length > 0 

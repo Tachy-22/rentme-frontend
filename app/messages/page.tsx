@@ -35,7 +35,7 @@ export default async function MessagesPageRoute() {
 
   return (
     <LayoutComponent>
-      <MessagesPage initialConversations={initialConversations} />
+      <MessagesPage initialConversations={initialConversations as unknown as Parameters<typeof MessagesPage>[0]['initialConversations']} />
     </LayoutComponent>
   );
 }

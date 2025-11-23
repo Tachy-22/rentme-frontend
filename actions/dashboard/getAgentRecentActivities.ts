@@ -100,9 +100,9 @@ export async function getAgentRecentActivities(): Promise<{
                   id: `msg-${conversation.id}`,
                   type: 'new_inquiry',
                   title: `New message from ${participantName}`,
-                  description: lastMessage.content.length > 50 
-                    ? `${lastMessage.content.substring(0, 50)}...`
-                    : lastMessage.content,
+                  description: (lastMessage.content as string).length > 50 
+                    ? `${(lastMessage.content as string).substring(0, 50)}...`
+                    : lastMessage.content as string,
                   timestamp: lastMessage.sentAt as string,
                   actionUrl: `/agent/messages`
                 });

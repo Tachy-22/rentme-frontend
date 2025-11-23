@@ -82,13 +82,13 @@ export async function searchProperties(params: SearchPropertiesParams) {
         const searchableText = [
           property.title,
           property.description,
-          property.location?.address,
-          property.location?.city,
-          ...(property.amenities || [])
+          ((property.location as Record<string, unknown>)?.address as string),
+          ((property.location as Record<string, unknown>)?.city as string),
+          ...((property.amenities as string[]) || [])
         ].join(' ').toLowerCase();
 
         searchTerms.forEach(term => {
-          const titleMatches = (property.title?.toLowerCase().includes(term) ? 3 : 0);
+          const titleMatches = ((property.title as string)?.toLowerCase().includes(term) ? 3 : 0);
           const descriptionMatches = (searchableText.includes(term) ? 1 : 0);
           score += titleMatches + descriptionMatches;
         });
@@ -108,7 +108,7 @@ export async function searchProperties(params: SearchPropertiesParams) {
         return a.relevanceScore - b.relevanceScore;
       });
 
-      result.data = scoredProperties;
+      result.data = scoredProperties as any;
     } else {
       // Apply verification ranking boost even for non-relevance sorts
       const rankedProperties = result?.data?.map((property: Record<string, unknown>) => {
@@ -125,8 +125,8 @@ export async function searchProperties(params: SearchPropertiesParams) {
         
         // Then by the requested sort field
         const field = sortBy === 'relevance' ? 'createdAt' : sortBy;
-        const aValue = a[field] || 0;
-        const bValue = b[field] || 0;
+        const aValue = (a as any)[field] || 0;
+        const bValue = (b as any)[field] || 0;
         
         if (sortOrder === 'desc') {
           return bValue - aValue;
@@ -134,7 +134,7 @@ export async function searchProperties(params: SearchPropertiesParams) {
         return aValue - bValue;
       });
 
-      result.data = rankedProperties;
+      result.data = rankedProperties as any;
     }
 
     return {

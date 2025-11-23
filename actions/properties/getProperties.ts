@@ -73,9 +73,12 @@ export async function getProperties(params: GetPropertiesParams = {}) {
 
     const result = await queryDocuments({
       collectionName: 'properties',
-      filters: whereConditions,
+      filters: whereConditions.map(condition => ({
+        ...condition,
+        operator: condition.operator as any
+      })),
       orderByField: sortBy,
-      orderDirection: sortOrder,
+      orderDirection: sortOrder as any,
       limitCount: limit + offset // We'll handle offset in client-side filtering for now
     });
 

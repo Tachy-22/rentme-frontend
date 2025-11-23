@@ -51,7 +51,7 @@ export async function getMatchedRenters() {
     }
 
     const agent = agentResult.data as Record<string, unknown>;
-    const isVerified = agent.profile?.verificationStatus === 'verified';
+    const isVerified = (agent.profile as Record<string, unknown>)?.verificationStatus === 'verified';
 
     // Only verified agents can access matched renters
     if (!isVerified) {
@@ -100,23 +100,23 @@ export async function getMatchedRenters() {
         });
 
         return {
-          id: renter.id,
-          name: `${renter.profile?.firstName || ''} ${renter.profile?.lastName || ''}`.trim(),
-          email: renter.email,
-          university: renter.profile?.university || 'Not specified',
+          id: renter.id as string,
+          name: `${(renter.profile as Record<string, unknown>)?.firstName || ''} ${(renter.profile as Record<string, unknown>)?.lastName || ''}`.trim(),
+          email: renter.email as string,
+          university: (renter.profile as Record<string, unknown>)?.university as string || 'Not specified',
           budget: {
-            min: renter.profile?.budgetMin || 0,
-            max: renter.profile?.budgetMax || 0
+            min: (renter.profile as Record<string, unknown>)?.budgetMin as number || 0,
+            max: (renter.profile as Record<string, unknown>)?.budgetMax as number || 0
           },
-          preferredLocation: renter.profile?.preferredLocation || 'Any',
-          accommodationType: renter.profile?.accommodationType || [],
-          verificationStatus: renter.profile?.verificationStatus || 'unverified',
-          profilePicture: renter.profile?.profilePicture,
+          preferredLocation: (renter.profile as Record<string, unknown>)?.preferredLocation as string || 'Any',
+          accommodationType: (renter.profile as Record<string, unknown>)?.accommodationType as string[] || [],
+          verificationStatus: (renter.profile as Record<string, unknown>)?.verificationStatus as string || 'unverified',
+          profilePicture: (renter.profile as Record<string, unknown>)?.profilePicture as string,
           matchScore,
-          lastActive: renter.profile?.lastActive || renter.createdAt,
+          lastActive: (renter.profile as Record<string, unknown>)?.lastActive as string || renter.createdAt as string,
           contact: {
-            phone: renter.profile?.phone,
-            email: renter.email
+            phone: (renter.profile as Record<string, unknown>)?.phone as string,
+            email: renter.email as string
           }
         };
       })
@@ -141,7 +141,7 @@ export async function getMatchedRenters() {
 function calculateAgentPriceRange(properties: Record<string, unknown>[]) {
   if (properties.length === 0) return { min: 0, max: 1000000 };
 
-  const prices = properties.map(p => p.price?.amount || 0).filter(p => p > 0);
+  const prices = properties.map(p => ((p.price as Record<string, unknown>)?.amount as number) || 0).filter(p => p > 0);
   if (prices.length === 0) return { min: 0, max: 1000000 };
 
   return {
@@ -153,8 +153,8 @@ function calculateAgentPriceRange(properties: Record<string, unknown>[]) {
 function extractAgentLocations(properties: Record<string, unknown>[]) {
   const locations = new Set<string>();
   properties.forEach(p => {
-    if (p.location?.city) locations.add(p.location.city.toLowerCase());
-    if (p.location?.area) locations.add(p.location.area.toLowerCase());
+    if ((p.location as Record<string, unknown>)?.city) locations.add(((p.location as Record<string, unknown>).city as string).toLowerCase());
+    if ((p.location as Record<string, unknown>)?.area) locations.add(((p.location as Record<string, unknown>).area as string).toLowerCase());
   });
   return Array.from(locations);
 }
@@ -162,7 +162,7 @@ function extractAgentLocations(properties: Record<string, unknown>[]) {
 function extractPropertyTypes(properties: Record<string, unknown>[]) {
   const types = new Set<string>();
   properties.forEach(p => {
-    if (p.propertyType) types.add(p.propertyType.toLowerCase());
+    if (p.propertyType) types.add((p.propertyType as string).toLowerCase());
   });
   return Array.from(types);
 }
@@ -173,8 +173,8 @@ function calculateMatchScore(renter: Record<string, unknown>, agentCriteria: { p
 
   // Budget compatibility (40% weight)
   const renterBudget = {
-    min: renter.profile?.budgetMin || 0,
-    max: renter.profile?.budgetMax || 0
+    min: (renter.profile as Record<string, unknown>)?.budgetMin as number || 0,
+    max: (renter.profile as Record<string, unknown>)?.budgetMax as number || 0
   };
 
   if (renterBudget.max > 0 && agentCriteria.priceRange.min > 0) {
@@ -191,7 +191,7 @@ function calculateMatchScore(renter: Record<string, unknown>, agentCriteria: { p
   }
 
   // Location match (30% weight)
-  const renterLocation = renter.profile?.preferredLocation?.toLowerCase() || '';
+  const renterLocation = ((renter.profile as Record<string, unknown>)?.preferredLocation as string)?.toLowerCase() || '';
   if (renterLocation && agentCriteria.locations.length > 0) {
     const locationMatch = agentCriteria.locations.some((loc: string) => 
       renterLocation.includes(loc) || loc.includes(renterLocation)
@@ -203,7 +203,7 @@ function calculateMatchScore(renter: Record<string, unknown>, agentCriteria: { p
   }
 
   // Property type match (20% weight)
-  const renterAccommodationType = renter.profile?.accommodationType || [];
+  const renterAccommodationType = (renter.profile as Record<string, unknown>)?.accommodationType as string[] || [];
   if (renterAccommodationType.length > 0 && agentCriteria.propertyTypes.length > 0) {
     const typeMatch = renterAccommodationType.some((type: string) =>
       agentCriteria.propertyTypes.includes(type.toLowerCase())

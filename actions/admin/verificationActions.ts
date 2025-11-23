@@ -127,7 +127,7 @@ export async function updateVerificationStatus(params: UpdateVerificationStatusP
     // Update user profile
     const userUpdateResult = await updateDocument({
       collectionName: 'users',
-      documentId: verification.userId,
+      documentId: verification.userId as string,
       data: {
         'profile.verificationStatus': params.status,
         'profile.verifiedAt': params.status === 'verified' ? new Date().toISOString() : null,

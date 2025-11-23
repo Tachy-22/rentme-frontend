@@ -35,7 +35,7 @@ export async function getConversations() {
     // Enrich conversations with participant details
     const enrichedConversations = await Promise.all(
       result.data.map(async (conversation: Record<string, unknown>) => {
-        const otherParticipantId = conversation.participants.find((id: string) => id !== userId);
+        const otherParticipantId = (conversation.participants as string[]).find((id: string) => id !== userId);
         
         if (!otherParticipantId) {
           return conversation;
@@ -58,11 +58,11 @@ export async function getConversations() {
           otherParticipant = {
             id: otherParticipantId,
             name: fullName,
-            profilePicture: userData.profile?.profilePicture || null,
+            profilePicture: (userData.profile as Record<string, unknown>)?.profilePicture as string || null,
             role: userData.role,
-            verificationStatus: userData.profile?.verificationStatus || 'unverified',
+            verificationStatus: (userData.profile as Record<string, unknown>)?.verificationStatus as string || 'unverified',
             isOnline: userData.lastSeen ? 
-              (new Date().getTime() - new Date(userData.lastSeen).getTime()) < 300000 : false // 5 minutes
+              (new Date().getTime() - new Date(userData.lastSeen as string).getTime()) < 300000 : false // 5 minutes
           };
         }
 
@@ -71,7 +71,7 @@ export async function getConversations() {
         if (conversation.propertyId) {
           const propertyResult = await getDocument({
             collectionName: 'properties',
-            documentId: conversation.propertyId
+            documentId: conversation.propertyId as string
           });
 
           if (propertyResult.success && propertyResult.data) {
@@ -88,7 +88,7 @@ export async function getConversations() {
           ...conversation,
           otherParticipant,
           property,
-          unreadCount: conversation.unreadCount?.[userId] || 0
+          unreadCount: (conversation.unreadCount as Record<string, number>)?.[userId] || 0
         };
       })
     );

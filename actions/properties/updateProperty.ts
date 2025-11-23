@@ -93,7 +93,7 @@ export async function updateProperty(params: UpdatePropertyParams) {
 
       // Remove specified images
       if (updates.removeImages && updates.removeImages.length > 0) {
-        currentImages = currentImages.filter((img: Record<string, unknown>) => 
+        currentImages = (currentImages as Record<string, unknown>[]).filter((img: Record<string, unknown>) => 
           !updates.removeImages!.includes(img.url as string)
         );
       }
@@ -104,7 +104,7 @@ export async function updateProperty(params: UpdatePropertyParams) {
           try {
             const uploadResult = await uploadImage(image);
             if (uploadResult.success && uploadResult.url) {
-              currentImages.push({
+              (currentImages as any[]).push({
                 url: uploadResult.url,
                 publicId: uploadResult.publicId || '',
                 width: 800,
