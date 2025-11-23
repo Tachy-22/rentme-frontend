@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SetStateAction } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -396,7 +396,7 @@ export default function PropertyManagement() {
                       variant="outline"
                       onClick={() => {
                         setSelectedProperty(property);
-                        setNewStatus((property as Record<string, unknown>).status as PropertyStatus);
+                        setNewStatus((property as Property).status as PropertyStatus);
                         setShowStatusDialog(true);
                       }}
                     >
@@ -437,7 +437,7 @@ export default function PropertyManagement() {
               <label className="text-sm font-medium">New Status</label>
               <select
                 value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
+                onChange={(e) => setNewStatus(e.target.value as SetStateAction<"" | PropertyStatus>)}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 <option value="available">Available</option>
