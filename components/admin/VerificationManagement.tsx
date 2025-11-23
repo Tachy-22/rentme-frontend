@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, SetStateAction } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,7 +85,7 @@ export default function VerificationManagement() {
     try {
       const result = await getAllVerificationRequests();
       if (result.success && result.data) {
-        setRequests(result.data);
+        setRequests(result.data as SetStateAction<VerificationRequest[]>);
       } else {
         toast.error('Failed to load verification requests');
       }
