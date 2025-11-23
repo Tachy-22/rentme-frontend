@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, PropertyType } from '@/types';
+import { User, PropertyType, Property } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,10 +69,10 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
     bathrooms: property.details?.bathrooms?.toString() || '1',
     area: property.details?.area?.value?.toString() || '',
     areaUnit: property.details?.area?.unit || 'sqm',
-    furnished: property.furnished || false,
-    availableFrom: property.availableFrom || '',
-    leaseDurationMin: property.leaseDuration?.min?.toString() || '6',
-    leaseDurationMax: property.leaseDuration?.max?.toString() || '12',
+    furnished: property.details.furnished || false,
+    availableFrom: property.details.availableFrom || '',
+    leaseDurationMin: property.details.leaseDuration?.min?.toString() || '6',
+    leaseDurationMax: property.details.leaseDuration?.max?.toString() || '12',
     
     // Step 3: Images & Description
     description: property.description || '',
@@ -394,7 +394,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
                         onChange={(e) => setFormData(prev => ({ ...prev, area: e.target.value }))}
                         placeholder="85"
                       />
-                      <Select value={formData.areaUnit} onValueChange={(value) => setFormData(prev => ({ ...prev, areaUnit: value }))}>
+                      <Select value={formData.areaUnit} onValueChange={(value) => setFormData(prev => ({ ...prev, areaUnit: value as "sqm" | "sqft" }))}>
                         <SelectTrigger className="w-24">
                           <SelectValue />
                         </SelectTrigger>
