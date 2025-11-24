@@ -119,6 +119,7 @@ export default function OnboardingPage() {
           },
           savedSearches: [],
           viewedProperties: [],
+          verificationStatus: 'pending' as const,
         };
       } else {
         profile = {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User } from '@/types';
+import { User, RenterProfile } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,7 +39,7 @@ export default function ApplicationFormClient({ user, property }: ApplicationFor
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const renterProfile = user.role === 'renter' ? user.profile : null;
+  const renterProfile = user.role === 'renter' ? (user.profile as RenterProfile) : null;
 
   const [formData, setFormData] = useState({
     personalInfo: {

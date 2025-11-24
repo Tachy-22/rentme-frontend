@@ -45,7 +45,7 @@ export function useRealTimeMessages({ conversationId, userId }: UseRealTimeMessa
     try {
       const result = await getMessages({ conversationId: convId });
       if (result.success && result.data) {
-        setMessages(result.data);
+        setMessages(result.data as unknown as Message[]);
       }
     } catch (error) {
       console.error('Error loading initial messages:', error);

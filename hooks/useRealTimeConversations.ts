@@ -45,7 +45,7 @@ export function useRealTimeConversations({ userId, initialConversations }: UseRe
     try {
       const result = await getConversations();
       if (result.success && result.data) {
-        setConversations(result.data);
+        setConversations(result.data as unknown as Conversation[]);
       }
     } catch (error) {
       console.error('Error loading conversations:', error);

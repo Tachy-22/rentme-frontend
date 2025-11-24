@@ -268,7 +268,7 @@ export default function ApplicationsClient({ user, initialApplications }: Applic
                         <div className="flex items-center gap-2">
                           <UserIcon className="w-4 h-4 text-muted-foreground" />
                           <span className="text-muted-foreground">Agent:</span>
-                          <span>{application.property?.agent?.firstName} {application.property?.agent?.lastName}</span>
+                          <span>{application.property?.agent?.name}</span>
                         </div>
                       )}
                       

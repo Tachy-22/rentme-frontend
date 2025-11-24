@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import { getProperty } from '@/actions/properties/getProperty';
 import EditPropertyPage from '@/components/agent/EditPropertyPage';
+import { Property } from '@/types';
 import { redirect } from 'next/navigation';
 
 export default async function PropertyEditPage({ params }: { params: { id: string } }) {
@@ -30,5 +31,5 @@ export default async function PropertyEditPage({ params }: { params: { id: strin
     redirect('/agent/properties');
   }
 
-  return <EditPropertyPage user={user} property={property} />;
+  return <EditPropertyPage user={user} property={property as unknown as Property} />;
 }

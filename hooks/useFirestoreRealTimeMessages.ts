@@ -38,12 +38,13 @@ export function useFirestoreRealTimeMessages({ conversationId, userId }: UseFire
 
   // Get sender details from Firestore
   const enrichMessageWithSender = async (message: Record<string, unknown>): Promise<Message> => {
+    const senderId = message.senderId as string;
     try {
-      const userDoc = await getDoc(doc(db, 'users', message.senderId));
+      const userDoc = await getDoc(doc(db, 'users', senderId));
       let sender = {
-        id: message.senderId,
+        id: senderId,
         name: 'Unknown User',
-        profilePicture: null,
+        profilePicture: undefined,
         role: 'user',
         verificationStatus: 'unverified'
       };
@@ -55,33 +56,45 @@ export function useFirestoreRealTimeMessages({ conversationId, userId }: UseFire
         const fullName = `${firstName} ${lastName}`.trim() || userData.name || 'Unknown User';
         
         sender = {
-          id: message.senderId,
+          id: senderId,
           name: fullName,
-          profilePicture: userData.profile?.profilePicture || null,
+          profilePicture: userData.profile?.profilePicture || undefined,
           role: userData.role,
           verificationStatus: userData.profile?.verificationStatus || 'unverified'
         };
       }
 
       return {
-        ...message,
-        id: message.id,
+        id: message.id as string,
+        conversationId: message.conversationId as string,
+        senderId,
+        content: message.content as string,
+        type: (message.type as 'text' | 'image' | 'file') || 'text',
+        attachmentUrl: message.attachmentUrl as string,
+        sentAt: message.sentAt as string,
+        isRead: Boolean(message.isRead),
         sender,
-        isOwn: message.senderId === userId
+        isOwn: senderId === userId
       };
     } catch (error) {
       console.error('Error enriching message with sender:', error);
       return {
-        ...message,
-        id: message.id,
+        id: message.id as string,
+        conversationId: message.conversationId as string,
+        senderId,
+        content: message.content as string,
+        type: (message.type as 'text' | 'image' | 'file') || 'text',
+        attachmentUrl: message.attachmentUrl as string,
+        sentAt: message.sentAt as string,
+        isRead: Boolean(message.isRead),
         sender: {
-          id: message.senderId,
+          id: senderId,
           name: 'Unknown User',
-          profilePicture: null,
+          profilePicture: undefined,
           role: 'user',
           verificationStatus: 'unverified'
         },
-        isOwn: message.senderId === userId
+        isOwn: senderId === userId
       };
     }
   };
