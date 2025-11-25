@@ -1,4 +1,4 @@
-import { User, UserRole } from '@/types';
+import { User } from '@/types';
 
 export interface AccessRules {
   canMessageAgents: boolean;
