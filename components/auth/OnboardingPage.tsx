@@ -20,20 +20,14 @@ const NIGERIAN_UNIVERSITIES = [
   'University of Lagos (UNILAG)',
   'University of Ibadan (UI)',
   'Obafemi Awolowo University (OAU)',
-  'University of Nigeria, Nsukka (UNN)',
-  'Ahmadu Bello University (ABU)',
-  'University of Benin (UNIBEN)',
   'Lagos State University (LASU)',
   'Federal University of Technology, Akure (FUTA)',
-  'University of Port Harcourt (UNIPORT)',
-  'Covenant University',
-  'Babcock University',
-  'Other'
+ 
+ 
 ];
 
 const NIGERIAN_STATES = [
-  'Lagos', 'Abuja', 'Kano', 'Oyo', 'Rivers', 'Kaduna', 'Ogun', 'Imo', 'Plateau', 
-  'Kwara', 'Anambra', 'Borno', 'Delta', 'Osun', 'Edo', 'Sokoto', 'Other'
+  'Lagos', 'Ondo', 'Oyo'
 ];
 
 export default function OnboardingPage() {
@@ -312,7 +306,7 @@ export default function OnboardingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="budgetMin" className="text-white text-sm md:text-base">Min Budget (₦/month)</Label>
+                  <Label htmlFor="budgetMin" className="text-white text-sm md:text-base">Min Budget (₦/year)</Label>
                   <Input
                     id="budgetMin"
                     type="number"

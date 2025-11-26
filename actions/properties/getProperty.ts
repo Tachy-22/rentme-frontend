@@ -39,7 +39,7 @@ export async function getProperty(propertyId: string) {
       isSaved: false, // Will be determined per user
       agent: {
         id: property.agentId,
-        name: 'Agent Name', // Will be fetched separately
+        name: property.agentId, // Will be fetched separately
         profilePicture: '',
         rating: 4.5,
         verificationStatus: 'verified'

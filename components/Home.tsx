@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { useRef, useState, useEffect, ReactNode } from "react";
 import {
     DraggableCardBody,
@@ -83,7 +83,7 @@ function StoryCard({ story, index }: StoryCardProps) {
                 rotateY: cardRotateY,
                 transformStyle: "preserve-3d",
             }}
-            className="flex-none w-[300px] md:w-[450px] h-[400px] md:h-[550px] relative cursor-pointer"
+            className="flex-none w-screen sm:w-[320px] md:w-[450px] h-[550px] relative cursor-pointer"
             whileHover={{ scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
         >
@@ -357,7 +357,21 @@ export default function Home() {
         offset: ["start start", "end end"]
     });
 
-    const bookX = useTransform(bookScrollProgress.scrollYProgress, [0, 1], ["1%", "-95%"]);
+    // Calculate responsive transform values
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const bookX = useTransform(
+        bookScrollProgress.scrollYProgress,
+        [0, 1],
+        isMobile ? ["0%", "-83%"] : ["1%", "-95%"]
+    );
 
 
     // Image sequence frame calculation
@@ -373,14 +387,14 @@ export default function Home() {
     const getImageUrl = (frame: number) => {
         // Using different Unsplash images to simulate frame sequence
         const imageIds = [
-            "photo-1441974231531-c6227db76b6e", // Forest
-            "photo-1506905925346-21bda4d32df4", // Mountain
-            "photo-1506905925346-21bda4d32df4", // Mountain
-            "photo-1441974231531-c6227db76b6e", // Forest
+            "students_searching_the_rentme_platform.png", // Forest
+            "students_searching_the_rentme_platform.png", // Mountain
+            "student_meeting_agents.png", // Mountain
+            "student_moving_in.png", // Forest
         ];
         const imageIndex = Math.floor((frame / totalFrames) * imageIds.length);
         const selectedId = imageIds[Math.min(imageIndex, imageIds.length - 1)];
-        return `https://images.unsplash.com/${selectedId}?w=1200&h=800&fit=crop&crop=center`;
+        return `${selectedId}`;
     };
 
     const navItems = [
@@ -798,8 +812,9 @@ export default function Home() {
 
                 {/* Horizontal Scroll - Book Opening Animation */}
                 <section
+                    id="stories"
                     ref={bookSectionRef}
-                    className="relative h-[300vh] bg-black"
+                    className="relative h-[400vh] md:h-[300vh] bg-black"
                 >
                     <div className="sticky top-0 flex h-screen items-center overflow-hidden">
                         <div className="w-full">
@@ -822,7 +837,7 @@ export default function Home() {
                             {/* Horizontal scrolling container */}
                             <motion.div
                                 style={{ x: bookX }}
-                                className="flex gap-4 md:gap-8"
+                                className="flex gap-4 md:gap-8 w-max"
                             >
                                 {[
                                     {
@@ -830,7 +845,7 @@ export default function Home() {
                                         title: "The Search",
                                         subtitle: "Every journey begins with a dream",
                                         content: "Thousands of students across Nigeria begin their quest for independence, seeking that perfect place to call home.",
-                                        image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=800&fit=crop&crop=center",
+                                        image: "the_search.png",
                                     },
                                     {
                                         page: 2,
@@ -844,28 +859,28 @@ export default function Home() {
                                         title: "The Discovery",
                                         subtitle: "Finding home in unexpected places",
                                         content: "From cozy studios near UNILAG to spacious apartments around UI campus, every student finds their match.",
-                                        image: "https://images.unsplash.com/photo-1571055107559-3e67626fa8be?w=600&h=800&fit=crop&crop=center",
+                                        image: "the_discovery.png",
                                     },
                                     {
                                         page: 4,
                                         title: "The Negotiation",
                                         subtitle: "Fair deals, transparent process",
                                         content: "Secure negotiations, transparent pricing, and digital contracts ensure every student gets the best deal possible.",
-                                        image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&h=800&fit=crop&crop=center",
+                                        image: "the_negociation.png",
                                     },
                                     {
                                         page: 5,
                                         title: "The Beginning",
                                         subtitle: "Where memories are made",
                                         content: "Move-in day arrives, keys are exchanged, and another student begins their journey of growth and independence.",
-                                        image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=600&h=800&fit=crop&crop=center",
+                                        image: "the_begining.png",
                                     },
                                     {
                                         page: 6,
                                         title: "Your Chapter",
                                         subtitle: "Ready to write your story?",
                                         content: "Join thousands who have found their perfect accommodation through Rentme. Your perfect home awaits.",
-                                        image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=800&fit=crop&crop=center",
+                                        image: "your_chapter.png",
                                     }
                                 ].map((story, index) => {
                                     return (
@@ -933,12 +948,14 @@ export default function Home() {
                 </section>
 
                 {/* Trippy Scroll Section */}
-                <TrippyScroll />
+                {/* <TrippyScroll /> */}
                 {/* Text Parallax Section */}
-                <TextParallaxContentExample />
+                <section id="features">
+                    <TextParallaxContentExample />
+                </section>
 
                 {/* Product Features - Scroll-driven reveals */}
-                <section className="py-8 ">
+                <section id="how-it-works" className="py-8 ">
                     <div className="max-w-7xl mx-auto px-4 md:px-8">
                         {/* Section header */}
                         <motion.div
@@ -961,7 +978,7 @@ export default function Home() {
                             {[
                                 {
                                     title: "Create Your Profile",
-                                    description: "Join as a verified student with your university email. Set your preferences, budget, and location near your campus.",
+                                    description: "Join as a verified student with your gmail. Set your preferences, budget, and location near your campus Then verify your self by submitting your Student Id",
                                     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop&crop=center",
                                     reverse: false
                                 },
@@ -973,7 +990,7 @@ export default function Home() {
                                 },
                                 {
                                     title: "Secure Your Home",
-                                    description: "Complete secure payments, sign digital contracts, and get your keys. Move into your perfect student accommodation.",
+                                    description: "Complete secure payments directly with the agents, sign contracts, and get your keys. Move into your perfect student accommodation.",
                                     image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&h=600&fit=crop&crop=center",
                                     reverse: false
                                 }
@@ -1038,7 +1055,7 @@ export default function Home() {
                 </section>
 
                 {/* Student Stories - Draggable Cards */}
-                <section className="py-16 md:py-20 bg-gray-900/30 relative">
+                <section className="py-16 md:py-20 bg-gray-900/30 relative overflow-x-hidden max-w-screen">
                     <motion.div
                         className="text-center mb-12 md:mb-16 relative z-20 px-4"
                         initial={{ opacity: 0, y: 30 }}
@@ -1047,10 +1064,10 @@ export default function Home() {
                         viewport={{ once: true }}
                     >
                         <h2 className="text-3xl md:text-5xl lg:text-6xl font-thin mb-4 md:mb-6">
-                            Student Success Stories
+                            Industry Recognition
                         </h2>
                         <p className="text-lg md:text-xl text-gray-400">
-                            Real students, real experiences with Rentme
+                            Quotes from real estate giants
                         </p>
                     </motion.div>
 
@@ -1079,9 +1096,9 @@ export default function Home() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                             {[
-                                { label: "Active Students", value: "25K+", unit: "Verified" },
-                                { label: "Partner Agents", value: "500+", unit: "Trusted" },
-                                { label: "Universities", value: "50+", unit: "Campuses" },
+                                { label: "Active Students", value: "100+", unit: "Verified" },
+                                { label: "Partner Agents", value: "20+", unit: "Trusted" },
+                                { label: "Universities", value: "1", unit: "Campuses" },
                                 { label: "Success Rate", value: "96%", unit: "Matched" }
                             ].map((spec, index) => (
                                 <motion.div
@@ -1115,7 +1132,7 @@ export default function Home() {
                 </section>
 
                 {/* Final CTA */}
-                <section className="py-16 md:py-20">
+                <section id="contact" className="py-16 md:py-20">
                     <motion.div
                         className="text-center max-w-4xl mx-auto px-4 md:px-8"
                         initial={{ opacity: 0, y: 30 }}
@@ -1127,7 +1144,7 @@ export default function Home() {
                             Ready to Find Your Home?
                         </h2>
                         <p className="text-lg md:text-xl text-gray-400 mb-8 md:mb-12 leading-relaxed">
-                            Join thousands of students who&apos;ve already found their perfect
+                            Join students who&apos;ve already found their perfect
                             <br />
                             off-campus accommodation through Rentme.
                         </p>
@@ -1161,7 +1178,7 @@ export default function Home() {
                                 <h3 className="font-medium mb-4">For Students</h3>
                                 <div className="space-y-2 text-sm text-gray-400">
                                     <motion.a
-                                        href="#"
+                                        href="/auth"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1169,7 +1186,7 @@ export default function Home() {
                                         Browse Listings
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="#how-it-works"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1177,7 +1194,7 @@ export default function Home() {
                                         How It Works
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="#features"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1191,7 +1208,7 @@ export default function Home() {
                                 <h3 className="font-medium mb-4">For Agents</h3>
                                 <div className="space-y-2 text-sm text-gray-400">
                                     <motion.a
-                                        href="#"
+                                        href="/auth"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1199,7 +1216,7 @@ export default function Home() {
                                         List Property
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="#features"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1207,7 +1224,7 @@ export default function Home() {
                                         Agent Resources
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="#stories"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1221,7 +1238,7 @@ export default function Home() {
                                 <h3 className="font-medium mb-4">Support</h3>
                                 <div className="space-y-2 text-sm text-gray-400">
                                     <motion.a
-                                        href="#"
+                                        href="/help"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1229,7 +1246,9 @@ export default function Home() {
                                         Help Center
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="https://wa.me/2348146225874"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1237,7 +1256,9 @@ export default function Home() {
                                         Contact Us
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="https://wa.me/2348146225874"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1251,7 +1272,7 @@ export default function Home() {
                                 <h3 className="font-medium mb-4">Legal</h3>
                                 <div className="space-y-2 text-sm text-gray-400">
                                     <motion.a
-                                        href="#"
+                                        href="/privacy"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1259,7 +1280,7 @@ export default function Home() {
                                         Privacy
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="/terms"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1267,7 +1288,7 @@ export default function Home() {
                                         Terms
                                     </motion.a>
                                     <motion.a
-                                        href="#"
+                                        href="/security"
                                         className="block hover:text-white transition-colors"
                                         whileHover={{ x: 5 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -1295,74 +1316,6 @@ export default function Home() {
     );
 }
 
-const TrippyScroll = () => {
-    const targetRef = useRef<HTMLDivElement | null>(null);
-    const { scrollYProgress } = useScroll({
-        target: targetRef,
-    });
-
-    const rotate = useTransform(scrollYProgress, [0, 1], ["0deg", "90deg"]);
-
-    return (
-        <div ref={targetRef} className="relative z-0 h-[800vh] bg-neutral-200">
-            <div className="sticky top-0 h-screen bg-white">
-                <Trippy rotate={rotate} />
-            </div>
-        </div>
-    );
-};
-
-const NUM_SECTIONS = 25;
-const PADDING = `${100 / NUM_SECTIONS / 2}vmin`;
-
-const generateSections = (
-    count: number,
-    color: string,
-    rotate: MotionValue<string>
-) => {
-    if (count === NUM_SECTIONS) {
-        return <></>;
-    }
-
-    const nextColor = color === "black" ? "white" : "black";
-
-    return (
-        <Section rotate={rotate} background={color}>
-            {generateSections(count + 1, nextColor, rotate)}
-        </Section>
-    );
-};
-
-const Trippy = ({ rotate }: { rotate: MotionValue<string> }) => {
-    return (
-        <motion.div className="absolute inset-0 overflow-hidden bg-black">
-            {generateSections(0, "black", rotate)}
-        </motion.div>
-    );
-};
-
-const Section = ({
-    background,
-    children,
-    rotate,
-}: {
-    background: string;
-    rotate: MotionValue<string>;
-    children?: React.ReactNode;
-}) => {
-    return (
-        <motion.div
-            className="relative h-full w-full origin-center"
-            style={{
-                background,
-                rotate,
-                padding: PADDING,
-            }}
-        >
-            {children}
-        </motion.div>
-    );
-};
 
 const TextParallaxContentExample = () => {
     return (
@@ -1374,8 +1327,9 @@ const TextParallaxContentExample = () => {
             >
                 <RentmeContent
                     title="Student Verification System"
-                    description="Every student on Rentme is verified through their university email and student ID. This ensures that agents are connecting with genuine students, creating a safer marketplace for everyone."
-                    buttonText="Learn About Verification"
+                    description="Every student on Rentme is verified through their university details and student ID. This ensures that agents are connecting with genuine students, creating a safer marketplace for everyone."
+                // buttonText="Learn About Verification"
+                // buttonLink="/features"
                 />
             </TextParallaxContent>
             <TextParallaxContent
@@ -1386,7 +1340,8 @@ const TextParallaxContentExample = () => {
                 <RentmeContent
                     title="Trusted Real Estate Agents"
                     description="We partner only with licensed and verified real estate agents across Nigerian universities. Each agent undergoes thorough background checks and maintains high ratings from students."
-                    buttonText="View Partner Agents"
+                // buttonText="View Partner Agents"
+                // buttonLink="/auth"
                 />
             </TextParallaxContent>
             <TextParallaxContent
@@ -1398,6 +1353,7 @@ const TextParallaxContentExample = () => {
                     title="Quality Accommodations"
                     description="From modern studios to shared apartments, every listing is verified for quality, safety, and proximity to campus. Find your perfect student accommodation with confidence."
                     buttonText="Browse Listings"
+                    buttonLink="/auth"
                 />
             </TextParallaxContent>
         </div>
@@ -1502,11 +1458,13 @@ const OverlayCopy = ({
 const RentmeContent = ({
     title,
     description,
-    buttonText
+    buttonText,
+    buttonLink
 }: {
     title: string;
     description: string;
-    buttonText: string;
+    buttonText?: string;
+    buttonLink?: string;
 }) => (
     <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 pb-24 pt-12 md:grid-cols-12">
         <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-black">
@@ -1516,9 +1474,12 @@ const RentmeContent = ({
             <p className="mb-8 text-xl text-neutral-600 md:text-2xl leading-relaxed">
                 {description}
             </p>
-            <button className="w-full rounded bg-neutral-900 px-9 py-4 text-xl text-white transition-colors hover:bg-neutral-700 md:w-fit">
+            {buttonText && <a
+                href={buttonLink}
+                className="inline-block w-full rounded bg-neutral-900 px-9 py-4 text-xl text-white transition-colors hover:bg-neutral-700 md:w-fit text-center"
+            >
                 {buttonText} <span className="inline ml-2">→</span>
-            </button>
+            </a>}
         </div>
     </div>
 );
@@ -1594,7 +1555,7 @@ const DraggableTestimonials = () => {
     const testimonials = [
         {
             name: "Adaora Okwu",
-            university: "University of Lagos",
+            university: "FUTA",
             course: "Engineering",
             quote: "Rentme made finding accommodation so easy! The agents were verified and trustworthy.",
             image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=400&h=400&fit=crop&crop=face",
@@ -1657,11 +1618,11 @@ const DraggableTestimonials = () => {
                 <DraggableCardBody key={index} className={testimonial.className}>
                     <div className="bg-white rounded-2xl p-4 shadow-2xl w-full h-full backdrop-blur-sm">
                         <div className="flex items-center mb-4">
-                            <img
+                            {/* <img
                                 src={testimonial.image}
                                 alt={testimonial.name}
                                 className="w-16 h-16 rounded-full object-cover mr-4"
-                            />
+                            /> */}
                             <div>
                                 <h3 className="text-lg font-bold text-gray-900">{testimonial.name}</h3>
                                 <p className="text-sm text-gray-600">{testimonial.course}</p>

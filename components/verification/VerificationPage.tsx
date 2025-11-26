@@ -27,7 +27,8 @@ import {
   FileText,
   Shield,
   AlertCircle,
-  User as UserIcon
+  User as UserIcon,
+  ArrowLeft
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getVerificationStatus } from '@/lib/access-control';
@@ -41,14 +42,8 @@ const NIGERIAN_UNIVERSITIES = [
   'University of Lagos (UNILAG)',
   'University of Ibadan (UI)',
   'Obafemi Awolowo University (OAU)',
-  'University of Nigeria, Nsukka (UNN)',
-  'Ahmadu Bello University (ABU)',
-  'University of Benin (UNIBEN)',
   'Lagos State University (LASU)',
   'Federal University of Technology, Akure (FUTA)',
-  'University of Port Harcourt (UNIPORT)',
-  'Covenant University',
-  'Babcock University',
   'Other'
 ];
 
@@ -367,6 +362,23 @@ export default function VerificationPage({ user }: VerificationPageProps) {
       <div className="p-6 lg:p-8 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  window.location.href = user.role === 'renter' ? '/dashboard' : '/agent/dashboard';
+                }
+              }}
+              className="p-2"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </div>
           <h1 className="text-3xl font-bold">Account Verification</h1>
           <p className="text-muted-foreground">
             Verify your {user.role} account to unlock full platform features

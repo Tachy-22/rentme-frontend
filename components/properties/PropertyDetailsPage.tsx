@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { User, Property, CloudinaryImage } from '@/types';
+import { Property, CloudinaryImage } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -43,13 +43,11 @@ interface PropertyDetailsPageProps {
       responseTime?: number;
     };
   };
-  user: User;
 }
 
 
-export default function PropertyDetailsPage({ property, user }: PropertyDetailsPageProps) {
+export default function PropertyDetailsPage({ property }: PropertyDetailsPageProps) {
   const [isSaved, setIsSaved] = useState(property?.isSaved || false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleSaveToggle = () => {
     setIsSaved(!isSaved);
@@ -210,7 +208,7 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
               <Avatar className="h-12 w-12">
                 <AvatarImage src={property.agent?.profilePicture} />
                 <AvatarFallback>
-                  {property.agent?.name.split(' ').map((n: string) => n[0]).join('')}
+                  {property.agent?.name?.split(' ').map((n: string) => n[0]).join('') || 'A'}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -346,7 +344,7 @@ export default function PropertyDetailsPage({ property, user }: PropertyDetailsP
               <Avatar className="h-12 w-12">
                 <AvatarImage src={property.agent?.profilePicture} />
                 <AvatarFallback>
-                  {property.agent?.name.split(' ').map((n: string) => n[0]).join('')}
+                  {property.agent?.name?.split(' ').map((n: string) => n[0]).join('') || 'A'}
                 </AvatarFallback>
               </Avatar>
               <div>

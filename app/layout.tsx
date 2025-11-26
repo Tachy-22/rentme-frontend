@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} font-sans antialiased`}
+        className={`${inter.variable} font-sans antialiased overflow-x-hidden max-w-screen`}
       >
         <ThemeProvider
           defaultTheme="system"

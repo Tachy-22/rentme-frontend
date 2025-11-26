@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+html {
+  scroll-behavior: smooth;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -119,4 +123,21 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* --- UNIVERSAL SCROLLBAR HIDING SOLUTION --- */
+
+/* 1. Target WebKit-based browsers (Chrome, Safari, Edge, Opera) for all elements */
+*::-webkit-scrollbar {
+    display: none;
+}
+
+/* 2. Target Firefox (using the 'html' element for the main window) */
+html {
+    scrollbar-width: none;
+}
+
+/* 3. Target Internet Explorer/Older Edge (using the 'body' element for the main window) */
+body {
+    -ms-overflow-style: none;
 }

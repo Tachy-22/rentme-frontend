@@ -121,6 +121,7 @@ export default function MessagesPage({
     scrollToBottom();
   }, [messages]);
 
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -155,16 +156,13 @@ export default function MessagesPage({
       return;
     }
 
-    if (accessRules.messageLimit !== undefined) {
-      toast.error(`Message limit reached. Unverified ${user.role}s can send up to ${accessRules.messageLimit} messages per week.`);
-      return;
-    }
 
     const success = await sendRealTimeMessage(newMessage.trim());
     if (success) {
       setNewMessage('');
       // Reload conversations to update last message
       loadConversations();
+      
     }
   };
 
@@ -439,16 +437,7 @@ export default function MessagesPage({
 
               {/* Message Input */}
               <div className="p-3 md:p-4 border-t bg-card">
-                {accessRules.messageLimit !== undefined && (
-                  <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-800">
-                      ⚠️ Unverified {user?.role}s can send up to {accessRules.messageLimit} messages per week.
-                      <Button variant="link" className="p-0 h-auto ml-1 text-yellow-800" asChild>
-                        <a href="/verification">Get verified</a>
-                      </Button> for unlimited messaging.
-                    </p>
-                  </div>
-                )}
+            
 
                 <div className="flex items-end gap-2 md:gap-3">
                   <div className="flex-1">
@@ -467,13 +456,13 @@ export default function MessagesPage({
                     />
                   </div>
 
-                  <Button size="sm" variant="outline" disabled className="h-10 w-10 md:h-9 md:w-auto md:px-3">
+                  {/* <Button size="sm" variant="outline" disabled className="h-10 w-10 md:h-9 md:w-auto md:px-3">
                     <Paperclip className="w-4 h-4" />
                   </Button>
 
                   <Button size="sm" variant="outline" disabled className="h-10 w-10 md:h-9 md:w-auto md:px-3">
                     <ImageIcon className="w-4 h-4" />
-                  </Button>
+                  </Button> */}
 
                   <Button
                     size="sm"

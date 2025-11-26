@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
   const userId = request.cookies.get('user-id')?.value;
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/auth', '/auth/onboarding'];
+  const publicRoutes = ['/', '/auth', '/auth/onboarding', '/help', '/privacy', '/terms', '/security'];
   
   if (publicRoutes.includes(pathname)) {
     // If user is authenticated and trying to access auth pages, redirect to dashboard

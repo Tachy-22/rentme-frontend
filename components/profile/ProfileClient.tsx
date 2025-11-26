@@ -68,10 +68,10 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       setIsLoading(false);
     }
   };
-
+//image
   const handleCancel = () => {
     setFormData({
-      firstName: user.profile?.firstName || '',
+      firstName: user.profile?.firstName || user.profile?.firstName ||'',
       lastName: user.profile?.lastName || '',
       phone: user.profile?.phone || '',
       dateOfBirth: user.profile?.dateOfBirth || '',

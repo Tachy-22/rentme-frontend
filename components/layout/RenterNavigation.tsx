@@ -112,12 +112,12 @@ export default function RenterNavigation() {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="relative">
+              {/* <Button variant="ghost" size="sm" className="relative">
                 <Bell className="w-4 h-4" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-[10px] flex items-center justify-center text-white">
                   3
                 </span>
-              </Button>
+              </Button> */}
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

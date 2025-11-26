@@ -63,7 +63,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   const [isSaved, setIsSaved] = useState(property.isSaved);
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showMessageModal, setShowMessageModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   const accessRules = getUserAccessRules(user);
@@ -149,21 +148,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       return;
     }
 
-    // Check message limits
-    if (accessRules.messageLimit) {
-      setShowMessageModal(true);
-      return;
-    }
+    // Check message limits - need to get current message count
+    // For now, allow messaging and handle limits in the messaging interface
+    // TODO: Implement proper message count tracking
 
     // Redirect to messages with agent and property context
     window.location.href = `/messages?agent=${property.agent?.id || property.agentId || 'unknown'}&property=${property.id}`;
   };
 
-  const handleReport = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toast.info('Report functionality coming soon');
-  };
 
   return (
     <>
@@ -309,15 +301,15 @@ export default function PropertyCard({ property }: PropertyCardProps) {
                   ₦{property.price.amount.toLocaleString()}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  per {property.price.period}
+                  per year
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={property.agent.profilePicture} />
                   <AvatarFallback className="text-xs">
-                    {property.agent.name.split(' ').map(n => n[0]).join('')}
+                    {property.agent.name?.split(' ').map(n => n[0]).join('') || 'A'}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-right">
@@ -327,7 +319,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
                     <span>{property.agent.rating}</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Action Buttons */}
@@ -362,23 +354,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
       </Link>
     </Card>
 
-    {/* Message Limit Modal */}
-    <AlertDialog open={showMessageModal} onOpenChange={setShowMessageModal}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Message Limit Reached</AlertDialogTitle>
-          <AlertDialogDescription>
-            Unverified renters can send up to 3 messages per week. Get verified to unlock unlimited messaging and priority support.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Link href="/verification">Get Verified</Link>
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
 
     {/* Verification Required Modal */}
     <AlertDialog open={showVerificationModal} onOpenChange={setShowVerificationModal}>

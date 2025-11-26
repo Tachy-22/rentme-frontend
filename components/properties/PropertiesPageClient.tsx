@@ -49,7 +49,7 @@ interface PropertiesPageClientProps {
 
 const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
 const AMENITIES = ['WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 'Security', 'Gym', 'Pool'];
-const NIGERIAN_CITIES = ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Port Harcourt', 'Benin City', 'Kaduna', 'Ilorin'];
+const NIGERIAN_CITIES = ['Lagos', 'Abuja', 'Ondo', 'Ibadan', ];
 
 // Helper function to enhance properties with required fields
 const enhanceProperty = (property: Property): EnhancedProperty => {

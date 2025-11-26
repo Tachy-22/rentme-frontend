@@ -43,10 +43,10 @@ interface RenterDashboardProps {
 }
 
 export default function RenterDashboard({ user, stats, recentActivities = [], recommendedProperties = [] }: RenterDashboardProps) {
-  const renterProfile = user.profile as RenterProfile;
+  const renterProfile = user as unknown as RenterProfile;
   const isVerified = renterProfile?.verificationStatus || false;
   const [showVerificationBanner, setShowVerificationBanner] = useState(!isVerified);
-
+console.log({renterProfile, user})
   return (
     <div className="space-y-8 p-6 overflow-auto">
       {/* Welcome Section - No Card */}
@@ -134,7 +134,7 @@ export default function RenterDashboard({ user, stats, recentActivities = [], re
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="font-bold text-lg">
-                      ₦{property.price?.amount?.toLocaleString()}/{property.price?.period}
+                      ₦{property.price?.amount?.toLocaleString()}/ Year
                     </p>
                     <div className="text-sm text-muted-foreground">
                       {property.details?.bedrooms}BR • {property.details?.bathrooms}BA
