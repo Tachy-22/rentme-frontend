@@ -29,7 +29,7 @@ export default function HelpPage() {
                                     How do I sign up?
                                 </AccordionTrigger>
                                 <AccordionContent className="text-gray-400 text-base leading-relaxed pb-6">
-                                    Use your gmail to create an account. We'll verify your student status before granting access to listings.
+                                    Use your gmail to create an account. We&apos;ll verify your student status before granting access to listings.
                                 </AccordionContent>
                             </AccordionItem>
                             <AccordionItem value="documents" className="border-gray-700 bg-orange-200/20 rounded-lg px-6">
@@ -37,7 +37,7 @@ export default function HelpPage() {
                                     What documents do I need?
                                 </AccordionTrigger>
                                 <AccordionContent className="text-gray-400 text-base leading-relaxed pb-6">
-                                    You'll need your student ID and gmail for verification. Additional documents may be required when applying for properties.
+                                    You&apos;ll need your student ID and gmail for verification. Additional documents may be required when applying for properties.
                                 </AccordionContent>
                             </AccordionItem>
                         </div>
