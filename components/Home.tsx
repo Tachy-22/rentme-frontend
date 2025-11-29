@@ -417,7 +417,7 @@ export default function Home() {
     ];
 
     return (
-        <div className="relative w-full flex flex-col ">
+        <div className="relative w-full  flex flex-col ">
             {/* Navbar */}
             <Navbar>
                 {/* Desktop Navigation */}
@@ -595,7 +595,7 @@ export default function Home() {
                                     whileTap={{ scale: 0.95 }}
                                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 >
-                                  Join us
+                                 Register as Agent
                                 </motion.a>
                             </motion.div>
 
@@ -699,7 +699,7 @@ export default function Home() {
                 </section>
 
                 {/* Feature Text - Subtle reveal */}
-                <section className="h-[50vh] pb-40 flex items-center justify-center">
+                <section className="h-[50vh] lg:h-fit pb-40 flex items-center justify-center overflow-x-hidden">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -918,7 +918,7 @@ export default function Home() {
                 </section>
 
                 {/* Dive In Section */}
-                <section className="py-16 md:py-20 bg-black text-white">
+                <section className="py-16 md:py-20 bg-black text-white overflow-x-hidden">
                     <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
@@ -935,9 +935,11 @@ export default function Home() {
                             >
                                 Let&apos;s Dive In
                             </motion.h2>
-                            <div className="text-lg md:text-xl text-gray-400 leading-relaxed mb-8 md:mb-12 max-w-3xl mx-auto">
-                                <TextGenerateEffect words="Experience the seamless journey of finding your perfect student accommodation. Every scroll brings you closer to home. Discover verified agents, secure payments, and trusted connections across Nigerian universities." />
-                            </div>
+                            {/* <div className="text-lg md:text-xl text-gray-400 leading-relaxed mb-8 md:mb-12 max-w-3xl mx-auto">
+                                <TextGenerateEffect words="" />
+                            </div> */}
+                            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
+                                Experience the seamless journey of finding your perfect student accommodation. Every scroll brings you closer to home. Discover verified agents, secure payments, and trusted connections across Nigerian universities.                                </p>
 
                             {/* Scroll indicator */}
                             {/* <motion.div
@@ -975,12 +977,12 @@ export default function Home() {
                 {/* Trippy Scroll Section */}
                 {/* <TrippyScroll /> */}
                 {/* Text Parallax Section */}
-                <section id="features">
+                <section id="features" className="overflow-x-hidden">
                     <TextParallaxContentExample />
                 </section>
 
                 {/* Product Features - Scroll-driven reveals */}
-                <section id="how-it-works" className="py-8 ">
+                <section id="how-it-works" className="py-8 overflow-x-hidden max-w-[100vw]">
                     <div className="max-w-7xl mx-auto px-4 md:px-8">
                         {/* Section header */}
                         <motion.div
@@ -1102,7 +1104,7 @@ export default function Home() {
 
 
                 {/* Technical Specs - Apple-style layout */}
-                <section className="py-20">
+                <section className="py-20 overflow-x-hidden">
                     <div className="max-w-7xl mx-auto px-8">
                         <motion.div
                             className="text-center mb-20"
@@ -1157,7 +1159,7 @@ export default function Home() {
                 </section>
 
                 {/* Final CTA */}
-                <section id="contact" className="py-16 md:py-20">
+                <section id="contact" className="py-16 md:py-20 overflow-x-hidden">
                     <motion.div
                         className="text-center max-w-4xl mx-auto px-4 md:px-8"
                         initial={{ opacity: 0, y: 30 }}
@@ -1407,7 +1409,7 @@ const TextParallaxContent = ({
                 paddingRight: IMG_PADDING,
             }}
         >
-            <div className="relative h-[150vh]">
+            <div className="relative h-[100vh] lg:h-[100vh]">
                 <StickyImage imgUrl={imgUrl} />
                 <OverlayCopy heading={heading} subheading={subheading} />
             </div>
@@ -1437,7 +1439,7 @@ const StickyImage = ({ imgUrl }: { imgUrl: string }) => {
                 scale,
             }}
             ref={targetRef}
-            className="sticky z-0 overflow-hidden rounded-3xl"
+            className="sticky z-0 overflow-hidden rounded-3xl "
         >
             <motion.div
                 className="absolute inset-0 bg-neutral-950/70"
@@ -1493,7 +1495,7 @@ const RentmeContent = ({
     buttonText?: string;
     buttonLink?: string;
 }) => (
-    <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 pb-24 pt-12 md:grid-cols-12">
+    <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 pb-24 lg:pt-12 md:grid-cols-12">
         <h2 className="col-span-1 text-3xl font-bold md:col-span-4 text-black">
             {title}
         </h2>
