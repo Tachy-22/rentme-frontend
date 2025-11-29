@@ -472,7 +472,7 @@ export default function Home() {
                                     <NavbarButton
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         variant="secondary"
-                                        className="w-full bg-gray-100 hover:bg-gray-200 border-gray-300 text-black"
+                                        className="w-full bg-gray-100 hover:bg-gray-200 border-gray-300 !text-black"
                                         href="/waitlist"
                                     >
                                         Join Waitlist
