@@ -2,6 +2,7 @@ import { getCurrentUser } from '@/actions/auth/getCurrentUser';
 import ProfileClient from '@/components/profile/ProfileClient';
 import RenterLayout from '@/components/layout/RenterLayout';
 import { redirect } from 'next/navigation';
+import { RenterProfile } from '@/types';
 
 export default async function ProfilePage() {
   const userResult = await getCurrentUser();
@@ -15,7 +16,7 @@ export default async function ProfilePage() {
   // Profile page is available to all authenticated users
   return (
     <RenterLayout>
-      <ProfileClient user={user} />
+      <ProfileClient user={user as unknown as RenterProfile} />
     </RenterLayout>
   );
 }

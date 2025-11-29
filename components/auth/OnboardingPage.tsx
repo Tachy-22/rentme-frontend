@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
-import { UserRole, PropertyType } from '@/types';
+import { UserRole, PropertyType, RenterProfile, AgentProfile, AdminProfile } from '@/types';
 
 const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
 const NIGERIAN_UNIVERSITIES = [
@@ -60,6 +60,10 @@ export default function OnboardingPage() {
   const handleNext = () => {
     if (step === 1 && !formData.role) {
       toast.error('Please select your role');
+      return;
+    }
+    if (step === 1 && formData.role === 'renter') {
+      toast.error('Student registration is coming soon!');
       return;
     }
     if (step === 2) {
@@ -145,7 +149,7 @@ export default function OnboardingPage() {
 
       const result = await completeOnboarding({
         role: formData.role,
-        profile,
+        profile:profile as RenterProfile | AgentProfile | AdminProfile,
       });
 
       if (result.success) {
@@ -191,15 +195,25 @@ export default function OnboardingPage() {
             <div className="space-y-4">
               <Label className="text-base md:text-lg font-medium text-white">What best describes you?</Label>
               <RadioGroup value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value as UserRole })}>
-                <div className="flex items-center space-x-3 p-3 md:p-4 border border-white/10 rounded-lg hover:bg-orange-500/10 cursor-pointer transition-colors"
-                     onClick={() => setFormData({ ...formData, role: 'renter' })}>
-                  <RadioGroupItem value="renter" id="renter" className="text-orange-500 border-orange-500/30" />
+                <div className="flex items-center space-x-3 p-3 md:p-4 border border-white/10 rounded-lg bg-gray-800/50 cursor-pointer transition-colors relative hover:bg-gray-700/50"
+                     onClick={() => {
+                       toast.error('Student registration is coming soon! Join our waitlist to be notified when it\'s available.');
+                       setTimeout(() => {
+                         router.push('/waitlist');
+                       }, 1500);
+                     }}>
+                  <RadioGroupItem value="renter" id="renter" className="text-gray-500 border-gray-500/30" disabled />
                   <Label htmlFor="renter" className="flex-1 cursor-pointer">
-                    <div className="font-medium text-white text-sm md:text-base">Student Renter</div>
-                    {/* <div className="text-sm text-gray-400">
-                      Looking for accommodation near your university
-                    </div> */}
+                    <div className="font-medium text-gray-400 text-sm md:text-base">Student Renter</div>
+                    <div className="text-xs rounded px-2 text-white font-medium bg-orange-400">
+                      Coming Soon
+                    </div>
                   </Label>
+                  {/* <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
+                    <span className="text-xs text-orange-400 font-semibold bg-black/70 px-2 py-1 rounded">
+                      COMING SOON
+                    </span>
+                  </div> */}
                 </div>
                 <div className="flex items-center space-x-3 p-3 md:p-4 border border-white/10 rounded-lg hover:bg-orange-500/10 cursor-pointer transition-colors"
                      onClick={() => setFormData({ ...formData, role: 'agent' })}>

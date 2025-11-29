@@ -23,7 +23,7 @@ export default function SecurityPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Data Protection</h2>
                         <p className="text-gray-300 mb-4">
-                            We use encryption and secure protocols to protect your personal information and 
+                            We use encryption and secure protocols to protect your personal information and
                             ensure safe communication between students and agents.
                         </p>
                     </section>
@@ -31,7 +31,7 @@ export default function SecurityPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Payment Security</h2>
                         <p className="text-gray-300 mb-4">
-                            All payment transactions are processed through secure, encrypted channels with 
+                            All payment transactions are processed through secure, encrypted channels with
                             fraud protection and dispute resolution mechanisms.
                         </p>
                     </section>
@@ -39,7 +39,7 @@ export default function SecurityPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Account Security</h2>
                         <p className="text-gray-300 mb-4">
-                            We recommend using strong passwords and keeping your account information secure. 
+                            We recommend using strong passwords and keeping your account information secure.
                             Report any suspicious activity immediately.
                         </p>
                     </section>
@@ -47,7 +47,7 @@ export default function SecurityPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Verification Process</h2>
                         <p className="text-gray-300 mb-4">
-                            All users undergo identity verification to ensure a safe marketplace for students 
+                            All users undergo identity verification to ensure a safe marketplace for students
                             and legitimate real estate professionals.
                         </p>
                     </section>
@@ -61,7 +61,7 @@ export default function SecurityPage() {
             </main>
 
             <footer className="mt-20 border-t border-gray-800 py-8 text-center text-gray-500">
-                <p>© 2024 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
+                <p>© 2025 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
             </footer>
         </div>
     );

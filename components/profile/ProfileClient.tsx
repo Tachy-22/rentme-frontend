@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User } from '@/types';
+import { RenterProfile } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,29 +24,28 @@ import {
 import { toast } from 'sonner';
 
 interface ProfileClientProps {
-  user: User;
+  user: RenterProfile;
 }
 
 export default function ProfileClient({ user }: ProfileClientProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: user.profile?.firstName || '',
-    lastName: user.profile?.lastName || '',
-    phone: user.profile?.phone || '',
-    dateOfBirth: user.profile?.dateOfBirth || '',
-    address: user.profile?.address || '',
-    city: user.profile?.city || '',
-    state: user.profile?.state || '',
-    bio: user.profile?.bio || '',
-    university: user.profile?.university || '',
-    studentId: user.profile?.studentId || '',
-    preferredContactMethod: user.profile?.preferredContactMethod || 'email'
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    phone: user.phone || '',
+    dateOfBirth: user.dateOfBirth || '',
+    address: user.address || '',
+    city: user.city || '',
+    state: user.state || '',
+    bio: user.bio || '',
+    university: user.university || '',
+    studentId: user.studentId || '',
+    preferredContactMethod: user.preferredContactMethod || 'email'
   });
 
-  const profile = user.profile;
-  const isVerified = (profile && 'verificationStatus' in profile) ? profile.verificationStatus === 'verified' : false;
-
+  const isVerified = user.verificationStatus === 'verified';
+  console.log({ user })
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -68,20 +67,20 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       setIsLoading(false);
     }
   };
-//image
+  //image
   const handleCancel = () => {
     setFormData({
-      firstName: user.profile?.firstName || user.profile?.firstName ||'',
-      lastName: user.profile?.lastName || '',
-      phone: user.profile?.phone || '',
-      dateOfBirth: user.profile?.dateOfBirth || '',
-      address: user.profile?.address || '',
-      city: user.profile?.city || '',
-      state: user.profile?.state || '',
-      bio: user.profile?.bio || '',
-      university: user.profile?.university || '',
-      studentId: user.profile?.studentId || '',
-      preferredContactMethod: user.profile?.preferredContactMethod || 'email'
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      phone: user.phone || '',
+      dateOfBirth: user.dateOfBirth || '',
+      address: user.address || '',
+      city: user.city || '',
+      state: user.state || '',
+      bio: user.bio || '',
+      university: user.university || '',
+      studentId: user.studentId || '',
+      preferredContactMethod: user.preferredContactMethod || 'email'
     });
     setIsEditing(false);
   };
@@ -146,7 +145,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
           <div className="flex flex-col items-center md:items-start space-y-4">
             <div className="relative">
               <Avatar className="h-24 w-24 ring-2 ring-orange-400">
-                <AvatarImage src={profile?.profilePicture} />
+                <AvatarImage src={user.profileImageUrl} />
                 <AvatarFallback className="text-lg">
                   {formData.firstName[0]}{formData.lastName[0]}
                 </AvatarFallback>

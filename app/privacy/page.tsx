@@ -23,7 +23,7 @@ export default function PrivacyPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Information We Collect</h2>
                         <p className="text-gray-300 mb-4">
-                            We collect information you provide when creating an account, including your university email, 
+                            We collect information you provide when creating an account, including your university email,
                             student ID verification, and accommodation preferences.
                         </p>
                     </section>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">How We Use Your Information</h2>
                         <p className="text-gray-300 mb-4">
-                            Your information is used to verify your student status, match you with suitable accommodations, 
+                            Your information is used to verify your student status, match you with suitable accommodations,
                             and facilitate secure communications with real estate agents.
                         </p>
                     </section>
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Data Security</h2>
                         <p className="text-gray-300 mb-4">
-                            We implement industry-standard security measures to protect your personal information and 
+                            We implement industry-standard security measures to protect your personal information and
                             ensure secure transactions on our platform.
                         </p>
                     </section>
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
             </main>
 
             <footer className="mt-20 border-t border-gray-800 py-8 text-center text-gray-500">
-                <p>© 2024 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
+                <p>© 2025 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
             </footer>
         </div>
     );

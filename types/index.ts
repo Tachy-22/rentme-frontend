@@ -28,7 +28,6 @@ export interface RenterProfile {
   lastName: string;
   dateOfBirth: string;
   phoneNumber: string;
-
   phone: string;
   occupation: string;
   employer?: string;
@@ -65,6 +64,17 @@ export interface RenterProfile {
   university?: string;
   studentId?: string;
   preferredContactMethod?: string;
+  role?:string;
+  email?: string;
+  profileImageUrl?:string;
+  createdAt: string;
+  updatedAt?: string;
+  lastLoginAt?: string;
+  isActive?: boolean;
+  subscriptionPlan?: string;
+  totalChats?: number;
+  totalListings?: number;
+  id: string;
 }
 
 export interface AgentProfile {

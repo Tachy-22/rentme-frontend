@@ -430,8 +430,8 @@ export default function Home() {
                     </NavbarLogo>
                     <NavItems items={navItems} />
                     <div className="flex items-center gap-4 ">
-                        <NavbarButton variant="gradient" href="/auth">Login</NavbarButton>
-                        <NavbarButton variant="primary" href="/auth">Join Rentme</NavbarButton>
+                        <NavbarButton variant="gradient" href="/waitlist">Join Waitlist</NavbarButton>
+                        <NavbarButton variant="primary" href="/auth">Register as Agent</NavbarButton>
                     </div>
                 </NavBody>
 
@@ -473,9 +473,9 @@ export default function Home() {
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         variant="secondary"
                                         className="w-full bg-gray-100 hover:bg-gray-200 border-gray-300 text-black"
-                                        href="/auth"
+                                        href="/waitlist"
                                     >
-                                        Login
+                                        Join Waitlist
                                     </NavbarButton>
                                     <NavbarButton
                                         onClick={() => setIsMobileMenuOpen(false)}
@@ -483,7 +483,7 @@ export default function Home() {
                                         className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
                                         href="/auth"
                                     >
-                                        Join Rentme
+                                        Register as Agent
                                     </NavbarButton>
                                 </div>
                             </div>
@@ -574,12 +574,37 @@ export default function Home() {
                                 ))}
                             </motion.div>
 
+                            {/* Hero CTA Buttons */}
+                            <motion.div
+                                className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4 md:px-0"
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1.4, duration: 0.8 }}
+                            >
+                                <motion.a
+                                    href="/waitlist"
+                                    className="px-5 py-2 md:px-6 md:py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full text-sm md:text-base font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 text-center shadow-lg"
+                                    whileTap={{ scale: 0.95 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                >
+                                    Join Student Waitlist
+                                </motion.a>
+                                <motion.a
+                                    href="/auth"
+                                    className="px-5 py-2 md:px-6 md:py-2.5 border-2 border-white/40 text-white rounded-full text-sm md:text-base font-medium hover:border-white hover:bg-white/10 transition-all duration-300 text-center backdrop-blur-sm"
+                                    whileTap={{ scale: 0.95 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                >
+                                  Join us
+                                </motion.a>
+                            </motion.div>
+
                             {/* Enhanced scroll indicator */}
                             <motion.div
                                 className="absolute -bottom-12 translate-y-40 left-1/2 transform -translate-x-1/2"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1.5, duration: 0.8 }}
+                                transition={{ delay: 1.8, duration: 0.8 }}
                             >
                                 <motion.div
                                     className="flex flex-col items-center space-y-2 cursor-pointer group"
@@ -915,7 +940,7 @@ export default function Home() {
                             </div>
 
                             {/* Scroll indicator */}
-                            <motion.div
+                            {/* <motion.div
                                 className="flex flex-col items-center space-y-4"
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
@@ -942,7 +967,7 @@ export default function Home() {
                                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                                     />
                                 </motion.div>
-                            </motion.div>
+                            </motion.div> */}
                         </motion.div>
                     </div>
                 </section>
@@ -1055,7 +1080,7 @@ export default function Home() {
                 </section>
 
                 {/* Student Stories - Draggable Cards */}
-                <section className="py-16 md:py-20 bg-gray-900/30 relative overflow-x-hidden max-w-screen">
+                {/* <section className="py-16 md:py-20 bg-gray-900/30 relative overflow-x-hidden max-w-screen">
                     <motion.div
                         className="text-center mb-12 md:mb-16 relative z-20 px-4"
                         initial={{ opacity: 0, y: 30 }}
@@ -1072,7 +1097,7 @@ export default function Home() {
                     </motion.div>
 
                     <DraggableTestimonials />
-                </section>
+                </section> */}
 
 
 
@@ -1150,22 +1175,24 @@ export default function Home() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 md:px-0">
-                            <motion.button
-                                className="px-8 py-3 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-colors"
+                            <motion.a
+                                href="/waitlist"
+                                className="px-8 py-3 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-colors text-center"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                             >
-                                Join Rentme
-                            </motion.button>
-                            <motion.button
-                                className="px-8 py-3 border border-white/30 text-white rounded-full text-lg font-medium hover:border-white/50 transition-colors"
+                                Join Waitlist
+                            </motion.a>
+                            <motion.a
+                                href="/auth"
+                                className="px-8 py-3 border border-white/30 text-white rounded-full text-lg font-medium hover:border-white/50 transition-colors text-center"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                             >
-                                View Listings
-                            </motion.button>
+                                Register as Agent
+                            </motion.a>
                         </div>
                     </motion.div>
                 </section>
@@ -1306,7 +1333,7 @@ export default function Home() {
                                 transition={{ duration: 0.8 }}
                                 viewport={{ once: true }}
                             >
-                                © 2024 Rentme. Connecting students with trusted accommodation across Nigeria.
+                                © 2025 Rentme. Connecting students with trusted accommodation across Nigeria.
                             </motion.p>
                         </div>
                     </div>

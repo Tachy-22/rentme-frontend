@@ -97,7 +97,7 @@ export default function HelpPage() {
             </main>
 
             <footer className="mt-20 border-t border-gray-800 py-8 text-center text-gray-500">
-                <p>© 2024 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
+                <p>© 2025 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
             </footer>
         </div>
     );

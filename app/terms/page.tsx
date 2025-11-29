@@ -23,7 +23,7 @@ export default function TermsPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Acceptance of Terms</h2>
                         <p className="text-gray-300 mb-4">
-                            By using Rentme, you agree to these terms of service and our privacy policy. 
+                            By using Rentme, you agree to these terms of service and our privacy policy.
                             These terms apply to all users of the platform.
                         </p>
                     </section>
@@ -31,7 +31,7 @@ export default function TermsPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">User Responsibilities</h2>
                         <p className="text-gray-300 mb-4">
-                            Users must provide accurate information, maintain account security, and follow 
+                            Users must provide accurate information, maintain account security, and follow
                             platform guidelines when interacting with other users.
                         </p>
                     </section>
@@ -39,7 +39,7 @@ export default function TermsPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-medium mb-4">Platform Rules</h2>
                         <p className="text-gray-300 mb-4">
-                            All listings must be accurate, users must be verified students or licensed agents, 
+                            All listings must be accurate, users must be verified students or licensed agents,
                             and transactions must comply with local laws.
                         </p>
                     </section>
@@ -60,7 +60,7 @@ export default function TermsPage() {
             </main>
 
             <footer className="mt-20 border-t border-gray-800 py-8 text-center text-gray-500">
-                <p>© 2024 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
+                <p>© 2025 Rentme. Connecting students with trusted accommodation across Nigeria.</p>
             </footer>
         </div>
     );
