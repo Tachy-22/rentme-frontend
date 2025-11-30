@@ -359,7 +359,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
 
   return (
     <div className="min-h-screen bg-background overflow-y-auto pb-[10rem]">
-      <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+      <div className="p-2 lg:p-8 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">

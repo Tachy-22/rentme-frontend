@@ -45,8 +45,7 @@ const AMENITIES = [
   'Gym', 'Pool', 'Generator', 'Water Supply', 'Cable TV', 'Furnished'
 ];
 const NIGERIAN_STATES = [
-  'Lagos', 'Abuja', 'Kano', 'Oyo', 'Rivers', 'Kaduna', 'Ogun', 'Imo', 'Plateau',
-  'Kwara', 'Anambra', 'Borno', 'Delta', 'Osun', 'Edo', 'Sokoto'
+  'Lagos', 'Ondo'
 ];
 
 export default function AddPropertyPage({ user }: AddPropertyPageProps) {
@@ -346,7 +345,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
                   </div>
 
                   <div>
-                    <Label htmlFor="price">Monthly Rent (₦) *</Label>
+                    <Label htmlFor="price">Yearly Rent (₦) *</Label>
                     <Input
                       id="price"
                       type="number"

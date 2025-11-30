@@ -14,19 +14,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  FileText, 
-  Search, 
-  Filter, 
-  Eye, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Briefcase, 
+import {
+  FileText,
+  Search,
+  Filter,
+  Eye,
+  CheckCircle,
+  XCircle,
+  Clock,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Briefcase,
   DollarSign,
   Home,
   Users,
@@ -181,9 +181,9 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
       if (result.success) {
         toast.success(`Application ${newStatus} successfully`);
         // Update local state
-        setFilteredApplications(prev => 
-          prev.map(app => 
-            app.id === applicationId 
+        setFilteredApplications(prev =>
+          prev.map(app =>
+            app.id === applicationId
               ? { ...app, status: newStatus }
               : app
           )
@@ -222,7 +222,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-6 lg:p-8">
+      <div className="p-2 lg:p-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -232,7 +232,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
                 Review and manage rental applications for your properties
               </p>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="text-sm">
                 {applications.length} Total Applications
@@ -256,7 +256,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -284,7 +284,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -361,7 +361,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
                         </div>
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-8 rounded overflow-hidden">
@@ -380,7 +380,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
                         </div>
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <Badge className={cn('capitalize', getStatusColor(application.status))}>
                         <div className="flex items-center gap-1">
@@ -389,7 +389,7 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
                         </div>
                       </Badge>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="font-medium">
                         {formatCurrency(application.employmentInfo?.monthlyIncome || 0)}
@@ -398,11 +398,11 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
                         {application.employmentInfo?.employmentStatus}
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="text-sm">{formatDate(application.submittedAt)}</div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <Dialog>
                         <DialogTrigger asChild>
@@ -629,8 +629,8 @@ export default function AgentApplicationsPage({ applications = [] }: AgentApplic
             <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <p className="text-lg text-muted-foreground mb-2">No applications found</p>
             <p className="text-sm text-muted-foreground">
-              {searchQuery || statusFilter !== 'all' 
-                ? 'Try adjusting your search or filters' 
+              {searchQuery || statusFilter !== 'all'
+                ? 'Try adjusting your search or filters'
                 : 'Applications will appear here when renters apply for your properties'
               }
             </p>

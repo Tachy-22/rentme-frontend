@@ -41,7 +41,7 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-6 lg:p-8">
+      <div className="p-2 lg:p-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold">Apply for Property</h1>
@@ -50,7 +50,7 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
             </p>
           </div>
 
-          <ApplicationFormClient 
+          <ApplicationFormClient
             user={userResult.user}
             property={property}
           />

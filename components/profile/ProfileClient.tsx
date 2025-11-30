@@ -91,7 +91,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
   };
 
   return (
-    <div className="space-y-6 p-4 md:p-6 lg:p-8 overflow-auto lg:max-w-4xl min-w-full mx-auto ">
+    <div className="space-y-6 p-4 md:p-2 lg:p-8 overflow-auto lg:max-w-4xl min-w-full mx-auto ">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl md:text-3xl font-bold">My Profile</h1>

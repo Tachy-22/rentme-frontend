@@ -17,7 +17,7 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-6 lg:p-8">
+      <div className="p-2 lg:p-8">
         <Analytics />
       </div>
     </div>

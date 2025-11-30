@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Eye, 
-  MessageCircle, 
-  FileText, 
-  TrendingUp, 
+import {
+  Eye,
+  MessageCircle,
+  FileText,
+  TrendingUp,
   TrendingDown,
   BarChart3,
   PieChart,
@@ -75,7 +75,7 @@ export default function AgentAnalyticsPage() {
     try {
       setLoading(true);
       const result = await getPropertyAnalytics();
-      
+
       if (!result.success) {
         setError(result.error || 'Failed to load analytics');
         return;
@@ -123,7 +123,7 @@ export default function AgentAnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6 lg:p-8">
+      <div className="min-h-screen bg-background p-2 lg:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -138,7 +138,7 @@ export default function AgentAnalyticsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background p-6 lg:p-8">
+      <div className="min-h-screen bg-background p-2 lg:p-8">
         <div className="max-w-4xl mx-auto">
           <Alert className="border-red-200 bg-red-50">
             <AlertDescription className="text-red-800">{error}</AlertDescription>
@@ -150,7 +150,7 @@ export default function AgentAnalyticsPage() {
 
   if (!agentAnalytics) {
     return (
-      <div className="min-h-screen bg-background p-6 lg:p-8">
+      <div className="min-h-screen bg-background p-2 lg:p-8">
         <div className="max-w-4xl mx-auto">
           <Card>
             <CardContent className="p-8 text-center">
@@ -164,7 +164,7 @@ export default function AgentAnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-2 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -259,7 +259,7 @@ export default function AgentAnalyticsPage() {
                   </h3>
                   <p className="text-muted-foreground">
                     {agentAnalytics.topPerformingProperty.location.city}
-                    {agentAnalytics.topPerformingProperty.location.area && 
+                    {agentAnalytics.topPerformingProperty.location.area &&
                       `, ${agentAnalytics.topPerformingProperty.location.area}`
                     }
                   </p>
@@ -319,10 +319,10 @@ export default function AgentAnalyticsPage() {
                   </div>
                   <div className="text-center">
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-primary h-2 rounded-full" 
-                        style={{ 
-                          width: `${Math.min((month.views / Math.max(...agentAnalytics.monthlyStats.map(m => m.views))) * 100, 100)}%` 
+                      <div
+                        className="bg-primary h-2 rounded-full"
+                        style={{
+                          width: `${Math.min((month.views / Math.max(...agentAnalytics.monthlyStats.map(m => m.views))) * 100, 100)}%`
                         }}
                       ></div>
                     </div>
@@ -355,12 +355,12 @@ export default function AgentAnalyticsPage() {
                         </div>
                         <p className="text-sm text-muted-foreground">
                           {property.location.city}
-                          {property.location.area && `, ${property.location.area}`} • 
-                          {formatCurrency(property.price.amount)} • 
+                          {property.location.area && `, ${property.location.area}`} •
+                          {formatCurrency(property.price.amount)} •
                           {property.daysListed} days listed
                         </p>
                       </div>
-                      
+
                       <div className="grid grid-cols-4 gap-4 text-center lg:text-left">
                         <div>
                           <div className="flex items-center gap-1 justify-center lg:justify-start">
@@ -369,7 +369,7 @@ export default function AgentAnalyticsPage() {
                           </div>
                           <div className="text-xs text-muted-foreground">Views</div>
                         </div>
-                        
+
                         <div>
                           <div className="flex items-center gap-1 justify-center lg:justify-start">
                             <MessageCircle className="h-4 w-4 text-muted-foreground" />
@@ -377,7 +377,7 @@ export default function AgentAnalyticsPage() {
                           </div>
                           <div className="text-xs text-muted-foreground">Inquiries</div>
                         </div>
-                        
+
                         <div>
                           <div className="flex items-center gap-1 justify-center lg:justify-start">
                             <FileText className="h-4 w-4 text-muted-foreground" />
@@ -385,7 +385,7 @@ export default function AgentAnalyticsPage() {
                           </div>
                           <div className="text-xs text-muted-foreground">Applications</div>
                         </div>
-                        
+
                         <div>
                           <div className="flex items-center gap-1 justify-center lg:justify-start">
                             {property.conversionRate >= 2 ? (

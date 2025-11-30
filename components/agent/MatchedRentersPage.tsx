@@ -60,7 +60,7 @@ export default function MatchedRentersPage() {
     try {
       setLoading(true);
       const result = await getMatchedRenters();
-      
+
       if (!result.success) {
         if (result.error === 'VERIFICATION_REQUIRED') {
           setIsVerificationRequired(true);
@@ -84,7 +84,7 @@ export default function MatchedRentersPage() {
     try {
       setContactingRenter(renterId);
       const result = await createConversation({ participantId: renterId });
-      
+
       if (result.success && result.conversationId) {
         router.push(`/agent/messages?conversation=${result.conversationId}`);
       } else {
@@ -115,7 +115,7 @@ export default function MatchedRentersPage() {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) return 'Today';
     if (diffDays <= 7) return `${diffDays} days ago`;
     if (diffDays <= 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
@@ -124,7 +124,7 @@ export default function MatchedRentersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6 lg:p-8">
+      <div className="min-h-screen bg-background p-2 lg:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -139,7 +139,7 @@ export default function MatchedRentersPage() {
 
   if (isVerificationRequired) {
     return (
-      <div className="min-h-screen bg-background p-6 lg:p-8">
+      <div className="min-h-screen bg-background p-2 lg:p-8">
         <div className="max-w-4xl mx-auto">
           <Alert className="border-amber-200 bg-amber-50">
             <Shield className="h-4 w-4 text-amber-600" />
@@ -147,7 +147,7 @@ export default function MatchedRentersPage() {
               <div className="space-y-4">
                 <p className="font-medium">Verification Required</p>
                 <p>To access matched renters and connect with verified students, you need to complete your agent verification process.</p>
-                <Button 
+                <Button
                   onClick={() => router.push('/agent/verification')}
                   className="bg-amber-600 hover:bg-amber-700"
                 >
@@ -162,7 +162,7 @@ export default function MatchedRentersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6 lg:p-8">
+    <div className="min-h-screen bg-background p-2 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -205,7 +205,7 @@ export default function MatchedRentersPage() {
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">No matched renters found</h3>
                 <p className="text-muted-foreground">
-                  {searchTerm 
+                  {searchTerm
                     ? 'Try adjusting your search criteria'
                     : 'Check back later for new matches or add more properties to improve matching'
                   }

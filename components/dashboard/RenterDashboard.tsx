@@ -43,15 +43,16 @@ interface RenterDashboardProps {
 }
 
 export default function RenterDashboard({ user, stats, recentActivities = [], recommendedProperties = [] }: RenterDashboardProps) {
-  const renterProfile = user as unknown as RenterProfile;
-  const isVerified = renterProfile?.verificationStatus || false;
+  const renterProfile = user?.profile as unknown as RenterProfile;
+  console.log({renterProfile})
+  const isVerified = renterProfile.verificationStatus || false;
   const [showVerificationBanner, setShowVerificationBanner] = useState(!isVerified);
 console.log({renterProfile, user})
   return (
     <div className="space-y-8 p-6 overflow-auto">
       {/* Welcome Section - No Card */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">
+        <h1 className="text-xl lg:text-3xl font-bold text-foreground">
           Welcome back, {renterProfile?.firstName}!
         </h1>
       </div>
@@ -96,9 +97,9 @@ console.log({renterProfile, user})
       {/* Recommended Properties */}
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-row items-center justify-between">
+        {/* <div className="flex flex-row items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-muted-foreground">Recommended for You</h2>
+            <h2 className="text-lg lg:text-2xl font-bold text-muted-foreground">Recommended for You</h2>
             <p className="text-muted-foreground mt-1">Properties that match your preferences</p>
           </div>
           <Button variant="outline" asChild>
@@ -107,7 +108,7 @@ console.log({renterProfile, user})
               <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </Button>
-        </div>
+        </div> */}
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

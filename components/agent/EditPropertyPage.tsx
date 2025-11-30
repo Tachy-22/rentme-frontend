@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
+import {
   ArrowLeft,
   ArrowRight,
   Upload,
@@ -40,7 +40,7 @@ interface EditPropertyPageProps {
 
 const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
 const AMENITIES = [
-  'WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 'Security', 
+  'WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 'Security',
   'Gym', 'Pool', 'Generator', 'Water Supply', 'Cable TV', 'Furnished'
 ];
 const NIGERIAN_STATES = [
@@ -51,7 +51,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     // Step 1: Basic Details
     title: property.title || '',
@@ -62,7 +62,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
     address: property.location?.address || '',
     city: property.location?.city || '',
     state: property.location?.state || '',
-    
+
     // Step 2: Property Details
     bedrooms: property.details?.bedrooms?.toString() || '1',
     bathrooms: property.details?.bathrooms?.toString() || '1',
@@ -72,7 +72,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
     availableFrom: property.details.availableFrom || '',
     leaseDurationMin: property.details.leaseDuration?.min?.toString() || '6',
     leaseDurationMax: property.details.leaseDuration?.max?.toString() || '12',
-    
+
     // Step 3: Images & Description
     description: property.description || '',
     amenities: property.amenities || [],
@@ -124,12 +124,12 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
     if (e.target.files) {
       const newImages = Array.from(e.target.files);
       const totalImages = formData.existingImages.length + formData.newImages.length + newImages.length - formData.imagesToRemove.length;
-      
+
       if (totalImages > 5) {
         toast.error('Maximum 5 images allowed');
         return;
       }
-      
+
       setFormData(prev => ({
         ...prev,
         newImages: [...prev.newImages, ...newImages]
@@ -208,7 +208,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
         propertyId: property.id,
         updates
       });
-      
+
       if (result.success) {
         toast.success('Property updated successfully!');
         router.push('/agent/properties');
@@ -231,7 +231,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-6 lg:p-8 max-w-4xl mx-auto">
+      <div className="p-2 lg:p-8 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Button variant="ghost" asChild className="mb-4">
@@ -254,7 +254,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
               const Icon = step.icon;
               const isActive = currentStep === step.number;
               const isCompleted = currentStep > step.number;
-              
+
               return (
                 <div key={step.number} className="flex items-center">
                   <div className={`flex items-center gap-2 ${isActive ? 'text-primary' : isCompleted ? 'text-green-600' : 'text-muted-foreground'}`}>
@@ -362,7 +362,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {[1,2,3,4,5].map(num => (
+                        {[1, 2, 3, 4, 5].map(num => (
                           <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
                         ))}
                       </SelectContent>
@@ -376,7 +376,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {[1,2,3,4,5].map(num => (
+                        {[1, 2, 3, 4, 5].map(num => (
                           <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
                         ))}
                       </SelectContent>
@@ -423,7 +423,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {[3,6,9,12,18,24].map(num => (
+                          {[3, 6, 9, 12, 18, 24].map(num => (
                             <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
                           ))}
                         </SelectContent>
@@ -434,7 +434,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {[6,12,18,24,36].map(num => (
+                          {[6, 12, 18, 24, 36].map(num => (
                             <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
                           ))}
                         </SelectContent>
@@ -471,7 +471,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
 
                 <div>
                   <Label>Property Images * (Max 5)</Label>
-                  
+
                   {/* Existing Images */}
                   {formData.existingImages.filter(img => !formData.imagesToRemove.includes(img.url)).length > 0 && (
                     <div className="mt-2">
@@ -480,26 +480,26 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
                         {formData.existingImages
                           .filter(img => !formData.imagesToRemove.includes(img.url))
                           .map((image, index) => (
-                          <div key={index} className="relative group">
-                            <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                              <Image
-                                src={image.url}
-                                alt={`Property image ${index + 1}`}
-                                width={200}
-                                height={150}
-                                className="w-full h-full object-cover"
-                              />
+                            <div key={index} className="relative group">
+                              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+                                <Image
+                                  src={image.url}
+                                  alt={`Property image ${index + 1}`}
+                                  width={200}
+                                  height={150}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => removeExistingImage(image.url)}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => removeExistingImage(image.url)}
-                            >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
                   )}
