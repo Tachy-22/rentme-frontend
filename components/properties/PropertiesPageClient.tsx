@@ -47,7 +47,7 @@ interface PropertiesPageClientProps {
   initialProperties?: Property[];
 }
 
-const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
+const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge', 'self con.', '2 bed room'];
 const AMENITIES = ['WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 'Security', 'Gym', 'Pool'];
 const NIGERIAN_CITIES = ['Lagos', 'Abuja', 'Ondo', 'Ibadan', ];
 

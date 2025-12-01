@@ -1,6 +1,6 @@
 export type UserRole = 'renter' | 'agent' | 'admin' | 'super_admin';
 
-export type PropertyType = 'self con.' | '2 bed room' | 'room' | 'studio' | 'shared' | 'shared_room' | 'lodge';
+export type PropertyType = 'house'|'apartment'|'self con.' | '2 bed room' | 'room' | 'studio' | 'shared' | 'shared_room' | 'lodge';
 
 export type PropertyStatus = 'available' | 'rented' | 'pending' | 'maintenance';
 

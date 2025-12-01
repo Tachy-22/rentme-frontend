@@ -270,6 +270,9 @@ export default function PropertyManagement() {
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <option value="all">All Types</option>
+                            <option value="2 bed room">2 Bed room</option>
+                            <option value="self con.">Self contained</option>
+
               <option value="apartment">Apartment</option>
               <option value="house">House</option>
               <option value="room">Room</option>

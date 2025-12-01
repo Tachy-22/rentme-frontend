@@ -137,6 +137,7 @@ export default function MessagesPage({
 
       if (result.success && result.conversationId) {
         setSelectedConversation(result.conversationId as string);
+        setShowConversations(false); // Hide conversations list on mobile to show chat
         loadConversations();
         // Clear URL parameters
         router.replace('/messages', { scroll: false });
