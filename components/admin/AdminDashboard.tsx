@@ -110,7 +110,7 @@ export default function AdminDashboard({ user }: AdminDashboardProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-2 lg:p-8 space-y-6">
+      <div className="p-0 lg:p-8 space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-muted-foreground">Manage and monitor the RentMe platform</p>

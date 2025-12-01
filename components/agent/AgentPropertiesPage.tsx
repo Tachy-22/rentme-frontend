@@ -138,9 +138,9 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
 
   return (
     <div className="min-h-screen bg-background overflow-auto ">
-      <div className="p-2 lg:p-8">
+      <div className="p-0 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 lg:gap-0 lg:flex-row  lg:items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">My Properties</h1>
             <p className="text-muted-foreground">
@@ -171,32 +171,32 @@ export default function AgentPropertiesPage({ user, properties = [] }: AgentProp
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
           <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold">{properties.length}</div>
+            <CardContent className="p-4 justify-center items-center lg:items-start lg:justify-start flex flex-col" >
+              <div className="text-2xl font-bold w-fit mx-auto ">{properties.length}</div>
               <div className="text-sm text-muted-foreground">Total Properties</div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold">
+            <CardContent className="p-4 justify-center items-center lg:items-start lg:justify-start flex flex-col" >
+              <div className="text-2xl font-bold w-fit mx-auto">
                 {properties.filter(p => p.status === 'available').length}
               </div>
               <div className="text-sm text-muted-foreground">Available</div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold">
+            <CardContent className="p-4 justify-center items-center lg:items-start lg:justify-start flex flex-col" >
+              <div className="text-2xl font-bold w-fit mx-auto">
                 {properties.reduce((sum, p) => sum + p.viewCount, 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Views</div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="text-2xl font-bold">
+            <CardContent className="p-4 justify-center items-center lg:items-start lg:justify-start flex flex-col" >
+              <div className="text-2xl font-bold w-fit mx-auto">
                 {properties.reduce((sum, p) => sum + (p.inquiries || 0), 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Inquiries</div>

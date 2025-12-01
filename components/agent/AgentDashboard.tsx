@@ -92,10 +92,10 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-2 lg:p-8">
+      <div className="p-0 lg:p-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-4 lg;gap-0">
             <div>
               {/* <h1 className="text-3xl font-bold">Dashboard</h1> */}
               <p className="text-muted-foreground">
@@ -112,7 +112,7 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
 
           {!isVerified && (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center  gap-2">
                 <Shield className="w-5 h-5 text-yellow-600" />
                 <span className="font-medium text-yellow-800">Verification Required</span>
               </div>
@@ -130,12 +130,12 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <Home className="w-6 h-6 text-blue-600" />
+            <CardContent className=" lg:p-6">
+              <div className="flex flex-col justify-center lg:justify-start lg:flex-row  lg:items-center gap-4 ">
+                <div className="p-3 hidden lg:block bg-blue-100 rounded-lg">
+                  <Home className="w-6 h-6  text-blue-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{dashboardStats.totalProperties}</p>
@@ -146,10 +146,10 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <MessageCircle className="w-6 h-6 text-green-600" />
+            <CardContent className=" lg:p-6">
+              <div className="flex flex-col justify-center lg:justify-start lg:flex-row  lg:items-center gap-4 ">
+                <div className="p-3 hidden lg:block bg-green-100 rounded-lg">
+                  <MessageCircle className="w-6 h-6  text-green-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{dashboardStats.totalInquiries}</p>
@@ -160,10 +160,10 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <FileText className="w-6 h-6 text-purple-600" />
+            <CardContent className=" lg:p-6">
+              <div className="flex items-center  gap-4">
+                <div className="p-3 hidden lg:block bg-purple-100 rounded-lg">
+                  <FileText className="w-6 h-6  text-purple-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{dashboardStats.applications}</p>
@@ -174,10 +174,10 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-orange-100 rounded-lg">
-                  <TrendingUp className="w-6 h-6 text-orange-600" />
+            <CardContent className=" lg:p-6">
+              <div className="flex items-center  gap-4">
+                <div className="p-3 hidden lg:block bg-orange-100 rounded-lg">
+                  <TrendingUp className="w-6 h-6  text-orange-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{dashboardStats.totalViews}</p>
@@ -217,7 +217,7 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
                       <div className="flex-1">
                         <p className="font-medium">{activity.title}</p>
                         <p className="text-sm text-muted-foreground">{activity.description}</p>
-                        <div className="flex items-center gap-1 mt-1">
+                        <div className="flex items-center  gap-1 mt-1">
                           <Clock className="w-3 h-3 text-muted-foreground" />
                           <span className="text-xs text-muted-foreground">
                             {getRelativeTime(activity.timestamp)}
@@ -259,12 +259,12 @@ export default function AgentDashboard({ user, stats, recentActivities = [] }: A
                   View Messages
                 </Link>
               </Button>
-              <Button variant="outline" className="w-full justify-start" asChild>
+              {/* <Button variant="outline" className="w-full justify-start" asChild>
                 <Link href="/agent/applications">
                   <FileText className="w-4 h-4 mr-2" />
                   Review Applications
                 </Link>
-              </Button>
+              </Button> */}
               <Button variant="outline" className="w-full justify-start" asChild>
                 <Link href="/agent/renters">
                   <Users className="w-4 h-4 mr-2" />

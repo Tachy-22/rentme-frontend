@@ -21,26 +21,34 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 
 const navigation = [
   { name: 'Dashboard', href: '/agent/dashboard', icon: Home },
   { name: 'Listings', href: '/agent/properties', icon: Building2 },
-  { name: 'Applications', href: '/agent/applications', icon: FileText },
+  // { name: 'Applications', href: '/agent/applications', icon: FileText },
   { name: 'Messages', href: '/agent/messages', icon: MessageCircle },
   { name: 'Matched Renters', href: '/agent/renters', icon: Users },
   { name: 'Analytics', href: '/agent/analytics', icon: BarChart3 },
-  { name: 'Profile', href: '/agent/profile', icon: User },
+  // { name: 'Profile', href: '/agent/profile', icon: User },
 ];
 
 export default function AgentNavigation() {
   const pathname = usePathname();
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
 
   return (
     <Sidebar>
       <SidebarHeader>
-        <Link href="/agent/dashboard" className="flex items-center space-x-2 px-2">
+        <Link href="/agent/dashboard" className="flex items-center space-x-2 px-2" onClick={handleNavClick}>
           <img 
             src="/logo-white.png" 
             alt="RentMe Logo" 
@@ -60,7 +68,7 @@ export default function AgentNavigation() {
               return (
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild isActive={isActive}>
-                    <Link href={item.href}>
+                    <Link href={item.href} onClick={handleNavClick}>
                       <Icon className="w-5 h-5" />
                       <span>{item.name}</span>
                     </Link>
@@ -71,7 +79,7 @@ export default function AgentNavigation() {
             
             <SidebarMenuItem>
               <SidebarMenuButton asChild variant="outline">
-                <Link href="/agent/properties/new">
+                <Link href="/agent/properties/new" onClick={handleNavClick}>
                   <Plus className="w-5 h-5" />
                   <span>Add New Listing</span>
                 </Link>

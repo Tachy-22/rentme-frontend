@@ -70,9 +70,9 @@ export default function AppHeader({ userRole }: AppHeaderProps) {
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
       <div className="flex items-center gap-3">
         <SidebarTrigger />
-        <div>
+        {/* <div>
           <h1 className="text-xl font-semibold">{getPageTitle()}</h1>
-        </div>
+        </div> */}
       </div>
 
       <div className="flex items-center gap-4">
@@ -88,7 +88,7 @@ export default function AppHeader({ userRole }: AppHeaderProps) {
         {userRole === 'agent' && !isVerified && (
           <Button size="sm" variant="outline" asChild>
             <Link href="/agent/verification">
-              <Shield className="w-4 h-4 mr-2" />
+              <Shield className="w-4 h-4 mr-2 lg:block hidden" />
               Get Verified
             </Link>
           </Button>
@@ -133,18 +133,22 @@ export default function AppHeader({ userRole }: AppHeaderProps) {
               </div>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href={`/${userRole}/profile`} className="flex items-center">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={`/${userRole}/settings`} className="flex items-center">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </Link>
-            </DropdownMenuItem>
+            {userRole === 'admin' && (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link href={`/${userRole}/profile`} className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href={`/${userRole}/settings`} className="flex items-center">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+              </>
+            )}
             {userRole === 'agent' && !isVerified && (
               <DropdownMenuItem asChild>
                 <Link href="/agent/verification" className="flex items-center">

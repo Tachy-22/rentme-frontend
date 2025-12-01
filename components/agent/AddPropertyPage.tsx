@@ -39,7 +39,7 @@ interface AddPropertyPageProps {
   user: User;
 }
 
-const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
+const PROPERTY_TYPES: PropertyType[] = ['self con.', '2 bed room', 'room', 'lodge'];
 const AMENITIES = [
   'WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 'Security',
   'Gym', 'Pool', 'Generator', 'Water Supply', 'Cable TV', 'Furnished'
@@ -62,7 +62,7 @@ export default function AddPropertyPage({ user }: AddPropertyPageProps) {
     type: '' as PropertyType,
     price: '',
     currency: 'NGN',
-    period: 'monthly',
+    period: 'yearly',
     address: '',
     city: '',
     state: '',

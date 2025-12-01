@@ -19,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
+import {
   Upload,
   CheckCircle,
   Clock,
@@ -110,7 +110,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (verificationStatus.status === 'pending' && verificationData) {
       toast.error('Verification request already submitted');
       return;
@@ -140,7 +140,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
         toast.error('Please fill in all required fields');
         return;
       }
-      
+
       // Check file sizes
       if (formData.studentId && formData.studentId.size > maxSizeBytes) {
         toast.error(`Student ID file is too large: ${formatFileSize(formData.studentId.size)}. Maximum allowed: 5MB`);
@@ -159,7 +159,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
         toast.error('Please fill in all required fields');
         return;
       }
-      
+
       // Check file sizes
       if (formData.cacCertificate && formData.cacCertificate.size > maxSizeBytes) {
         toast.error(`CAC certificate file is too large: ${formatFileSize(formData.cacCertificate.size)}. Maximum allowed: 5MB`);
@@ -225,7 +225,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
     if (verificationStatus.status === 'pending' && !verificationData) {
       return <AlertCircle className="w-5 h-5 text-gray-600" />;
     }
-    
+
     switch (verificationStatus.status) {
       case 'verified':
         return <CheckCircle className="w-5 h-5 text-green-600" />;
@@ -243,7 +243,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
     if (verificationStatus.status === 'pending' && !verificationData) {
       return `Get verified to unlock ${user.role === 'renter' ? 'unlimited messaging and priority support' : 'unlimited listings and premium features'}.`;
     }
-    
+
     switch (verificationStatus.status) {
       case 'verified':
         return 'Your account is verified! You have full access to all platform features.';
@@ -298,7 +298,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
           onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
           className="hidden"
         />
-        
+
         {file ? (
           <div className="border rounded-lg p-4 space-y-3">
             {file.type.startsWith('image/') && (
@@ -310,7 +310,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
                 />
               </div>
             )}
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-gray-500" />
@@ -328,7 +328,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
                 Remove
               </Button>
             </div>
-            
+
             <Button
               type="button"
               variant="outline"
@@ -359,12 +359,12 @@ export default function VerificationPage({ user }: VerificationPageProps) {
 
   return (
     <div className="min-h-screen bg-background overflow-y-auto pb-[10rem]">
-      <div className="p-2 lg:p-8 max-w-4xl mx-auto">
+      <div className="p-0 lg:p-8 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="sm"
               onClick={() => {
                 if (typeof window !== 'undefined' && window.history.length > 1) {
@@ -401,7 +401,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
               </div>
             </div>
           </CardHeader>
-          
+
           {verificationStatus.status === 'pending' && verificationData && (
             <CardContent>
               <div className="space-y-2">
@@ -424,7 +424,7 @@ export default function VerificationPage({ user }: VerificationPageProps) {
                 Submit Verification Documents
               </CardTitle>
               <CardDescription>
-                {user.role === 'renter' 
+                {user.role === 'renter'
                   ? 'Upload your student ID or admission letter to verify your student status'
                   : 'Upload your business documents to verify your agency'
                 }

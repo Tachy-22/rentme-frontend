@@ -233,12 +233,12 @@ export default function PropertyDetailsPage({ property }: PropertyDetailsPagePro
                   Send Message
                 </Link>
               </Button>
-              <Button variant="outline" className="w-full" asChild>
+              {/* <Button variant="outline" className="w-full" asChild>
                 <Link href={`/apply/${property.id}`}>
                   <FileText className="w-4 h-4 mr-2" />
                   Apply Now
                 </Link>
-              </Button>
+              </Button> */}
             </div>
           </div>
 
@@ -259,8 +259,8 @@ export default function PropertyDetailsPage({ property }: PropertyDetailsPagePro
               <div className="space-y-1">
                 <span className="text-sm font-medium text-gray-600">Available From:</span>
                 <p className="font-medium">
-                  {property.details?.availableFrom ?
-                    new Date(property.details.availableFrom).toLocaleDateString() :
+                  {property.availableFrom ?
+                    new Date(property.availableFrom).toLocaleDateString() :
                     'Not specified'
                   }
                 </p>
@@ -270,7 +270,7 @@ export default function PropertyDetailsPage({ property }: PropertyDetailsPagePro
                 <p className="font-medium">
                   {property.details?.leaseDuration ?
                     `${property.details.leaseDuration.min}-${property.details.leaseDuration.max} ${property.details.leaseDuration.unit}` :
-                    'Not specified'
+                    '12 months'
                   }
                 </p>
               </div>
@@ -369,17 +369,17 @@ export default function PropertyDetailsPage({ property }: PropertyDetailsPagePro
                   Send Message
                 </Link>
               </Button>
-              <Button variant="outline" className="w-full" asChild>
+              {/* <Button variant="outline" className="w-full" asChild>
                 <Link href={`/apply/${property.id}`}>
                   <FileText className="w-4 h-4 mr-2" />
                   Apply Now
                 </Link>
-              </Button>
+              </Button> */}
             </div>
           </div>
 
           {/* Nearby Places */}
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <h2 className="text-lg font-semibold">Nearby Places</h2>
             <div className="space-y-3">
               {property.nearbyPlaces?.length && property.nearbyPlaces?.length > 0 ? property.nearbyPlaces.map((place: { name: string; distance: string; type: string }, index: number) => (
@@ -394,7 +394,7 @@ export default function PropertyDetailsPage({ property }: PropertyDetailsPagePro
                 <div className="text-sm text-muted-foreground">No nearby places listed</div>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

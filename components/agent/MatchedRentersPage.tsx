@@ -124,7 +124,7 @@ export default function MatchedRentersPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-2 lg:p-8">
+      <div className="min-h-screen bg-background p-0 lg:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -139,7 +139,7 @@ export default function MatchedRentersPage() {
 
   if (isVerificationRequired) {
     return (
-      <div className="min-h-screen bg-background p-2 lg:p-8">
+      <div className="min-h-screen bg-background p-0 lg:p-8">
         <div className="max-w-4xl mx-auto">
           <Alert className="border-amber-200 bg-amber-50">
             <Shield className="h-4 w-4 text-amber-600" />
@@ -162,7 +162,7 @@ export default function MatchedRentersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-2 lg:p-8">
+    <div className="min-h-screen bg-background p-0 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>

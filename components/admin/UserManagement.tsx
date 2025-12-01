@@ -9,14 +9,14 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  User, 
-  CheckCircle, 
-  XCircle, 
-  Shield, 
+import {
+  Users,
+  Search,
+  Filter,
+  User,
+  CheckCircle,
+  XCircle,
+  Shield,
   UserCheck,
   UserX,
   Trash2,
@@ -27,6 +27,7 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { getAllUsers, updateUserStatus, deleteUser } from '@/actions/admin/userManagement';
+import { AgentProfile, RenterProfile } from '@/types';
 
 interface User {
   id: string;
@@ -91,7 +92,7 @@ export default function UserManagement() {
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(user => 
+      filtered = filtered.filter(user =>
         user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.profile?.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.profile?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -195,22 +196,22 @@ export default function UserManagement() {
     }
   };
 
-  const getUserName = (user: User) => {
-    return user.profile?.fullName || 
-           (user.profile?.firstName && user.profile?.lastName 
-             ? `${user.profile.firstName} ${user.profile.lastName}` 
-             : 'Unknown User');
+  const getUserName = (user: AgentProfile | RenterProfile) => {
+    return user?.firstName ||
+      (user?.firstName && user?.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : 'Unknown User');
   };
 
   const getStatusBadge = (user: User) => {
     if (user.isActive === false) {
       return <Badge variant="destructive">Suspended</Badge>;
     }
-    
+
     if (user.profile?.verificationStatus === 'verified') {
       return <Badge variant="default" className="bg-green-100 text-green-800">Verified</Badge>;
     }
-    
+
     return <Badge variant="secondary">Active</Badge>;
   };
 
@@ -308,7 +309,7 @@ export default function UserManagement() {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium">{getUserName(user)}</span>
+                        <span className="font-medium">{getUserName(user as RenterProfile | AgentProfile)}</span>
                         {getStatusBadge(user)}
                         <Badge variant="outline" className="capitalize text-xs">
                           {user.role}
@@ -320,7 +321,7 @@ export default function UserManagement() {
                           <Mail className="w-3 h-3" />
                           {user.email}
                         </div>
-                        
+
                         {user.profile?.phone && (
                           <div className="flex items-center gap-1">
                             <Phone className="w-3 h-3" />
@@ -406,7 +407,7 @@ export default function UserManagement() {
           <DialogHeader>
             <DialogTitle>Suspend User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to suspend {selectedUser ? getUserName(selectedUser) : 'this user'}?
+              Are you sure you want to suspend {selectedUser ? getUserName(selectedUser as RenterProfile | AgentProfile) : 'this user'}?
               This action will prevent them from accessing the platform.
             </DialogDescription>
           </DialogHeader>
@@ -443,7 +444,7 @@ export default function UserManagement() {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to permanently delete {selectedUser ? getUserName(selectedUser) : 'this user'}?
+              Are you sure you want to permanently delete {selectedUser ? getUserName(selectedUser as RenterProfile | AgentProfile) : 'this user'}?
               This action cannot be undone and will remove all their data.
             </DialogDescription>
           </DialogHeader>

@@ -340,7 +340,7 @@ export default function MessagesPage({
                       <h3 className="font-semibold text-base md:text-lg truncate">{selectedConv.otherParticipant?.name}</h3>
                       <div className="hidden sm:flex items-center gap-1">
                         <Shield className="w-3 h-3" />
-                        <Badge
+                        {/* <Badge
                           className={cn(
                             "text-xs",
                             getVerificationStatus(selectedConv.otherParticipant as unknown as User).bgColor,
@@ -348,7 +348,7 @@ export default function MessagesPage({
                           )}
                         >
                           {getVerificationStatus(selectedConv.otherParticipant as unknown as User).status}
-                        </Badge>
+                        </Badge> */}
                       </div>
                     </div>
 
@@ -362,9 +362,9 @@ export default function MessagesPage({
                     )}
                   </div>
 
-                  <div className="text-xs md:text-sm text-muted-foreground">
+                  {/* <div className="text-xs md:text-sm text-muted-foreground">
                     {selectedConv.otherParticipant?.isOnline ? 'Online' : 'Offline'}
-                  </div>
+                  </div> */}
                 </div>
               </div>
 

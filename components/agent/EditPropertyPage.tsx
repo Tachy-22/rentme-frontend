@@ -38,7 +38,7 @@ interface EditPropertyPageProps {
   property: Property;
 }
 
-const PROPERTY_TYPES: PropertyType[] = ['apartment', 'house', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
+const PROPERTY_TYPES: PropertyType[] = ['self con.', '2 bed room', 'room', 'studio', 'shared', 'shared_room', 'lodge'];
 const AMENITIES = [
   'WiFi', 'Parking', 'Kitchen', 'Air Conditioning', 'Laundry', 'Security',
   'Gym', 'Pool', 'Generator', 'Water Supply', 'Cable TV', 'Furnished'
@@ -58,7 +58,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
     type: property.type as PropertyType || '',
     price: property.price?.amount?.toString() || '',
     currency: property.price?.currency || 'NGN',
-    period: property.price?.period || 'monthly',
+    period: property.price?.period || 'yearly',
     address: property.location?.address || '',
     city: property.location?.city || '',
     state: property.location?.state || '',
@@ -231,7 +231,7 @@ export default function EditPropertyPage({ user, property }: EditPropertyPagePro
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="p-2 lg:p-8 max-w-4xl mx-auto">
+      <div className="p-0 lg:p-8 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <Button variant="ghost" asChild className="mb-4">
