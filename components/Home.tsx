@@ -430,8 +430,8 @@ export default function Home() {
                     </NavbarLogo>
                     <NavItems items={navItems} />
                     <div className="flex items-center gap-4 ">
-                        <NavbarButton variant="gradient" href="/waitlist">Join Waitlist</NavbarButton>
-                        <NavbarButton variant="primary" href="/auth">Register as Agent</NavbarButton>
+                        <NavbarButton variant="gradient" href="/auth">Sign up</NavbarButton>
+                        <NavbarButton variant="primary" href="/auth">Log in</NavbarButton>
                     </div>
                 </NavBody>
 
@@ -473,9 +473,9 @@ export default function Home() {
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         variant="secondary"
                                         className="w-full bg-gray-100 hover:bg-gray-200 border-gray-300 !text-black"
-                                        href="/waitlist"
+                                        href="/auth"
                                     >
-                                        Join Waitlist
+                                        Sign up
                                     </NavbarButton>
                                     <NavbarButton
                                         onClick={() => setIsMobileMenuOpen(false)}
@@ -483,8 +483,7 @@ export default function Home() {
                                         className="w-full bg-orange-500 hover:bg-orange-600 text-white border-orange-500"
                                         href="/auth"
                                     >
-                                        Register as Agent
-                                    </NavbarButton>
+                                        Log in                                    </NavbarButton>
                                 </div>
                             </div>
                         </div>
@@ -582,12 +581,12 @@ export default function Home() {
                                 transition={{ delay: 1.4, duration: 0.8 }}
                             >
                                 <motion.a
-                                    href="/waitlist"
+                                    href="/auth"
                                     className="px-5 py-2 md:px-6 md:py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full text-sm md:text-base font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 text-center shadow-lg"
                                     whileTap={{ scale: 0.95 }}
                                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 >
-                                    Join Student Waitlist
+                                    Sign up
                                 </motion.a>
                                 <motion.a
                                     href="/auth"
@@ -595,8 +594,7 @@ export default function Home() {
                                     whileTap={{ scale: 0.95 }}
                                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 >
-                                 Register as Agent
-                                </motion.a>
+                                    Log in                                </motion.a>
                             </motion.div>
 
                             {/* Enhanced scroll indicator */}
@@ -1178,13 +1176,13 @@ export default function Home() {
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 md:px-0">
                             <motion.a
-                                href="/waitlist"
+                                href="/auth"
                                 className="px-8 py-3 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-colors text-center"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                             >
-                                Join Waitlist
+                                Sign up
                             </motion.a>
                             <motion.a
                                 href="/auth"
@@ -1193,7 +1191,7 @@ export default function Home() {
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
                             >
-                                Register as Agent
+                                Log in
                             </motion.a>
                         </div>
                     </motion.div>
